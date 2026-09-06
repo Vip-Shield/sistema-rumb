@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Manual POP RUMB</title>
+    <link rel="shortcut icon" type="imagex/png" href="../IMAGENS/caveira.ico">
+
+    <style>
+        /* --- ESTÉTICA PMERJ (Azul e Dourado) --- */
+        :root {
+            --cor-fundo: #00153B;
+            --cor-card: #F4F4F4;
+            --cor-destaque: #FFD700;
+            --cor-texto: #333;
+            --cor-botao: #00205b;
+            --cor-alerta: #c82333;
+            --cor-sucesso: #28a745;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--cor-fundo);
+            color: white;
+            margin: 0;
+            padding-bottom: 40px;
+        }
+
+        /* --- CABEÇALHO INSTITUCIONAL (Rola normalmente) --- */
+        .header-pmerj {
+            background: linear-gradient(to bottom, #00205b, #001030);
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between; /* LOGOS NAS PONTAS */
+            border-bottom: 1px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .logo-brasao {
+            height: 75px;
+            width: auto;
+            filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.5));
+            transition: transform 0.2s;
+        }
+        
+        /* Ajuste para telas pequenas: Logos diminuem */
+        @media (max-width: 600px) {
+            .logo-brasao { height: 50px; }
+            .titulo-sistema { font-size: 1rem !important; }
+            .subtitulo { display: none; }
+        }
+
+        .titulo-container {
+            flex-grow: 1;
+            text-align: center;
+            padding: 0 10px;
+        }
+
+        .titulo-sistema {
+            font-size: 1.4rem;
+            font-weight: 900;
+            color: var(--cor-destaque);
+            text-transform: uppercase;
+            margin: 0;
+            text-shadow: 1px 1px 2px black;
+        }
+        
+        .subtitulo {
+            font-size: 0.8rem;
+            opacity: 0.9;
+            margin: 0;
+            color: #ddd;
+            letter-spacing: 2px;
+            margin-top: 5px;
+        }
+
+        /* --- ÁREA DE CONTROLES (STICKY - Fixa ao rolar) --- */
+        .controles-fixos {
+            position: sticky; /* O Segredo do "fixar a partir daqui" */
+            top: 0;
+            z-index: 1000;
+            background: rgba(0, 21, 59, 0.95); /* Fundo semi-transparente */
+            backdrop-filter: blur(10px); /* Efeito de vidro */
+            padding: 15px 0;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            border-bottom: 2px solid var(--cor-destaque);
+        }
+
+        /* Barra de Busca */
+        .search-container {
+            text-align: center;
+            margin-bottom: 10px;
+            padding: 0 20px;
+        }
+
+        #inputBusca {
+            width: 100%;
+            max-width: 600px;
+            padding: 12px 20px;
+            border-radius: 30px;
+            border: 2px solid var(--cor-destaque);
+            font-size: 1rem;
+            outline: none;
+            background: white;
+            color: #333;
+            font-weight: bold;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+            transition: box-shadow 0.3s;
+        }
+        #inputBusca:focus {
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+        }
+
+        /* Botões de Categoria */
+        .categorias-container {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            padding: 0 10px;
+        }
+
+        .btn-categoria {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 6px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+        
+        .btn-categoria:hover, .btn-categoria.ativo {
+            background: var(--cor-destaque);
+            color: var(--cor-botao);
+            border-color: var(--cor-destaque);
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+        }
+
+        /* --- LISTA DE PROCEDIMENTOS --- */
+        .main-container {
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .pop-item {
+            background: var(--cor-card);
+            color: var(--cor-texto);
+            margin-bottom: 15px;
+            border-radius: 8px;
+            border-left: 6px solid var(--cor-botao);
+            overflow: hidden;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+            transition: transform 0.2s;
+        }
+
+        /* Cores diferentes para tipos de POP */
+        .pop-item.tipo-emergencia { border-left-color: var(--cor-alerta); }
+        .pop-item.tipo-rotina { border-left-color: var(--cor-botao); }
+        .pop-item.tipo-adm { border-left-color: #17a2b8; }
+
+        .pop-header {
+            padding: 15px 20px;
+            background: #fff;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #eee;
+        }
+        .pop-header:active { background: #f0f0f0; }
+
+        .pop-titulo { 
+            font-weight: 800; 
+            font-size: 1.05rem; 
+            color: var(--cor-botao); 
+            display: block;
+            margin-bottom: 4px;
+        }
+        
+        .pop-tag {
+            display: inline-block;
+            font-size: 0.65rem;
+            padding: 3px 8px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            font-weight: bold;
+            color: white;
+            letter-spacing: 0.5px;
+        }
+
+        .tag-rotina { background-color: var(--cor-botao); }
+        .tag-emergencia { background-color: var(--cor-alerta); }
+        .tag-adm { background-color: #17a2b8; }
+
+        .pop-resumo { font-size: 0.85rem; color: #666; margin-top: 5px; font-weight: 500;}
+
+        .pop-icon { 
+            font-size: 1.5rem; 
+            color: var(--cor-botao); 
+            font-weight: bold; 
+            margin-left: 15px;
+            transition: transform 0.3s;
+        }
+
+        .pop-detalhe {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-out;
+            background: #fff;
+        }
+
+        .pop-conteudo {
+            padding: 25px;
+            border-top: 1px solid #ddd;
+            line-height: 1.6;
+            font-size: 0.95rem;
+            color: #444;
+        }
+        
+        .passo { margin-bottom: 12px; display: block; position: relative; padding-left: 15px; }
+        .passo::before { content: "•"; position: absolute; left: 0; color: var(--cor-destaque); font-weight: bold; }
+        
+        .atencao { 
+            background: rgba(200, 35, 51, 0.1); 
+            color: #a01b2a; 
+            padding: 15px; 
+            border-radius: 6px; 
+            font-weight: bold;
+            margin-top: 15px;
+            border-left: 4px solid var(--cor-alerta);
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header-pmerj">
+        <a href="../dashboard.html">
+<img src="logo_pmerj.png" alt="Logo PMERJ" class="logo-brasao" onerror="this.style.display='none'" title="Voltar ao Painel"
+></a>
+        
+        <div class="titulo-container">
+            <h1 class="titulo-sistema">RUMB - POP - 3ªUPP/19ºBPM</h1>
+            <p class="subtitulo">MANUAL DE PROCEDIMENTOS OPERACIONAIS</p>
+        </div>
+        
+        <a href="../dashboard.html"><img src="escudo.png" alt="Escudo Unidade" class="logo-brasao" onerror="this.style.display='none'" title="Voltar ao Painel"></a>
+    </header>
+
+    <div class="controles-fixos">
+        <div class="search-container">
+            <input type="text" id="inputBusca" placeholder="🔍 Pesquisar procedimento..." onkeyup="filtrarLista()">
+        </div>
+
+        <div class="categorias-container">
+            <button class="btn-categoria ativo" onclick="filtrarCategoria('TODAS', this)">TODOS</button>
+            <button class="btn-categoria" onclick="filtrarCategoria('ROTINA', this)">ROTINA</button>
+            <button class="btn-categoria" onclick="filtrarCategoria('EMERGÊNCIA', this)">EMERGÊNCIA</button>
+            <button class="btn-categoria" onclick="filtrarCategoria('ADM', this)">ADMINISTRATIVO</button>
+        </div>
+    </div>
+
+    <div class="main-container" id="lista-pops">
+        </div>
+
+    <script>
+        // --- BASE DE DADOS DE PROCEDIMENTOS (POP) ---
+        const procedimentos = [
+            // --- ROTINA OPERACIONAL ---
+            {
+                titulo: "Cautela de Armamento (Retirada)",
+                categoria: "ROTINA",
+                resumo: "Procedimento diário para entrega de armamento.",
+                conteudo: `
+                    <span class="passo">Exigir a apresentação da <strong>Carteira Funcional (RG PM)</strong> física ou digital.</span>
+                    <span class="passo">Verificar a escala de serviço (Previsão do dia).</span>
+                    <span class="passo">Retirar o armamento do escaninho e apresentar ao policial para conferência visual (janela de ejeção aberta).</span>
+                    <span class="passo"><strong>INSPEÇÃO OBRIGATÓRIA:</strong> Exigir que o policial inspecione visual e fisicamente o armamento no balcão, dando o 'ciente' de que o material está apto para o serviço antes de assinar a carga.</span>
+                    <span class="passo">Entregar os carregadores e munições separadamente (na mão).</span>
+                    <span class="passo">Lançar no sistema: Tipo, Modelo, Nº Série e Quantidade de Munição.</span>
+                    <span class="passo">Colher assinatura do policial no Livro de Carga (o ato de assinar firma a responsabilidade pelas condições do material).</span>
+                    <div class="atencao">⚠️ VEDADA A CAUTELA PARA POLICIAIS EM TRAJES CIVIS SEM AUTORIZAÇÃO DO CMT.</div>
+                `
+            },
+            {
+                titulo: "Descautela de Armamento (Devolução)",
+                categoria: "ROTINA",
+                resumo: "Recebimento e conferência pós-serviço.",
+                conteudo: `
+                    <span class="passo">O Policial deve dirigir-se à <strong>Caixa de Areia</strong> e executar o golpe de segurança antes de se aproximar do guichê.</span>
+                    <span class="passo">Receber o armamento ABERTO (ferrolho à retaguarda) e SEM CARREGADOR.</span>
+                    <span class="passo">Realizar inspeção visual (limpeza, ferrugem, peças soltas).</span>
+                    <span class="passo">Conferir munição <strong>cartucho por cartucho</strong> na presença do policial.</span>
+                    <span class="passo">Dar baixa no Livro/Sistema apenas após conferência total.</span>
+                `
+            },
+            {
+                titulo: "Passagem de Serviço (Conferência Geral)",
+                categoria: "ROTINA",
+                resumo: "Troca de turno entre Armeiros.",
+                conteudo: `
+                    <span class="passo">O armeiro que assume deve conferir <strong>TODO</strong> o armamento físico da reserva (Cabide + Escaninhos).</span>
+                    <span class="passo">Confrontar a contagem física com o Livro de Carga Geral.</span>
+                    <span class="passo">Conferir as cautelas em aberto (armas na rua) verificando as assinaturas.</span>
+                    <span class="passo">Verificar estado de conservação e limpeza da reserva (chão, bancadas).</span>
+                    <span class="passo">Assinar o Livro de Parte assumindo a responsabilidade.</span>
+                    <div class="atencao">⚠️ JAMAIS ASSUMA O SERVIÇO SE HOUVER DIVERGÊNCIA NUMÉRICA (FALTA DE ARMA). COMUNIQUE IMEDIATAMENTE.</div>
+                `
+            },
+            {
+                titulo: "Cautela e Verificação de Câmera Operacional (COP)",
+                categoria: "ROTINA",
+                resumo: "Regras de acautelamento, teste de bateria e responsabilidade do Policial.",
+                conteudo: `
+                    <span class="passo"><strong>RESPONSABILIDADE DO POLICIAL:</strong> No ato da retirada, ainda no balcão da reserva, o policial é integralmente responsável por ligar a câmera, verificar o nível de bateria para o turno e atestar seu pleno funcionamento visual e sistêmico.</span>
+                    <span class="passo">Caso constate bateria insuficiente, falha de pareamento ou defeito físico, o policial deve recusar o equipamento imediatamente e solicitar a substituição ao armeiro antes de assumir o serviço.</span>
+                    <span class="passo">Ao dar o "aceite" (assinar o livro ou bipar no sistema), o policial assume o ônus da cautela e declara oficialmente que inspecionou o material e o recebeu em plenas condições operacionais.</span>
+                    <span class="passo"><strong>RESPONSABILIDADE DA RUMB:</strong> Cabe ao armeiro de serviço a função logística de garantir que, ao receber as câmeras do turno anterior, todas sejam devidamente acopladas ao Dockstation para recarga e upload seguro das imagens.</span>
+                    <span class="passo">Havendo recusa justificada do policial por falha técnica na retirada, o armeiro tem o dever de registrar a avaria no livro de alterações (ou sistema) e providenciar uma COP reserva para a guarnição.</span>
+                    <div class="atencao">⚠️ ATENÇÃO: Sair para o policiamento com a COP descarregada ou inoperante sem relato formal prévio à RUMB configura negligência (Item 40 do RDPMERJ). Em caso de Auto de Resistência ou ocorrência grave sem registro de imagem, a justificativa de "recebimento sem bateria" não possui amparo legal para afastar o policial das sanções disciplinares, administrativas ou de IPM (presunção de ocultação de provas).</div>
+                `
+            },
+            
+            // --- EMERGÊNCIAS ---
+            {
+                titulo: "Não Devolução de Armamento",
+                categoria: "EMERGÊNCIA",
+                resumo: "Policial não entrega o material bélico ao término do serviço.",
+                conteudo: `
+                    <span class="passo">Confirmar no sistema ou livro de carga a ausência da baixa do material após o término regulamentar do turno.</span>
+                    <span class="passo">Realizar tentativa de contato imediato com o policial militar ou com o comandante da sua guarnição.</span>
+                    <span class="passo">Confirmada a pendência e a não devolução, comunicar imediatamente ao Oficial de Dia ou Supervisor do turno.</span>
+                    <span class="passo">Confeccionar Parte relatando o fato, com enquadramento nos itens 40 e 45 do Anexo I do RDPMERJ e diretrizes do Bol da PM nº 045/2005.</span>
+                    <div class="atencao">⚠️ A OMISSÃO DO ARMEIRO EM RELATAR A FALTA DA ARMA NO INVENTÁRIO O SUJEITA A SANÇÕES DISCIPLINARES POR NEGLIGÊNCIA.</div>
+                `
+            },
+            {
+                titulo: "Disparo Acidental na Unidade",
+                categoria: "EMERGÊNCIA",
+                resumo: "Procedimentos para tiro acidental na caixa de areia ou reserva.",
+                conteudo: `
+                    <span class="passo"><strong>PRIORIDADE:</strong> Verificar feridos e acionar socorro médico se necessário.</span>
+                    <span class="passo">Isolar a área imediatamente. Ninguém toca na arma.</span>
+                    <span class="passo">Comunicar ao Oficial de Dia e Supervisão.</span>
+                    <span class="passo">Reter o policial e o armamento no local para perícia.</span>
+                    <span class="passo">Registrar em Livro de Parte com horário exato e rol de testemunhas.</span>
+                `
+            },
+            {
+                titulo: "Consumo de Munição (Tiro em Serviço)",
+                categoria: "EMERGÊNCIA",
+                resumo: "Policial retorna com menos munição do que saiu.",
+                conteudo: `
+                    <span class="passo">Conferir a quantidade exata de estojos deflagrados vs munição intacta trazida.</span>
+                    <span class="passo">Exigir cópia do Registro de Ocorrência (RO) ou Parte Administrativa justificando o disparo.</span>
+                    <span class="passo">Recolher os estojos deflagrados em invólucro separado (Saco de Evidência).</span>
+                    <span class="passo">Comunicar à P/4 (Logística) para reposição.</span>
+                    <div class="atencao">⚠️ É PROIBIDO O POLICIAL COMPLETAR A MUNIÇÃO DE OUTRA FONTE (PARTICULAR) PARA MASCARAR O USO.</div>
+                `
+            },
+            {
+                titulo: "Material Danificado / Avariado",
+                categoria: "EMERGÊNCIA",
+                resumo: "Arma com coronha quebrada, alça de mira solta, etc.",
+                conteudo: `
+                    <span class="passo">Não receber o material como 'Normal/Bom Estado'.</span>
+                    <span class="passo">Solicitar ao policial que faça uma <strong>Parte Administrativa</strong> justificando a avaria.</span>
+                    <span class="passo">Fotografar o dano detalhadamente.</span>
+                    <span class="passo">Separar o armamento com etiqueta 'MANUTENÇÃO' (Não recolocar na prateleira de uso).</span>
+                    <span class="passo">Lançar no livro de alterações.</span>
+                `
+            },
+            {
+                titulo: "Extravio de Material Bélico",
+                categoria: "EMERGÊNCIA",
+                resumo: "Suspeita de falta de arma ou munição na reserva.",
+                conteudo: `
+                    <span class="passo">Trancar imediatamente a porta da Reserva de Armas (Ninguém entra, ninguém sai).</span>
+                    <span class="passo">Refazer a contagem geral calmamente por duas vezes.</span>
+                    <span class="passo">Verificar livros de cautela anteriores.</span>
+                    <span class="passo">Se confirmado, acionar o Chefe da Reserva e o Oficial de Dia em caráter de urgência.</span>
+                    <span class="passo">O serviço não pode ser passado até a solução ou abertura de IPM.</span>
+                `
+            },
+
+            // --- ADMINISTRATIVO ---
+            {
+                titulo: "Falta de Energia Elétrica",
+                categoria: "ADM",
+                resumo: "Procedimento para registro manual (Livro Preto).",
+                conteudo: `
+                    <span class="passo">Iniciar imediatamente o uso do <strong>Livro de Cautela Manual</strong>.</span>
+                    <span class="passo">Anotar de forma legível: Graduação, Nome de Guerra, ID, Hora, Material (com série) e Assinatura.</span>
+                    <span class="passo">Usar lanternas de emergência para conferência visual minuciosa do material.</span>
+                    <span class="passo">Após o retorno da energia, lançar os dados no sistema com a observação: 'Lançamento Retroativo - Falta de Luz'.</span>
+                `
+            },
+            {
+                titulo: "Policial Sem Identidade (Esquecimento)",
+                categoria: "ADM",
+                resumo: "Solicitação de cautela sem documento físico.",
+                conteudo: `
+                    <span class="passo">Regra Geral: <strong>Sem documento, sem armamento.</strong></span>
+                    <span class="passo">Exceção: Solicitar a presença de um Oficial ou Graduado da guarnição para confirmar a identidade do PM.</span>
+                    <span class="passo">Verificar foto e status no Portal da PMERJ/RH (se houver internet).</span>
+                    <span class="passo">Anotar no campo de observações quem autorizou a cautela verbalmente.</span>
+                `
+            },
+            {
+                titulo: "Policial com Sinais de Embriaguez",
+                categoria: "ADM",
+                resumo: "Procedimento de segurança preventiva.",
+                conteudo: `
+                    <span class="passo">Manter a calma e a postura profissional.</span>
+                    <span class="passo"><strong>NÃO ENTREGAR O ARMAMENTO SOB NENHUMA HIPÓTESE.</strong></span>
+                    <span class="passo">Informar discretamente ao Oficial de Dia ou Supervisor.</span>
+                    <span class="passo">Aguardar a chegada do Superior para avaliar a condição do policial.</span>
+                    <div class="atencao">⚠️ A SEGURANÇA DA TROPA E DA SOCIEDADE PREVALECE SOBRE A HIERARQUIA NESTE CASO.</div>
+                `
+            }
+        ];
+
+        // --- LÓGICA DO SISTEMA ---
+        function renderizarLista(lista = procedimentos) {
+            const container = document.getElementById('lista-pops');
+            container.innerHTML = '';
+
+            if (lista.length === 0) {
+                container.innerHTML = '<div style="text-align:center; padding:40px; color:#ccc;"><h3>Nenhum procedimento encontrado.</h3></div>';
+                return;
+            }
+
+            lista.forEach((pop, index) => {
+                let classeTipo = 'tipo-rotina';
+                let classeTag = 'tag-rotina';
+                if(pop.categoria === 'EMERGÊNCIA') { classeTipo = 'tipo-emergencia'; classeTag = 'tag-emergencia'; }
+                if(pop.categoria === 'ADM') { classeTipo = 'tipo-adm'; classeTag = 'tag-adm'; }
+
+                const html = `
+                    <div class="pop-item ${classeTipo}">
+                        <div class="pop-header" onclick="togglePop(this)">
+                            <div>
+                                <span class="pop-titulo">${pop.titulo}</span>
+                                <span class="pop-tag ${classeTag}">${pop.categoria}</span>
+                                <div class="pop-resumo">${pop.resumo}</div>
+                            </div>
+                            <div class="pop-icon">+</div>
+                        </div>
+                        <div class="pop-detalhe">
+                            <div class="pop-conteudo">
+                                ${pop.conteudo}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += html;
+            });
+        }
+
+        function togglePop(element) {
+            const detalhe = element.nextElementSibling;
+            const icon = element.querySelector('.pop-icon');
+            
+            if (detalhe.style.maxHeight) {
+                detalhe.style.maxHeight = null;
+                icon.innerText = "+";
+                icon.style.transform = "rotate(0deg)";
+            } else {
+                // Fecha outros abertos para focar na leitura
+                document.querySelectorAll('.pop-detalhe').forEach(d => d.style.maxHeight = null);
+                document.querySelectorAll('.pop-icon').forEach(i => { i.innerText = "+"; i.style.transform = "rotate(0deg)"; });
+
+                detalhe.style.maxHeight = detalhe.scrollHeight + "px";
+                icon.innerText = "-";
+                icon.style.transform = "rotate(180deg)";
+            }
+        }
+
+        function filtrarLista() {
+            const termo = document.getElementById('inputBusca').value.toLowerCase();
+            const filtrados = procedimentos.filter(pop => 
+                pop.titulo.toLowerCase().includes(termo) || 
+                pop.resumo.toLowerCase().includes(termo) ||
+                pop.conteudo.toLowerCase().includes(termo)
+            );
+            renderizarLista(filtrados);
+            document.querySelectorAll('.btn-categoria').forEach(b => b.classList.remove('ativo'));
+        }
+
+        function filtrarCategoria(categoria, btn) {
+            document.getElementById('inputBusca').value = '';
+            document.querySelectorAll('.btn-categoria').forEach(b => b.classList.remove('ativo'));
+            btn.classList.add('ativo');
+
+            if (categoria === 'TODAS') {
+                renderizarLista(procedimentos);
+            } else {
+                const filtrados = procedimentos.filter(pop => pop.categoria === categoria);
+                renderizarLista(filtrados);
+            }
+        }
+
+        // Inicialização
+        renderizarLista();
+    </script>
+</body>
+</html>

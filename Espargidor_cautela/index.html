@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cautela de Espargidores - RUMB</title>
+    <link rel="shortcut icon" type="imagex/png" href="../IMAGENS/caveira.ico">
+
+<style>
+  /* --- ESTILO GERAL --- */
+  * { box-sizing: border-box; }
+
+  body { 
+    font-family: 'Segoe UI', Arial, sans-serif; 
+    background: #001f3f; 
+    color: #fff; 
+    margin: 0; 
+    padding: 20px; 
+    padding-top: 130px; 
+    font-size: 11px; 
+  }
+  
+  /* --- CABEÇALHO --- */
+  .header { 
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 110px;
+    background: #001f3f; 
+    z-index: 1000; 
+    padding: 0 15px; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    border-bottom: 3px solid #FF851B; 
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+  }
+
+  .logo-img {
+    height: 80px; 
+    width: auto;
+    max-width: 80px;
+    object-fit: contain;
+    filter: drop-shadow(0px 0px 2px rgba(255,255,255,0.2));
+  }
+
+  .titulo { 
+    flex-grow: 1; 
+    text-align: center; 
+    padding: 0 10px;
+  }
+
+  .titulo h1 { 
+    font-size: 18px; 
+    margin: 0; 
+    color: #f0f0f0; 
+    text-transform: uppercase; 
+    letter-spacing: 1px;
+  }
+  
+  .titulo p { 
+    margin: 5px 0 0 0; 
+    color: #FF851B; 
+    font-weight: bold; 
+    font-size: 12px;
+  }
+
+  /* --- FORMULÁRIO --- */
+  .form-container { 
+    background: #001226; 
+    padding: 20px; 
+    border-radius: 8px; 
+    border: 1px solid #FF851B; 
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5); 
+    max-width: 1000px; 
+    margin: 0 auto; 
+  }
+  
+  .bloco-titulo { 
+    background: linear-gradient(90deg, #663300, #001f3f); 
+    color: #fff; padding: 6px; font-weight: bold; text-align: center; 
+    margin: 15px 0 10px 0; border-left: 5px solid #FF851B;
+    text-transform: uppercase; font-size: 12px;
+  }
+
+  .grid-campos { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; }
+  .campo-grupo { display: flex; flex-direction: column; }
+  
+  label { font-size: 10px; margin-bottom: 4px; color: #FFDC00; font-weight: bold; }
+  input, select { padding: 8px; border-radius: 4px; border: 1px solid #004080; background: #001830; color: #fff; font-size: 12px; width: 100%; }
+  input:focus { border-color: #FF851B; outline: none; }
+  
+  /* --- CÂMERA --- */
+  .camera-container {
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+    background: #000; padding: 10px; border: 1px dashed #FF851B; margin-top: 10px;
+    border-radius: 5px;
+  }
+  video, canvas, #fotoPreview { max-width: 100%; max-height: 200px; border-radius: 4px; }
+  .controles-camera { display: flex; gap: 10px; }
+
+  /* --- BOTÕES --- */
+  .btn-area { margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+  button { padding: 10px 20px; cursor: pointer; font-weight: bold; border-radius: 4px; border: none; text-transform: uppercase; font-size: 11px; color: white; transition: 0.3s;}
+  
+  .btn-salvar { background: #FF851B; color: #000; } .btn-salvar:hover { background: #e67700; }
+  .btn-camera { background: #0074D9; } .btn-capturar { background: #dc2626; }
+  .btn-print { background: #415a77; } 
+  .btn-backup { background: #059669; } .btn-restore { background: #dc2626; }
+  .btn-filter { background: #b8860b; color: black; }
+  
+  /* Botões de Edição e Exclusão */
+  .btn-editar { background: #ff851b; color: white; border: none; padding: 4px 6px; border-radius: 3px; cursor: pointer; font-size: 10px; margin-left: 5px; }
+  .btn-editar:hover { background: #e67300; }
+  .btn-excluir { background: #dc2626; color: white; border: none; padding: 4px 6px; border-radius: 3px; cursor: pointer; font-size: 10px; margin-left: 5px; }
+  .btn-excluir:hover { background: #991b1b; }
+  .btn-cancelar-edicao { background: #85144b; display: none; color: white; }
+  .btn-cancelar-edicao:hover { background: #72113f; }
+
+  /* --- TABELA E BUSCA --- */
+  .search-container { margin-top: 20px; margin-bottom: 10px; max-width: 1000px; margin-left: auto; margin-right: auto; }
+  #inputBusca { width: 100%; padding: 10px; background: #001226; border: 1px solid #FF851B; color: white; border-radius: 5px; font-weight: bold; box-sizing: border-box;}
+  #inputBusca::placeholder { color: #ccc; }
+  
+  /* CONTADOR DE ABERTAS */
+  .contador-box { background: #b8860b; color: #000; padding: 6px 12px; border-radius: 4px; font-weight: bold; font-size: 12px; box-shadow: 0 0 8px rgba(184, 134, 11, 0.5); display: inline-block; margin-bottom: 10px; }
+
+  .table-wrapper { overflow-x: auto; max-width: 1000px; margin: 0 auto; }
+  table { width: 100%; border-collapse: collapse; margin-top: 5px; background: white; color: black; }
+  th, td { border: 1px solid #ccc; padding: 6px; text-align: center; vertical-align: middle; font-size: 10px; }
+  th { background: #001f3f; color: white; text-transform: uppercase; }
+  
+  .img-tabela { width: 50px; height: 50px; object-fit: cover; border-radius: 4px; border: 1px solid #999; cursor: pointer; }
+  .img-tabela:hover { transform: scale(3); transition: 0.2s; border: 2px solid #FF851B; z-index: 100; position: relative; box-shadow: 0 0 10px rgba(0,0,0,0.5); }
+  
+  .btn-baixa { background: #15803d; color: white; padding: 5px 10px; border-radius: 3px; border:none; cursor: pointer; }
+
+  /* IMPRESSÃO */
+  @media print {
+    .form-container, .btn-area, .search-container, .no-print, .header { display: none; }
+    body { background: white; color: black; padding: 0; margin: 0; }
+    .header-print { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; border-bottom: 2px solid #000; padding-bottom: 10px; }
+    .header-print img { height: 60px; }
+    .header-print div { text-align: center; width: 100%; }
+    th { background: #ddd !important; color: black; border: 1px solid #000; }
+    td { border: 1px solid #000; }
+    .img-tabela { width: 30px; height: 30px; }
+  }
+  .header-print { display: block; display: none; }
+</style>
+</head>
+<body>
+
+<div class="header-print">
+    <img src="caveira.jpg" alt="RUMB" onerror="this.style.display='none'">
+    <div>
+        <h3>PMERJ - LIVRO DE CAUTELA DE ESPARGIDORES (RUMB)</h3>
+    </div>
+    <img src="pmerj.png" alt="PMERJ" onerror="this.style.display='none'">
+</div>
+
+<div class="header">
+  <a href="../dashboard.html"><img src="caveira.png" class="logo-img" alt="RUMB" title="Voltar ao Painel" onerror="this.style.display='none'"></a>
+  <div class="titulo">
+    <h1>Polícia Militar do Estado do Rio de Janeiro</h1>
+    <p>LIVRO DE CAUTELA DE ESPARGIDORES (GÁS)</p>
+  </div>
+  <img src="pmerj.png" class="logo-img" alt="PMERJ" onerror="this.style.display='none'">
+</div>
+
+<div class="form-container">
+  <form id="formCautela">
+    <input type="hidden" id="editIndex" value="-1">
+
+    <div class="bloco-titulo">1. IDENTIFICAÇÃO DO POLICIAL</div>
+    <div class="grid-campos">
+      <div class="campo-grupo">
+        <label>RG (Digite para buscar)</label>
+        <input type="text" id="rg" list="lista-rgs" required placeholder="00.000" autocomplete="off">
+        <datalist id="lista-rgs"></datalist>
+      </div>
+      <div class="campo-grupo" style="flex-grow: 2;">
+        <label>NOME DE GUERRA</label>
+        <input type="text" id="nome" list="lista-nomes" required placeholder="Nome do Policial" autocomplete="off">
+        <datalist id="lista-nomes"></datalist>
+      </div>
+      <div class="campo-grupo">
+        <label>GH</label>
+        <input type="text" id="gh" required placeholder="Ex: SD" class="auto-filled">
+      </div>
+    </div>
+
+    <div class="bloco-titulo">2. DADOS DO ESPARGIDOR (GÁS)</div>
+    <div class="grid-campos">
+      <div class="campo-grupo"><label>Nº SÉRIE / PATRIMÔNIO</label><input type="text" id="patrimonio" required placeholder="Nº da lata"></div>
+      
+      <div class="campo-grupo"><label>TIPO / MODELO</label>
+        <select id="modelo" required>
+	    <option value="G.PIM">G.PIM (OC)</option>
+            <option value="GEL">GEL (ALVO DIRECIONADO)</option>
+            <option value="ESPUMA">ESPUMA</option>
+            <option value="NEVOA">NÉVOA (SPRAY)</option>
+            <option value="LACRIMOGENIO">CS (LACRIMOGÊNIO)</option>
+            <option value="PSI">PSI (JATO)</option>
+        </select>
+      </div>
+
+      <div class="campo-grupo"><label>PESO (g)</label><input type="number" id="peso" required placeholder="Ex: 120" step="any"></div>
+      
+      <div class="campo-grupo"><label>VALIDADE</label><input type="month" id="validade"></div>
+    </div>
+
+    <div class="camera-container">
+        <label style="color:white">FOTO DO MATERIAL (ESTADO DE CONSERVAÇÃO)</label>
+        <video id="video" autoplay playsinline style="display:none"></video>
+        <canvas id="canvas" style="display:none"></canvas>
+        <img id="fotoPreview" src="" alt="Preview" style="display:none">
+        
+        <div class="controles-camera">
+            <button type="button" class="btn-camera" onclick="iniciarCamera()">📸 ABRIR CÂMERA</button>
+            <button type="button" class="btn-capturar" id="btnCapturar" onclick="tirarFoto()" style="display:none">🔘 CAPTURAR</button>
+            <button type="button" class="btn-restore" onclick="limparFoto()" style="display:none" id="btnLimpar">🗑️ REMOVER</button>
+        </div>
+        <input type="hidden" id="fotoBase64">
+    </div>
+
+    <div class="bloco-titulo">3. CONTROLE DE SAÍDA (RUMB)</div>
+    <div class="grid-campos">
+      <div class="campo-grupo"><label>DATA DA ATIVIDADE</label><input type="date" id="dataAt" required></div>
+      <div class="campo-grupo"><label>DATA DA CAUTELA</label><input type="date" id="dataC" required></div>
+      <div class="campo-grupo"><label>HORA</label><input type="time" id="horaC" required></div>
+      <div class="campo-grupo" style="flex-grow: 2;"><label style="color: #FF851B;">RUMB (QUARTILHEIRO)</label><input type="text" id="rumb" required placeholder="Quem entrega..."></div>
+    </div>
+
+    <div class="btn-area">
+      <button type="submit" id="btnSalvar" class="btn-salvar">💾 REGISTRAR</button>
+      <button type="button" class="btn-cancelar-edicao" id="btnCancelarEdicao" onclick="cancelarEdicao()">❌ CANCELAR EDIÇÃO</button>
+      <button type="button" class="btn-filter" onclick="mostrarAbertas()">🔴 SÓ ABERTAS</button>
+      <button type="button" class="btn-filter" onclick="render()">📘 TODAS</button>
+      <button type="button" class="btn-print" onclick="window.print()">🖨️ IMPRIMIR</button>
+      <button type="button" class="btn-backup" onclick="exportarBackup()">⬇️ SALVAR BACKUP</button>
+      <input type="file" id="fileBackup" style="display:none" onchange="importarBackup(this)">
+      <button type="button" class="btn-restore" onclick="document.getElementById('fileBackup').click()">⬆️ IMPORTAR</button>
+    </div>
+  </form>
+</div>
+
+<div class="search-container">
+  <div class="contador-box" id="contadorAbertas">🚨 CAUTELAS EM ABERTO: 0</div>
+  <input type="text" id="inputBusca" placeholder="🔍 BUSCAR (RG, Nome, Patrimônio...)" onkeyup="filtrarTabela()">
+</div>
+
+<div class="table-wrapper">
+  <table id="tabela">
+    <thead>
+      <tr>
+        <th style="background:#001f3f; width: 50px;">FOTO</th>
+        <th colspan="3">POLICIAL</th>
+        <th colspan="4">MATERIAL</th>
+        <th colspan="3" style="background:#FF851B; color: black;">SAÍDA</th>
+        <th colspan="3" style="background:#15803d;">DEVOLUÇÃO</th>
+        <th style="width: 90px;">AÇÃO</th>
+      </tr>
+      <tr>
+        <th>IMG</th>
+        <th>GH</th><th>RG</th><th>NOME</th>
+        <th>PATR.</th><th>TIPO</th><th>PESO (g)</th><th>VAL.</th>
+        <th>DATA</th><th>HORA</th><th>RUMB</th>
+        <th>DATA</th><th>HORA</th><th>RUMB</th>
+        <th>BAIXA</th>
+      </tr>
+    </thead>
+    <tbody id="tabelaCorpo"></tbody>
+  </table>
+</div>
+
+<script>
+// --- BANCO DE DADOS ---
+const databaseEfetivo = [
+  { gh: "SUB PM", rg: "68831", nome: "GOMES" },
+  { gh: "CB PM", rg: "101823", nome: "S. LEMOS" },
+  { gh: "SD PM", rg: "110297", nome: "L. BARBOSA" },
+  { gh: "CB PM", rg: "106260", nome: "BAPTISTA" },
+  { gh: "3º SGT PM", rg: "91071", nome: "DIAS" },
+  { gh: "CB PM", rg: "108786", nome: "TORRES" },
+  { gh: "3º SGT PM", rg: "99488", nome: "DE PAULA" },
+  { gh: "3º SGT PM", rg: "91665", nome: "R. ALCANTARA" },
+  { gh: "3º SGT PM", rg: "100032", nome: "R. LACERDA" },
+  { gh: "1º SGT PM", rg: "77614", nome: "ALZIR" },
+  { gh: "SUBTEN PM", rg: "66381", nome: "J. MARCELO" },
+  { gh: "3º SGT PM", rg: "94010", nome: "R. SIMÕES" },
+  { gh: "3º SGT PM", rg: "97196", nome: "DAN" },
+  { gh: "CB PM", rg: "106561", nome: "MARCOS" },
+  { gh: "3º SGT PM", rg: "99242", nome: "ADRIEL" },
+  { gh: "CB PM", rg: "105249", nome: "R. FILHO" },
+  { gh: "CB PM", rg: "102712", nome: "JOAQUIM" },
+  { gh: "3º SGT PM", rg: "100360", nome: "ULISSES" },
+  { gh: "CB PM", rg: "105375", nome: "RANGEL" },
+  { gh: "CB PM", rg: "102181", nome: "JUNIOR" },
+  { gh: "CB PM", rg: "106533", nome: "CORTEZ" },
+  { gh: "3º SGT PM", rg: "98121", nome: "JOHNATHAN" },
+  { gh: "3º SGT PM", rg: "96990", nome: "CLEISON" },
+  { gh: "CB PM", rg: "104197", nome: "DA SILVA" },
+  { gh: "3º SGT PM", rg: "98408", nome: "NASCIMENTO" },
+  { gh: "3º SGT PM", rg: "93752", nome: "CARDOSO" },
+  { gh: "2º SGT PM", rg: "85458", nome: "SANTOS" },
+  { gh: "CB PM", rg: "107510", nome: "DA SILVA" },
+  { gh: "SD PM", rg: "110796", nome: "ERICA" },
+  { gh: "2º SGT PM", rg: "83708", nome: "A. MENDES" },
+  { gh: "3º SGT PM", rg: "98607", nome: "SOUZA" },
+  { gh: "CB PM", rg: "102704", nome: "J. ANDRÉ" },
+  { gh: "CB PM", rg: "106351", nome: "M. ARAUJO" },
+  { gh: "CB PM", rg: "103727", nome: "BIZONI" },
+  { gh: "3º SGT PM", rg: "93998", nome: "F. PERES" },
+  { gh: "CB PM", rg: "107520", nome: "T. RODRIGUES" },
+  { gh: "CB PM", rg: "107561", nome: "COUTINHO" },
+  { gh: "CB PM", rg: "108292", nome: "JULIANO" },
+  { gh: "SD PM", rg: "110387", nome: "JOSUÉ" },
+  { gh: "CB PM", rg: "108824", nome: "CARMO" },
+  { gh: "CB PM", rg: "107805", nome: "M. PAULO" },
+  { gh: "3º SGT PM", rg: "98339", nome: "SOUZA" },
+  { gh: "3º SGT PM", rg: "95629", nome: "FULLY" },
+  { gh: "CB PM", rg: "104953", nome: "PINHEIRO" },
+  { gh: "CB PM", rg: "103051", nome: "TIRADENTES" },
+  { gh: "CB PM", rg: "104291", nome: "FELIX" },
+  { gh: "2º SGT PM", rg: "86615", nome: "ISAIAS" },
+  { gh: "1º SGT PM", rg: "73888", nome: "COIMBRA" },
+  { gh: "3º SGT PM", rg: "93331", nome: "FERREIRA" },
+  { gh: "3º SGT PM", rg: "98596", nome: "VIDAL" },
+  { gh: "CB PM", rg: "108190", nome: "UERBERT" },
+  { gh: "CB PM", rg: "102190", nome: "D. SILVA" },
+  { gh: "SD PM", rg: "110594", nome: "JULIANA FERREIRA" },
+  { gh: "SUBTEN PM", rg: "65727", nome: "SANTANA" },
+  { gh: "CB PM", rg: "105341", nome: "AZEVEDO" },
+  { gh: "3º SGT PM", rg: "100228", nome: "MIRANDA" },
+  { gh: "3º SGT PM", rg: "99791", nome: "ALMEIDA" },
+  { gh: "CB PM", rg: "105284", nome: "LEONARDO" },
+  { gh: "CB PM", rg: "109067", nome: "CAMILO" },
+  { gh: "CB PM", rg: "106467", nome: "L. SILVA" },
+  { gh: "SD PM", rg: "109738", nome: "MARIANO" },
+  { gh: "CB PM", rg: "105248", nome: "DE SOUZA" },
+  { gh: "3º SGT PM", rg: "93168", nome: "F. ABREU" },
+  { gh: "CB PM", rg: "109109", nome: "RODRIGUES" },
+  { gh: "SD PM", rg: "110470", nome: "TELES" },
+  { gh: "CB PM", rg: "108677", nome: "ÉDVAN" },
+  { gh: "3º SGT PM", rg: "91049", nome: "JHONATHAN" },
+  { gh: "2º SGT PM", rg: "86367", nome: "REGALDINO" },
+  { gh: "2º SGT PM", rg: "85426", nome: "BRITO" },
+  { gh: "3º SGT PM", rg: "93606", nome: "A. ALCANTARA" },
+  { gh: "CB PM", rg: "109510", nome: "MAGANO" },
+  { gh: "CB PM", rg: "109414", nome: "BIANCHI" },
+  { gh: "SD PM", rg: "109754", nome: "CAMELO" },
+  { gh: "SUBTEN PM", rg: "70372", nome: "MENDES" },
+  { gh: "SD PM", rg: "110433", nome: "D. SANTOS" },
+  { gh: "3º SGT PM", rg: "95714", nome: "MALAQUIAS" },
+  { gh: "SUBTEN PM", rg: "76452", nome: "WAGNER" },
+  { gh: "3º SGT PM", rg: "93081", nome: "GUEDES" },
+  { gh: "3º SGT PM", rg: "92119", nome: "CAIO" },
+  { gh: "3º SGT PM", rg: "100000", nome: "ALACRINO" },
+  { gh: "3º SGT PM", rg: "99164", nome: "R. MACHADO" },
+  { gh: "3º SGT PM", rg: "91783", nome: "CHARLES" },
+  { gh: "CB PM", rg: "106348", nome: "SOARES" },
+  { gh: "3º SGT PM", rg: "92732", nome: "MARCIO ESTEVÃO" },
+  { gh: "CB PM", rg: "105377", nome: "F. RIBEIRO" },
+  { gh: "SD PM", rg: "108664", nome: "SOUSA SILVA" },
+  { gh: "CB PM", rg: "105374", nome: "LAIA" },
+  { gh: "3º SGT PM", rg: "92490", nome: "VALIM" },
+  { gh: "CB PM", rg: "106650", nome: "MATHEUS" },
+  { gh: "3º SGT PM", rg: "96287", nome: "RODRIGUES" },
+  { gh: "2º SGT PM", rg: "85664", nome: "DENILSON" },
+  { gh: "3º SGT PM", rg: "92258", nome: "DOMINGOS" },
+  { gh: "3º SGT PM", rg: "93341", nome: "L. FRANCISCO" },
+  { gh: "SD PM", rg: "109908", nome: "TRIUMPHO" },
+  { gh: "3º SGT PM", rg: "91131", nome: "CONDE" },
+  { gh: "CB PM", rg: "101752", nome: "TRINDADE" },
+  { gh: "3º SGT PM", rg: "91115", nome: "ITALO" },
+  { gh: "3º SGT PM", rg: "96003", nome: "JONATHA" },
+  { gh: "CB PM", rg: "105391", nome: "HENRIQUE" },
+  { gh: "CB PM", rg: "106037", nome: "CAIQUE" },
+  { gh: "3º SGT PM", rg: "98202", nome: "CRISTIANO" },
+  { gh: "3º SGT PM", rg: "99226", nome: "M. JUNIOR" },
+  { gh: "3º SGT PM", rg: "96541", nome: "SILVEIRA" },
+  { gh: "2º SGT PM", rg: "85995", nome: "VINICIUS" },
+  { gh: "3º SGT PM", rg: "93227", nome: "L. ALMEIDA" },
+  { gh: "CB PM", rg: "105313", nome: "MIQUELINE" },
+
+];
+
+function initAutocomplete() {
+  const dlRg = document.getElementById('lista-rgs');
+  const dlNome = document.getElementById('lista-nomes');
+  databaseEfetivo.forEach(p => {
+    const optR = document.createElement('option');
+    optR.value = p.rg; optR.label = `${p.nome} (${p.gh})`; dlRg.appendChild(optR);
+    const optN = document.createElement('option');
+    optN.value = p.nome; optN.label = `${p.gh} - RG: ${p.rg}`; dlNome.appendChild(optN);
+  });
+}
+
+const inputRg = document.getElementById('rg');
+const inputNome = document.getElementById('nome');
+const inputGh = document.getElementById('gh');
+
+inputRg.addEventListener('input', function() {
+  const val = this.value;
+  const found = databaseEfetivo.find(p => p.rg === val);
+  if (found) { inputNome.value = found.nome; inputGh.value = found.gh; }
+});
+inputNome.addEventListener('input', function() {
+  const val = this.value;
+  const found = databaseEfetivo.find(p => p.nome === val);
+  if (found) { inputRg.value = found.rg; inputGh.value = found.gh; }
+});
+
+initAutocomplete();
+
+// --- LÓGICA DA CÂMERA ---
+const video = document.getElementById('video');
+const canvas = document.getElementById('canvas');
+const fotoPreview = document.getElementById('fotoPreview');
+const fotoBase64 = document.getElementById('fotoBase64');
+let streamCamera = null;
+
+async function iniciarCamera() {
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+        streamCamera = stream;
+        video.srcObject = stream;
+        video.style.display = 'block';
+        fotoPreview.style.display = 'none';
+        document.getElementById('btnCapturar').style.display = 'inline-block';
+        document.getElementById('btnLimpar').style.display = 'none';
+    } catch (err) {
+        alert("Erro ao acessar câmera: " + err + "\nVerifique se está usando HTTPS ou rodando localmente.");
+    }
+}
+
+function tirarFoto() {
+    if (!streamCamera) return;
+    const width = 320; 
+    const height = video.videoHeight / (video.videoWidth/width);
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(video, 0, 0, width, height);
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+    fotoBase64.value = dataUrl;
+    fotoPreview.src = dataUrl;
+    video.style.display = 'none';
+    fotoPreview.style.display = 'block';
+    streamCamera.getTracks().forEach(track => track.stop());
+    document.getElementById('btnCapturar').style.display = 'none';
+    document.getElementById('btnLimpar').style.display = 'inline-block';
+}
+
+function limparFoto() {
+    fotoBase64.value = "";
+    fotoPreview.style.display = 'none';
+    document.getElementById('btnLimpar').style.display = 'none';
+}
+
+// --- ESCALA RUMB (10 Turnos de 12 horas) ---
+const dbRumb = {
+    triumpho: { posto: "SD PM", nome: "TRIUMPHO" },
+    simoes: { posto: "3º SGT PM", nome: "R. SIMÕES" },
+    dan: { posto: "3º SGT PM", nome: "DAN" },
+    lacerda: { posto: "3º SGT PM", nome: "LACERDA" },
+    alacrino: { posto: "3º SGT PM", nome: "ALACRINO" }
+};
+
+const sequenciaEscala = [
+    dbRumb.dan,      // 0: 26/01 05h
+    dbRumb.triumpho, // 1: 26/01 17h
+    dbRumb.simoes,   // 2: 27/01 05h
+    dbRumb.dan,      // 3: 27/01 17h
+    dbRumb.lacerda,  // 4: 28/01 05h
+    dbRumb.simoes,   // 5: 28/01 17h
+    dbRumb.alacrino, // 6: 29/01 05h
+    dbRumb.lacerda,  // 7: 29/01 17h
+    dbRumb.triumpho, // 8: 30/01 05h
+    dbRumb.alacrino  // 9: 30/01 17h
+];
+
+// Data Âncora: Turno 0 iniciou em 26 de Janeiro de 2026 às 05:00
+const dataAncora = new Date(2026, 0, 26, 5, 0, 0);
+
+// --- LÓGICA DE ATUALIZAÇÃO AUTOMÁTICA DO RUMB ---
+function atualizarRumbAutomatico() {
+    const inputData = document.getElementById('dataC').value;
+    const inputHora = document.getElementById('horaC').value;
+
+    if (!inputData || !inputHora) return;
+
+    const partesData = inputData.split('-');
+    const partesHora = inputHora.split(':');
+    
+    const dataSelecionada = new Date(
+        partesData[0], 
+        partesData[1] - 1, 
+        partesData[2], 
+        partesHora[0], 
+        partesHora[1], 
+        0
+    );
+
+    const diffMs = dataSelecionada.getTime() - dataAncora.getTime();
+    const diffHoras = Math.floor(diffMs / (1000 * 60 * 60));
+    const offsetTurnos = Math.floor(diffHoras / 12);
+    const indiceTurno = ((offsetTurnos % 10) + 10) % 10;
+
+    document.getElementById('rumb').value = sequenciaEscala[indiceTurno].nome;
+}
+
+// --- SISTEMA ---
+const form = document.getElementById("formCautela");
+const tabela = document.querySelector("#tabelaCorpo");
+let dados = JSON.parse(localStorage.getItem("livroCautela_GAS")) || [];
+
+form.onsubmit = e => {
+  e.preventDefault();
+  
+  const novo = {
+    gh: document.getElementById('gh').value.toUpperCase(),
+    rg: document.getElementById('rg').value,
+    nome: document.getElementById('nome').value.toUpperCase(),
+    patrimonio: document.getElementById('patrimonio').value.toUpperCase(),
+    modelo: document.getElementById('modelo').value,
+    peso: document.getElementById('peso').value, 
+    validade: document.getElementById('validade').value,
+    foto: document.getElementById('fotoBase64').value,
+    dataAt: document.getElementById('dataAt').value, 
+    dataC: document.getElementById('dataC').value,
+    horaC: document.getElementById('horaC').value,
+    rumb: document.getElementById('rumb').value.toUpperCase(),
+    status: "Cautelado"
+  };
+
+  const editIndex = document.getElementById('editIndex').value;
+
+  try {
+      if (editIndex !== "-1") {
+          const index = parseInt(editIndex);
+          // Mantém os dados da devolução se a cautela já estava fechada
+          novo.status = dados[index].status;
+          novo.dataE = dados[index].dataE || '';
+          novo.horaE = dados[index].horaE || '';
+          novo.rumbEntrega = dados[index].rumbEntrega || '';
+          
+          dados[index] = novo;
+          cancelarEdicao();
+      } else {
+          const existeAberta = dados.some(d => d.rg === novo.rg && d.status === "Cautelado");
+          if (existeAberta) { alert("ATENÇÃO: Este policial já possui cautela em aberto."); return; }
+          
+          dados.push(novo);
+          form.reset(); 
+          limparFoto();
+          document.getElementById('dataAt').valueAsDate = new Date();
+          document.getElementById('dataC').valueAsDate = new Date();
+          document.getElementById('horaC').value = new Date().toLocaleTimeString('pt-BR').slice(0,5);
+          atualizarRumbAutomatico();
+      }
+      
+      salvar(); 
+      render(); 
+      document.getElementById('rg').focus();
+  } catch (err) {
+      alert("Memória cheia! Exporte um backup e limpe os dados.");
+  }
+};
+
+// --- LÓGICA DE EDIÇÃO ---
+function editarRegistro(index) {
+    const d = dados[index];
+    document.getElementById('editIndex').value = index;
+
+    document.getElementById('rg').value = d.rg || '';
+    document.getElementById('nome').value = d.nome || '';
+    document.getElementById('gh').value = d.gh || '';
+    document.getElementById('patrimonio').value = d.patrimonio || '';
+    document.getElementById('modelo').value = d.modelo || 'G.PIM';
+    document.getElementById('peso').value = d.peso || '';
+    document.getElementById('validade').value = d.validade || '';
+    
+    // As datas no Espargidor já estão salvas no formato YYYY-MM-DD pelo input type="date"
+    document.getElementById('dataAt').value = d.dataAt || '';
+    document.getElementById('dataC').value = d.dataC || '';
+    document.getElementById('horaC').value = d.horaC || '';
+    document.getElementById('rumb').value = d.rumb || '';
+    
+    if (d.foto) {
+        document.getElementById('fotoBase64').value = d.foto;
+        document.getElementById('fotoPreview').src = d.foto;
+        document.getElementById('fotoPreview').style.display = 'block';
+        document.getElementById('btnLimpar').style.display = 'inline-block';
+    } else {
+        limparFoto();
+    }
+
+    const btnSalvar = document.getElementById('btnSalvar');
+    btnSalvar.innerHTML = '💾 ATUALIZAR REGISTRO';
+    btnSalvar.style.background = '#0074D9'; 
+    btnSalvar.style.color = 'white';
+    document.getElementById('btnCancelarEdicao').style.display = 'inline-block';
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function cancelarEdicao() {
+    document.getElementById('editIndex').value = '-1';
+    form.reset();
+    limparFoto();
+    
+    document.getElementById('dataAt').valueAsDate = new Date();
+    document.getElementById('dataC').valueAsDate = new Date();
+    document.getElementById('horaC').value = new Date().toLocaleTimeString('pt-BR').slice(0,5);
+    atualizarRumbAutomatico();
+
+    const btnSalvar = document.getElementById('btnSalvar');
+    btnSalvar.innerHTML = '💾 REGISTRAR';
+    btnSalvar.style.background = '#FF851B';
+    btnSalvar.style.color = '#000';
+    document.getElementById('btnCancelarEdicao').style.display = 'none';
+}
+
+// --- LÓGICA DE EXCLUSÃO ---
+function excluirRegistro(index) {
+    if(confirm("⚠️ ATENÇÃO: Tem certeza que deseja EXCLUIR este registro permanentemente?\nEsta ação não pode ser desfeita.")) {
+        if (document.getElementById('editIndex').value == index) {
+            cancelarEdicao();
+        }
+        dados.splice(index, 1);
+        salvar();
+        render();
+    }
+}
+
+// --- LÓGICA DE BAIXA ---
+function entregar(index) {
+  const dataCInput = prompt("Informe a data da baixa (DD/MM/AAAA) ou deixe em branco para assumir a data atual:");
+  
+  let agora = new Date();
+  
+  if (dataCInput) {
+      const regexDataC = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+      if(regexDataC.test(dataCInput)){
+         const partes = dataCInput.split('/');
+         agora = new Date(partes[2], partes[1] - 1, partes[0], agora.getHours(), agora.getMinutes(), agora.getSeconds());
+      } else {
+          alert('Formato de data inválido. Assumindo a data atual.');
+      }
+  }
+
+  const diffMs = agora.getTime() - dataAncora.getTime();
+  const diffHoras = Math.floor(diffMs / (1000 * 60 * 60));
+  const offsetTurnos = Math.floor(diffHoras / 12);
+  const indiceTurno = ((offsetTurnos % 10) + 10) % 10; 
+  const sugestao = sequenciaEscala[indiceTurno].nome;
+
+  const nomeRumb = prompt(`Baixando em ${agora.toLocaleDateString('pt-BR')} às ${agora.toLocaleTimeString('pt-BR').slice(0,5)}.\n\nInforme o RUMB que está recebendo o material:`, sugestao);
+
+  if (nomeRumb === null || nomeRumb.trim() === "") {
+      alert("Baixa cancelada: É necessário informar quem recebeu o material.");
+      return;
+  }
+
+  dados[index].dataE = agora.toLocaleDateString('pt-BR');
+  dados[index].horaE = agora.toLocaleTimeString('pt-BR').slice(0,5);
+  dados[index].rumbEntrega = nomeRumb.toUpperCase();
+  dados[index].status = "Entregue";
+  salvar(); render();
+}
+
+function salvar() { localStorage.setItem("livroCautela_GAS", JSON.stringify(dados)); }
+
+function filtrarTabela() {
+  const termo = document.getElementById('inputBusca').value.toUpperCase();
+  const linhas = document.querySelectorAll('#tabelaCorpo tr');
+  linhas.forEach(linha => {
+      const textoLinha = linha.innerText.toUpperCase();
+      linha.style.display = textoLinha.includes(termo) ? '' : 'none';
+  });
+}
+
+function render(filtroAbertas = false) {
+  tabela.innerHTML = "";
+  
+  const abertasCount = dados.filter(d => d.status === "Cautelado").length;
+  document.getElementById("contadorAbertas").innerText = `🚨 CAUTELAS EM ABERTO: ${abertasCount}`;
+  
+  const listaExibicao = filtroAbertas ? dados.filter(d => d.status === "Cautelado") : dados;
+  
+  listaExibicao.slice().reverse().forEach((d) => {
+    const indexReal = dados.indexOf(d);
+    const dataCFormatada = (d.dataC && d.dataC.includes('-')) ? d.dataC.split('-').reverse().join('/') : (d.dataC || "-");
+    const imgTag = d.foto ? `<img src="${d.foto}" class="img-tabela" onclick="var win=window.open();win.document.write('<img src=${d.foto} style=width:100%>')">` : '<span style="color:#aaa">S/ FOTO</span>';
+
+    const tr = document.createElement("tr");
+    if(d.status === "Entregue") { tr.style.opacity = "0.6"; tr.style.background = "#e0ffe0"; }
+    
+    tr.innerHTML = `
+      <td>${imgTag}</td>
+      <td>${d.gh}</td> <td>${d.rg}</td> <td style="text-align:left; font-weight:bold">${d.nome}</td>
+      <td>${d.patrimonio}</td> <td>${d.modelo}</td> <td>${d.peso || "-"}</td> <td>${d.validade}</td>
+      <td>${dataCFormatada}</td> <td>${d.horaC}</td> <td style="color:#0074D9; font-weight:bold">${d.rumb}</td>
+      <td>${d.dataE || "-"}</td> <td>${d.horaE || "-"}</td> <td style="color:#15803d; font-weight:bold">${d.rumbEntrega || "-"}</td>
+      <td style="white-space: nowrap;">
+        ${d.status === "Cautelado" 
+            ? `<button class="btn-baixa no-print" onclick="entregar(${indexReal})">BAIXAR</button>` 
+            : `<span style="font-weight:bold; color:#15803d; margin-right: 5px;">OK</span>`}
+        <button class="btn-editar no-print" onclick="editarRegistro(${indexReal})" title="Editar">✏️</button>
+        <button class="btn-excluir no-print" onclick="excluirRegistro(${indexReal})" title="Excluir">🗑️</button>
+      </td>`;
+    tabela.appendChild(tr);
+  });
+  filtrarTabela();
+}
+
+function mostrarAbertas() { render(true); }
+
+function exportarBackup() {
+  const blob = new Blob([JSON.stringify(dados, null, 2)], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `Livro_Gas_RUMB-${new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')}.json`;
+  a.click();
+}
+
+function importarBackup(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    if(confirm("Substituir dados atuais pelo backup?")) {
+        try { 
+            dados = JSON.parse(e.target.result); 
+            salvar(); 
+            render(); 
+            alert("Importado!"); 
+        }
+        catch(err) { alert("Arquivo inválido."); }
+        finally { input.value = ""; }
+    }
+  };
+  reader.readAsText(file);
+}
+
+// INICIALIZA CAMPOS DE DATA, HORA E RUMB AUTOMÁTICO
+document.getElementById('dataAt').valueAsDate = new Date();
+document.getElementById('dataC').valueAsDate = new Date();
+document.getElementById('horaC').value = new Date().toLocaleTimeString('pt-BR').slice(0,5);
+atualizarRumbAutomatico();
+
+// Monitora mudanças para atualizar em tempo real
+document.getElementById('dataC').addEventListener('change', atualizarRumbAutomatico);
+document.getElementById('horaC').addEventListener('change', atualizarRumbAutomatico);
+
+render();
+</script>
+</body>
+</html>

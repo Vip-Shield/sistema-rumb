@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PMERJ - Reserva de Armas</title>
+    <link rel="shortcut icon" type="imagex/png" href="caveira.ico">
+
+    <style>
+        :root {
+            --cor-fundo: #00153B; 
+            --cor-card: #F4F4F4;  
+            --cor-destaque: #FFD700; 
+            --cor-texto: #333;
+            --cor-botao: #00205b;
+            --cor-sucesso: #28a745;
+            --cor-import: #007bff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--cor-fundo);
+            color: white;
+            margin: 0;
+            padding-bottom: 20px;
+        }
+
+        .header-pmerj {
+            background: linear-gradient(to bottom, #00205b, #001030);
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 3px solid var(--cor-destaque);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+        }
+
+        .logo-brasao { height: 90px; filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.7)); }
+
+        .titulo-container { flex-grow: 1; text-align: center; }
+        .titulo-principal { margin: 0; font-size: 1rem; color: #FFFFFF; opacity: 0.9; }
+        .titulo-sistema { margin: 5px 0 0 0; font-size: 1.5rem; font-weight: 900; color: var(--cor-destaque); text-transform: uppercase; }
+
+        .faixa-decorativa {
+            height: 8px;
+            background: repeating-linear-gradient(45deg, var(--cor-destaque), var(--cor-destaque) 20px, var(--cor-botao) 20px, var(--cor-botao) 40px);
+            margin-bottom: 20px;
+        }
+
+        .main-container { padding: 0 20px; max-width: 1200px; margin: 0 auto; }
+
+        .transfer-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            border: 1px dashed rgba(255, 215, 0, 0.2);
+            flex-wrap: wrap;
+        }
+
+        /* --- ESTILO DA BUSCA --- */
+        .busca-container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto 20px auto;
+            position: relative;
+        }
+
+        #inputBusca {
+            width: 100%;
+            padding: 15px 20px;
+            border-radius: 30px;
+            border: 2px solid var(--cor-destaque);
+            background: white;
+            color: var(--cor-texto);
+            font-size: 1rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            box-sizing: border-box;
+        }
+
+        .btn-filtro {
+            background: rgba(0, 32, 91, 0.6);
+            border: 2px solid var(--cor-destaque);
+            color: var(--cor-destaque);
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+        .btn-filtro.ativo { background: var(--cor-destaque); color: var(--cor-fundo); }
+        .btn-sync { border-radius: 8px; padding: 10px 15px; font-size: 0.75rem; }
+
+        .registro-box {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .inputs-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; width: 100%; }
+        .input-group { display: flex; flex-direction: column; color: var(--cor-destaque); font-weight: bold; font-size: 0.85rem; }
+
+        select, input[type="date"], input[type="text"] {
+            padding: 10px;
+            border-radius: 8px;
+            border: 2px solid var(--cor-botao);
+            background: var(--cor-card);
+            color: var(--cor-texto);
+            margin-top: 5px;
+        }
+
+        .btn-camera {
+            background: linear-gradient(135deg, var(--cor-destaque), #e6c200);
+            color: var(--cor-fundo);
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            border: none;
+            margin-top: 22px;
+        }
+
+        .btn-salvar {
+            background: linear-gradient(135deg, #28a745, #218838);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: bold;
+            display: none;
+            width: 100%;
+            max-width: 300px;
+            margin: 15px auto 0;
+        }
+
+        #gestaoPoliciais {
+            display: none;
+            background: #f8f9fa;
+            color: #333;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 2px solid var(--cor-botao);
+        }
+
+        .grid-papeletas { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; }
+        .card { background: var(--cor-card); color: var(--cor-texto); border-radius: 12px; overflow: hidden; border-bottom: 6px solid var(--cor-botao); }
+        .card-header { background: #e9ecef; padding: 10px; font-size: 0.8rem; font-weight: bold; }
+        .card-body { padding: 10px; text-align: center; }
+        .badge { background: var(--cor-botao); color: var(--cor-destaque); padding: 2px 8px; border-radius: 10px; font-size: 0.75rem; margin-right: 4px; }
+        .card-img { width: 100%; height: 150px; object-fit: cover; cursor: pointer; }
+        .btn-excluir { background: #c82333; color: white; border: none; width: 100%; padding: 8px; cursor: pointer; }
+
+        #modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: none; justify-content: center; align-items: center; z-index: 1000; }
+        #modal-img { max-width: 95%; max-height: 90%; border: 2px solid gold; }
+    </style>
+</head>
+<body>
+
+    <header class="header-pmerj">
+        <div class="logo-container">
+            <a href="../dashboard.html"><img src="logo_pmerj.png" alt="Brasão" class="logo-brasao" onerror="this.src='https://via.placeholder.com/90x100?text=PMERJ'"></a>
+        </div>
+        <div class="titulo-container">
+            <h1 class="titulo-principal">POLÍCIA MILITAR DO ESTADO DO RIO DE JANEIRO</h1>
+            <h2 class="titulo-sistema">RESERVA DE ARMAS - PAPELETAS</h2>
+        </div>
+        <div style="width: 90px;"></div>
+    </header>
+    
+    <div class="faixa-decorativa"></div>
+
+    <div class="main-container">
+        
+        <div class="transfer-container">
+            <button class="btn-filtro btn-sync" style="border-color: var(--cor-sucesso); color: var(--cor-sucesso);" onclick="exportarDados()">📤 EXPORTAR DADOS</button>
+            <button class="btn-filtro btn-sync" style="border-color: var(--cor-import); color: var(--cor-import);" onclick="document.getElementById('importarFile').click()">📥 IMPORTAR DADOS</button>
+            <button class="btn-filtro btn-sync" style="border-color: #6c757d; color: #6c757d;" onclick="toggleGestao()">👥 GESTÃO DE POLICIAIS</button>
+            <input type="file" id="importarFile" style="display: none;" accept=".json" onchange="importarDados(this)">
+        </div>
+
+        <div id="gestaoPoliciais">
+            <h3 style="margin-top: 0;">Cadastrar Novo Policial</h3>
+            <div class="inputs-row">
+                <input type="text" id="novoNome" placeholder="Posto/Grad + Nome">
+                <select id="novoLocal">
+                    <option value="GPP I">GPP I - PAVÃO</option>
+                    <option value="GPP II">GPP II - PAVÃOZINHO</option>
+                    <option value="GPP III">GPP III - CANTAGALO</option>
+                    <option value="GTPP I">GTPP I - PAVÃO</option>
+                    <option value="GTPP II">GTPP II - CANTAGALO</option>
+                    <option value="GTPP III">GTPP III - COPACABANA</option>
+                </select>
+                <select id="novaAla">
+                    <option value="A">TURMA A</option>
+                    <option value="B">TURMA B</option>
+                    <option value="C">TURMA C</option>
+                    <option value="D">TURMA D</option>
+                </select>
+                <button class="btn-camera" style="margin-top: 5px;" onclick="adicionarPolicial()">➕ ADICIONAR</button>
+            </div>
+            <hr>
+            <div id="listaCadastrados" style="max-height: 150px; overflow-y: auto; font-size: 0.8rem;"></div>
+        </div>
+<center>
+        <div class="filtros-container">
+            <button class="btn-filtro ativo" onclick="filtrar('TODAS')">TODAS</button>
+            <button class="btn-filtro" onclick="filtrar('A')">TURMA A</button>
+            <button class="btn-filtro" onclick="filtrar('B')">TURMA B</button>
+            <button class="btn-filtro" onclick="filtrar('C')">TURMA C</button>
+            <button class="btn-filtro" onclick="filtrar('D')">TURMA D</button>
+        </div>
+</center>
+        <div class="busca-container">
+            <input type="text" id="inputBusca" placeholder="🔍 Buscar por nome, data ou local..." oninput="renderizarLista()">
+        </div>
+
+        <div class="registro-box">
+            <div class="inputs-row">
+                <div class="input-group">
+                    <label>DATA:</label>
+                    <input type="date" id="dataInput">
+                </div>
+
+                <div class="input-group" style="position: relative;">
+                    <label>RESPONSÁVEL (OPCIONAL):</label>
+                    <div style="display: flex; gap: 5px;">
+                        <input type="text" id="responsavelInput" list="listaPoliciaisDatalist" placeholder="Nome ou selecione..." oninput="autoPreencherHibrido()" style="flex-grow: 1;">
+                        <button onclick="limparResponsavel()" style="margin-top:5px; border-radius:8px; border:1px solid #ccc; cursor:pointer; background: #eee;">✕</button>
+                    </div>
+                    <datalist id="listaPoliciaisDatalist"></datalist>
+                </div>
+                
+                <div class="input-group">
+                    <label>LOCAL DE SERVIÇO:</label>
+                    <select id="localInput">
+                        <optgroup label="GPP">
+                            <option value="GPP I">GPP I - PAVÃO</option>
+                            <option value="GPP II">GPP II - PAVÃOZINHO</option>
+                            <option value="GPP III">GPP III - CANTAGALO</option>
+                        </optgroup>
+                        <optgroup label="GTPP">
+                            <option value="GTPP I">GTPP I - PAVÃO</option>
+                            <option value="GTPP II">GTPP II - CANTAGALO</option>
+                            <option value="GTPP III">GTPP III - COPACABANA</option>
+                        </optgroup>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label>TURMA (ALA):</label>
+                    <select id="turmaInput">
+                        <option value="A">TURMA A</option>
+                        <option value="B">TURMA B</option>
+                        <option value="C">TURMA C</option>
+                        <option value="D">TURMA D</option>
+                    </select>
+                </div>
+                
+                <label class="btn-camera">
+                    📸 FOTO PAPELETA
+                    <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display: none;" onchange="processarFoto()">
+                </label>
+            </div>
+
+            <img id="preview-img">
+            <button id="btnSalvar" class="btn-salvar" onclick="salvarRegistro()">💾 GRAVAR REGISTRO</button>
+        </div>
+
+        <div id="gridRegistros" class="grid-papeletas"></div>
+    </div>
+
+    <div id="modal-overlay" onclick="this.style.display='none'">
+        <img id="modal-img">
+    </div>
+
+    <script>
+        let bancoDados = JSON.parse(localStorage.getItem('papeletas_db_v3')) || [];
+        let filtroAlaAtual = 'TODAS';
+        
+        let listaPoliciais = JSON.parse(localStorage.getItem('policiais_pmerj_db')) || [
+            {nome: "CB PM 103727 BIZONI", local: "GPP II", ala: "A"},
+            {nome: "CB PM 106561 MARCOS", local: "GPP II", ala: "A"},
+            {nome: "CB PM 105249 R. FILHO", local: "GPP II", ala: "A"},
+            {nome: "3º SGT PM 93998 F. PERES", local: "GPP II", ala: "A"},
+            {nome: "CB PM 101823 S. LEMOS", local: "GPP I", ala: "B"},
+            {nome: "SD PM 110297 L. BARBOSA", local: "GPP I", ala: "B"},
+            {nome: "CB PM 106260 BAPTISTA", local: "GPP I", ala: "B"},
+            {nome: "3º SGT PM 91071 DIAS", local: "GPP I", ala: "B"},
+            {nome: "CB PM 102704 J. ANDRÉ", local: "GPP III", ala: "C"},
+            {nome: "CB PM 106351 M. ARAUJO", local: "GPP III", ala: "C"},
+            {nome: "3º SGT PM 93752 CARDOSO", local: "GPP III", ala: "C"},
+            {nome: "CB PM 107520 T. RODRIGUES", local: "GPP I", ala: "C"},
+            {nome: "CB PM 107561 COUTINHO", local: "GPP I", ala: "C"},
+            {nome: "SD PM 110470 TELES", local: "GPP III", ala: "D"},
+            {nome: "CB PM 108677 ÉDVAN", local: "GPP III", ala: "D"},
+            {nome: "2º SGT PM 86367 REGALDINO", local: "GPP II", ala: "D"},
+            {nome: "3º SGT PM 92258 DOMINGOS", local: "GPP II", ala: "D"},
+            {nome: "2º SGT PM 85426 BRITO", local: "GPP II", ala: "D"},
+            {nome: "3º SGT PM 93341 L. FRANCISCO", local: "GPP II", ala: "D"},
+            {nome: "CB PM 108824 CARMO", local: "GTPP I", ala: "A"},
+            {nome: "CB PM 107805 M. PAULO", local: "GTPP I", ala: "A"},
+            {nome: "3º SGT PM 98339 SOUZA", local: "GTPP I", ala: "A"},
+            {nome: "3º SGT PM 95629 FULLY", local: "GTPP III", ala: "A"},
+            {nome: "CB PM 104953 PINHEIRO", local: "GTPP III", ala: "A"},
+            {nome: "CB PM 103051 TIRADENTES", local: "GTPP III", ala: "A"},
+            {nome: "CB PM 104291 FELIX", local: "GTPP III", ala: "A"},
+            {nome: "3º SGT PM 98596 VIDAL", local: "GTPP II", ala: "A"},
+            {nome: "CB PM 108190 UERBERT", local: "GTPP II", ala: "A"},
+            {nome: "CB PM 102190 D. SILVA", local: "GTPP II", ala: "A"},
+            {nome: "CB PM 109067 CAMILO", local: "GTPP I", ala: "B"},
+            {nome: "CB PM 106467 L. SILVA", local: "GTPP I", ala: "B"},
+            {nome: "SD PM 109738 MARIANO", local: "GTPP I", ala: "B"},
+            {nome: "CB PM 105248 DE SOUZA", local: "GTPP II", ala: "B"},
+            {nome: "3º SGT PM 93168 F.", local: "GTPP II", ala: "B"},
+            {nome: "CB PM 109109 RODRIGUES", local: "GTPP II", ala: "B"},
+            {nome: "3º SGT PM 99164 R. MACHADO", local: "GTPP III", ala: "B"},
+            {nome: "3º SGT PM 91783 CHARLES", local: "GTPP III", ala: "B"},
+            {nome: "CB PM 106348 SOARES", local: "GTPP III", ala: "B"},
+            {nome: "3º SGT PM 92732 MARCIO ESTEVÃO", local: "GTPP III", ala: "B"},
+            {nome: "CB PM 105377 F. RIBEIRO", local: "GTPP II", ala: "C"},
+            {nome: "SD PM 108664 SOUSA SILVA", local: "GTPP II", ala: "C"},
+            {nome: "CB PM 105374 LAIA", local: "GTPP II", ala: "C"},
+            {nome: "3º SGT PM 92490 VALIM", local: "GTPP III", ala: "C"},
+            {nome: "CB PM 106650 MATHEUS", local: "GTPP III", ala: "C"},
+            {nome: "3º SGT PM 96287 RODRIGUES", local: "GTPP III", ala: "C"},
+            {nome: "2º SGT PM 85664 DENILSON", local: "GTPP III", ala: "C"},
+            {nome: "3º SGT PM 96003 JONATHA", local: "GTPP I", ala: "C"},
+            {nome: "CB PM 105391 HENRIQUE", local: "GTPP I", ala: "C"},
+            {nome: "CB PM 106037 CAIQUE", local: "GTPP I", ala: "C"},
+            {nome: "3º SGT PM 98202 CRISTIANO", local: "GTPP I", ala: "C"},
+            {nome: "CB PM 108786 TORRES", local: "GTPP I", ala: "D"},
+            {nome: "3º SGT PM 99488 DE PAULA", local: "GTPP I", ala: "D"},
+            {nome: "3º SGT PM 91665 R. ALCANTARA", local: "GTPP I", ala: "D"},
+            {nome: "3º SGT PM 100032 R. LACERDA", local: "GTPP I", ala: "D"},
+            {nome: "3º SGT PM 100360 ULISSES", local: "GTPP II", ala: "D"},
+            {nome: "CB PM 105375 RANGEL", local: "GTPP II", ala: "D"},
+            {nome: "CB PM 104282 SILVA", local: "GTPP II", ala: "D"},
+            {nome: "CB PM 102181 JUNIOR", local: "GTPP III", ala: "D"},
+            {nome: "CB PM 106533 CORTEZ", local: "GTPP III", ala: "D"},
+            {nome: "3º SGT PM 98121 JOHNATHAN", local: "GTPP III", ala: "D"},
+            {nome: "3º SGT PM 96990 CLEISON", local: "GTPP III", ala: "D"}
+        ];
+
+        document.getElementById('dataInput').valueAsDate = new Date();
+        let fotoAtualBase64 = null;
+
+        function atualizarSelectPoliciais() {
+            const datalist = document.getElementById('listaPoliciaisDatalist');
+            datalist.innerHTML = '';
+            listaPoliciais.sort((a,b) => a.nome.localeCompare(b.nome)).forEach(p => {
+                const option = document.createElement('option');
+                option.value = p.nome;
+                datalist.appendChild(option);
+            });
+            renderizarListaGestao();
+        }
+
+        function autoPreencherHibrido() {
+            const nomeDigitado = document.getElementById('responsavelInput').value.toUpperCase();
+            const policial = listaPoliciais.find(p => p.nome.toUpperCase() === nomeDigitado);
+            if(policial) {
+                document.getElementById('localInput').value = policial.local;
+                document.getElementById('turmaInput').value = policial.ala;
+            }
+        }
+
+        function limparResponsavel() {
+            document.getElementById('responsavelInput').value = '';
+            document.getElementById('responsavelInput').focus();
+        }
+
+        function toggleGestao() {
+            const painel = document.getElementById('gestaoPoliciais');
+            painel.style.display = painel.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function adicionarPolicial() {
+            const nome = document.getElementById('novoNome').value.toUpperCase();
+            if(!nome) return alert("Digite o nome!");
+            listaPoliciais.push({
+                nome: nome,
+                local: document.getElementById('novoLocal').value,
+                ala: document.getElementById('novaAla').value
+            });
+            localStorage.setItem('policiais_pmerj_db', JSON.stringify(listaPoliciais));
+            document.getElementById('novoNome').value = "";
+            atualizarSelectPoliciais();
+        }
+
+        function removerPolicial(index) {
+            if(confirm("Remover policial da lista?")) {
+                listaPoliciais.splice(index, 1);
+                localStorage.setItem('policiais_pmerj_db', JSON.stringify(listaPoliciais));
+                atualizarSelectPoliciais();
+            }
+        }
+
+        function renderizarListaGestao() {
+            const div = document.getElementById('listaCadastrados');
+            div.innerHTML = listaPoliciais.map((p, i) => 
+                `<div style="display:flex; justify-content:space-between; padding:5px; border-bottom:1px solid #ddd">
+                    ${p.nome} (${p.local} - Ala ${p.ala}) 
+                    <button onclick="removerPolicial(${i})" style="color:red; border:none; background:none; cursor:pointer">✖</button>
+                </div>`
+            ).join('');
+        }
+
+        function processarFoto() {
+            const input = document.getElementById('cameraInput');
+            if (input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.src = e.target.result;
+                    img.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        const maxW = 800;
+                        const scale = maxW / img.width;
+                        canvas.width = maxW;
+                        canvas.height = img.height * scale;
+                        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+                        fotoAtualBase64 = canvas.toDataURL('image/jpeg', 0.7);
+                        document.getElementById('preview-img').src = fotoAtualBase64;
+                        document.getElementById('preview-img').style.display = 'block';
+                        document.getElementById('btnSalvar').style.display = 'block';
+                    }
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function salvarRegistro() {
+            if (!fotoAtualBase64) return alert("Tire a foto!");
+            const registro = {
+                id: Date.now(),
+                data: document.getElementById('dataInput').value,
+                turma: document.getElementById('turmaInput').value,
+                local: document.getElementById('localInput').value,
+                responsavel: document.getElementById('responsavelInput').value.trim() || "Não informado",
+                foto: fotoAtualBase64
+            };
+            bancoDados.unshift(registro);
+            localStorage.setItem('papeletas_db_v3', JSON.stringify(bancoDados));
+            location.reload(); 
+        }
+
+        function renderizarLista() {
+            const termoBusca = document.getElementById('inputBusca').value.toLowerCase();
+            const grid = document.getElementById('gridRegistros');
+            grid.innerHTML = '';
+            
+            // Filtra pela Ala e depois pelo termo de Busca
+            let listaFiltrada = filtroAlaAtual === 'TODAS' ? bancoDados : bancoDados.filter(i => i.turma === filtroAlaAtual);
+            
+            if(termoBusca) {
+                listaFiltrada = listaFiltrada.filter(item => {
+                    const dataF = item.data.split('-').reverse().join('/');
+                    return item.responsavel.toLowerCase().includes(termoBusca) || 
+                           item.local.toLowerCase().includes(termoBusca) || 
+                           dataF.includes(termoBusca);
+                });
+            }
+
+            listaFiltrada.forEach(item => {
+                const dataF = item.data.split('-').reverse().join('/');
+                grid.innerHTML += `
+                    <div class="card">
+                        <div class="card-header">📅 ${dataF}</div>
+                        <div class="card-body">
+                            <span class="badge">TURMA ${item.turma}</span>
+                            <span class="badge" style="background: #b8860b">${item.local}</span>
+                            <p style="font-size:0.7rem; margin-top:5px; color:#666">Resp: ${item.responsavel}</p>
+                        </div>
+                        <img src="${item.foto}" class="card-img" onclick="verFoto('${item.foto}')">
+                        <button class="btn-excluir" onclick="excluir(${item.id})">🗑️ Excluir</button>
+                    </div>
+                `;
+            });
+        }
+
+        function exportarDados() {
+            const dataStr = JSON.stringify({papeletas: bancoDados, policiais: listaPoliciais});
+            const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+            const link = document.createElement('a');
+            link.setAttribute('href', dataUri);
+            link.setAttribute('download', `backup_reserva_${new Date().toISOString().slice(0,10)}.json`);
+            link.click();
+        }
+
+        function importarDados(input) {
+            const reader = new FileReader();
+            reader.onload = function() {
+                const dados = JSON.parse(reader.result);
+                if(dados.papeletas) bancoDados = [...dados.papeletas, ...bancoDados];
+                if(dados.policiais) listaPoliciais = dados.policiais;
+                localStorage.setItem('papeletas_db_v3', JSON.stringify(bancoDados));
+                localStorage.setItem('policiais_pmerj_db', JSON.stringify(listaPoliciais));
+                location.reload();
+            };
+            reader.readAsText(input.files[0]);
+        }
+
+        function filtrar(t) {
+            filtroAlaAtual = t;
+            document.querySelectorAll('.btn-filtro').forEach(b => b.classList.remove('ativo'));
+            event.target.classList.add('ativo');
+            renderizarLista();
+        }
+
+        function excluir(id) {
+            if(confirm("Excluir?")) {
+                bancoDados = bancoDados.filter(i => i.id !== id);
+                localStorage.setItem('papeletas_db_v3', JSON.stringify(bancoDados));
+                renderizarLista();
+            }
+        }
+
+        function verFoto(src) {
+            document.getElementById('modal-img').src = src;
+            document.getElementById('modal-overlay').style.display = 'flex';
+        }
+
+        atualizarSelectPoliciais();
+        renderizarLista();
+    </script>
+</body>
+</html>

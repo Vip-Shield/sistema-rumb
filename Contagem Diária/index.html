@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contador de Material RUMB</title>
+    <link rel="shortcut icon" type="imagex/png" href="../IMAGENS/caveira.ico">
+
+    <style>
+        :root {
+            --azul-pmerj: #0b2c4d;
+            --azul-claro: #1f4f82;
+            --cinza-fundo: #f4f7f6;
+            --branco: #ffffff;
+            --vermelho: #d9534f;
+            --verde: #5cb85c;
+            --amarelo: #f0ad4e;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--cinza-fundo);
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+
+        header {
+            background-color: var(--azul-pmerj);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .container {
+            padding: 20px;
+            max-width: 1400px;
+            margin: auto;
+        }
+
+        .info-section {
+            display: flex;
+            gap: 20px;
+            background: var(--branco);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .info-group {
+            flex: 1;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+
+        input[type="text"], input[type="date"], input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            overflow-y: auto; /* Habilita rolagem vertical no container */
+            max-height: 70vh; /* Define uma altura máxima para ativar o congelamento do cabeçalho */
+            background: var(--branco);
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1200px;
+        }
+
+        th {
+            background-color: var(--azul-claro);
+            color: white;
+            padding: 12px 8px;
+            text-align: center;
+            font-size: 0.85em;
+            text-transform: uppercase;
+            vertical-align: top;
+            /* Regras para o congelamento */
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .header-opt {
+            margin-top: 5px;
+            font-size: 9px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #ccc;
+            font-weight: normal;
+            text-transform: none;
+        }
+        .header-opt input {
+            cursor: pointer;
+            margin-bottom: 2px;
+        }
+        .header-opt span {
+            cursor: pointer;
+        }
+
+        td {
+            padding: 10px 5px;
+            border-bottom: 1px solid #eee;
+            text-align: center;
+            font-size: 0.9em;
+        }
+
+        .col-desc { text-align: left; padding-left: 15px; width: 250px; }
+        .col-input { width: 70px; }
+        
+        input.input-contagem {
+            text-align: center;
+            border: 1px solid #ddd;
+            background-color: #fff9e6;
+        }
+        
+        input.input-inicial {
+            text-align: center;
+            border: 2px solid #0b2c4d;
+            background-color: #e3f2fd;
+            font-weight: bold;
+            color: #0b2c4d;
+        }
+
+        .status-faltando {
+            font-weight: bold;
+            color: var(--vermelho);
+        }
+
+        .status-ok {
+            background-color: #e8f5e9 !important;
+            color: #2e7d32;
+        }
+
+        .status-erro {
+            background-color: #ffebee !important;
+            color: #c62828;
+        }
+
+        .btn-container {
+            margin-top: 20px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn-print {
+            background-color: var(--azul-pmerj);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .btn-reset {
+            background-color: var(--amarelo);
+            color: #000;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            border: 1px solid #dba24a;
+        }
+
+        .btn-export {
+            background-color: #17a2b8;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-import {
+            background-color: var(--verde);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-print:hover { background-color: #154675; }
+        .btn-reset:hover { background-color: #e0a800; }
+        .btn-export:hover { background-color: #138496; }
+        .btn-import:hover { background-color: #4cae4c; }
+
+        @media print {
+            .btn-container, .header-opt { display: none !important; }
+            input { border: none !important; background: transparent !important; }
+            th, td { border: 1px solid #000; font-size: 10px; padding: 4px; }
+        }
+
+        .logo {
+            width: 80px;
+            align-items: center;
+            vertical-align: middle;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1><a href="../dashboard.html"><img src="caveira-dourada.png" alt="Foto da Caveira Armada" class="logo" title="Voltar ao Painel"></a>CONTAGEM DIÁRIA RUMB <img src="caveira-dourada.png" alt="Foto da Caveira Armada" class="logo"></h1>
+    <p>Setor de Material e Cautela</p>
+</header>
+
+<div class="container">
+    <div class="info-section">
+        <div class="info-group">
+            <label>Data da Contagem:</label>
+            <input type="date" id="dataAtual">
+        </div>
+        <div class="info-group">
+            <label>Responsável pela Contagem:</label>
+            <input type="text" id="responsavel" placeholder="Nome do Responsável">
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table id="tabelaContagem">
+            <thead>
+                <tr>
+                    <th>Cód</th>
+                    <th>Descrição</th>
+                    
+                    <th>
+                        Qtd Inicial
+                        <div class="header-opt">
+                            <input type="checkbox" id="chk-inicial" checked title="Manter este valor ao limpar">
+                            <span>Manter</span>
+                        </div>
+                    </th> 
+                    
+                    <th>
+                        RUMB
+                        <div class="header-opt">
+                            <input type="checkbox" id="chk-rumb" title="Manter este valor ao limpar">
+                            <span>Manter</span>
+                        </div>
+                    </th>
+                    
+                    <th>
+                        Ordinário
+                        <div class="header-opt">
+                            <input type="checkbox" id="chk-ord" title="Manter este valor ao limpar">
+                            <span>Manter</span>
+                        </div>
+                    </th>
+
+                    <th>
+                        Ord. Serv. Passado
+                        <div class="header-opt">
+                            <input type="checkbox" id="chk-ord-passado" title="Manter este valor ao limpar">
+                            <span>Manter</span>
+                        </div>
+                    </th>
+                    
+                    <th>
+                        RAS
+                        <div class="header-opt">
+                            <input type="checkbox" id="chk-ras" title="Manter este valor ao limpar">
+                            <span>Manter</span>
+                        </div>
+                    </th>
+                    
+                    <th>
+                        PROEIS
+                        <div class="header-opt">
+                            <input type="checkbox" id="chk-proeis" title="Manter este valor ao limpar">
+                            <span>Manter</span>
+                        </div>
+                    </th>
+                    
+                    <th>
+                        Perm.
+                        <div class="header-opt">
+                            <input type="checkbox" id="chk-perm" checked title="Manter este valor ao limpar">
+                            <span>Manter</span>
+                        </div>
+                    </th>
+                    
+                    <th>
+                        Guardado
+                        <div class="header-opt">
+                            <input type="checkbox" id="chk-guard" title="Manter este valor ao limpar">
+                            <span>Manter</span>
+                        </div>
+                    </th>
+                    
+                    <th>
+                        Baixada
+                        <div class="header-opt">
+                            <input type="checkbox" id="chk-baixa" checked title="Manter este valor ao limpar">
+                            <span>Manter</span>
+                        </div>
+                    </th> 
+                    
+                    <th>Faltando</th>
+                    <th>Total Atual</th>
+                </tr>
+            </thead>
+            <tbody id="corpoTabela">
+            </tbody>
+        </table>
+    </div>
+
+    <div class="btn-container">
+        <!-- Novos botões de Salvar/Importar -->
+        <input type="file" id="arquivoImportacao" accept=".json" style="display: none;" onchange="importarDados(event)">
+        <button class="btn-import" onclick="document.getElementById('arquivoImportacao').click()">📂 Importar Dados</button>
+        <button class="btn-export" onclick="exportarDados()">💾 Salvar Arquivo</button>
+        
+        <!-- Botões originais -->
+        <button class="btn-reset" onclick="iniciarNovoDia()">🧹 INICIAR NOVO DIA (ZERAR NÃO MARCADOS)</button>
+        <button class="btn-print" onclick="window.print()">🖨️ Imprimir / PDF</button>
+    </div>
+</div>
+
+<script>
+    // Lista de Materiais Atualizada
+    const materiaisPadrao = [
+        { cod: "001", desc: "Pistola PT100", cat: "Arma Curta", inicial: 20 },
+        { cod: "002", desc: "Carregadores PT100", cat: "Munição", inicial: 60 },
+        { cod: "003", desc: "Pistola IMBEL", cat: "Arma Curta", inicial: 10 },
+        { cod: "004", desc: "Carregadores IMBEL", cat: "Munição", inicial: 20 },
+        { cod: "005", desc: "Fuzil 7.62", cat: "Arma Longa", inicial: 17 },
+        { cod: "006", desc: "Carregadores Fuzil 7.62", cat: "Munição", inicial: 32 },
+        { cod: "007", desc: "Fuzil 5.56", cat: "Arma Longa", inicial: 8 },
+        { cod: "008", desc: "Carregadores Fuzil 5.56", cat: "Munição", inicial: 16 },
+        { cod: "009", desc: "Espingarda CAL. 12 M3 A1 BENELLI (Nº SEPM-00267Y)", cat: "Arma Longa", inicial: 1 },
+        { cod: "010", desc: "Lançador Cal. 37/40mm (Nº G27609)", cat: "Arma Longa", inicial: 1 },
+        { cod: "011", desc: "Cartuchos 37/40mm", cat: "Munição", inicial: 10 },
+        { cod: "012", desc: "Munições de Elastômero", cat: "Munição", inicial: 100 },
+        { cod: "013", desc: "Coletes Balísticos Nível 3", cat: "Equipamentos", inicial: 75 },
+        { cod: "014", desc: "Capacetes Balísticos", cat: "Equipamentos", inicial: 4 },
+        { cod: "015", desc: "Rádio Digital", cat: "Comunicador", inicial: 20 },
+        { cod: "016", desc: "Câmeras - COP", cat: "Equipamento", inicial: 64 },
+        { cod: "017", desc: "Tonfas", cat: "Outros", inicial: 26 },
+        { cod: "018", desc: "GL 108 MAX Espargidor 450g (Lote MUT-V)", cat: "Efeito moral", inicial: 4 },
+        { cod: "019", desc: "GL 108 MINI Espargidor 65g (Lote MUT-X)", cat: "Efeito moral", inicial: 2 },
+        { cod: "020", desc: "Spark", cat: "Equipamento", inicial: 4 } // Novo Item
+    ];
+
+    const corpoTabela = document.getElementById('corpoTabela');
+
+    // Tenta carregar do LocalStorage ou usa o padrão
+    let dadosSalvos = JSON.parse(localStorage.getItem('db_contagem_rumb')) || {};
+
+    function renderizarTabela() {
+        corpoTabela.innerHTML = ""; // Limpa antes de renderizar
+
+        materiaisPadrao.forEach((item, index) => {
+            // Tenta recuperar valores salvos para esta linha, senão usa 0 ou o inicial padrão
+            let linhaSalva = dadosSalvos[index] || {};
+            
+            // Valor Inicial: Se tiver salvo, usa o salvo. Se não, usa o do array padrão.
+            let valInicial = linhaSalva.inicial !== undefined ? linhaSalva.inicial : item.inicial;
+            
+            // Demais valores
+            let valRumb = linhaSalva.rumb || 0;
+            let valOrd = linhaSalva.ord || 0;
+            let valOrdPassado = linhaSalva.ordPassado || 0;
+            let valRas = linhaSalva.ras || 0;
+            let valProeis = linhaSalva.proeis || 0;
+            let valPerm = linhaSalva.perm || 0;
+            let valGuard = linhaSalva.guard || 0;
+            let valBaixa = linhaSalva.baixa || 0;
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${item.cod}</td>
+                <td class="col-desc">${item.desc}</td>
+                
+                <td class="col-input"><input type="number" class="input-inicial" value="${valInicial}" oninput="calcular(${index})" id="inicial-${index}"></td>
+                
+                <td class="col-input"><input type="number" class="input-contagem" value="${valRumb}" min="0" oninput="calcular(${index})" id="rumb-${index}"></td>
+                <td class="col-input"><input type="number" class="input-contagem" value="${valOrd}" min="0" oninput="calcular(${index})" id="ord-${index}"></td>
+                <td class="col-input"><input type="number" class="input-contagem" value="${valOrdPassado}" min="0" oninput="calcular(${index})" id="ordPassado-${index}"></td>
+                <td class="col-input"><input type="number" class="input-contagem" value="${valRas}" min="0" oninput="calcular(${index})" id="ras-${index}"></td>
+                <td class="col-input"><input type="number" class="input-contagem" value="${valProeis}" min="0" oninput="calcular(${index})" id="proeis-${index}"></td>
+                <td class="col-input"><input type="number" class="input-contagem" value="${valPerm}" min="0" oninput="calcular(${index})" id="perm-${index}"></td>
+                <td class="col-input"><input type="number" class="input-contagem" value="${valGuard}" min="0" oninput="calcular(${index})" id="guard-${index}"></td>
+                <td class="col-input"><input type="number" class="input-contagem" value="${valBaixa}" min="0" oninput="calcular(${index})" id="baixa-${index}"></td>
+                
+                <td id="falta-${index}" class="status-faltando">0</td>
+                <td id="total-${index}">0</td>
+            `;
+            corpoTabela.appendChild(tr);
+            
+            // Força o cálculo inicial para atualizar cores e totais
+            calcular(index, false); 
+        });
+    }
+
+    function calcular(idx, salvar = true) {
+        const inicial = parseInt(document.getElementById(`inicial-${idx}`).value) || 0;
+        
+        const rumb = parseInt(document.getElementById(`rumb-${idx}`).value) || 0;
+        const ord = parseInt(document.getElementById(`ord-${idx}`).value) || 0;
+        const ordPassado = parseInt(document.getElementById(`ordPassado-${idx}`).value) || 0;
+        const ras = parseInt(document.getElementById(`ras-${idx}`).value) || 0;
+        const proeis = parseInt(document.getElementById(`proeis-${idx}`).value) || 0;
+        const perm = parseInt(document.getElementById(`perm-${idx}`).value) || 0;
+        const guard = parseInt(document.getElementById(`guard-${idx}`).value) || 0;
+        const baixa = parseInt(document.getElementById(`baixa-${idx}`).value) || 0;
+
+        const totalAtual = rumb + ord + ordPassado + ras + proeis + perm + guard + baixa;
+        const falta = inicial - totalAtual;
+
+        const cellTotal = document.getElementById(`total-${idx}`);
+        const cellFalta = document.getElementById(`falta-${idx}`);
+
+        cellTotal.innerText = totalAtual;
+        cellFalta.innerText = falta;
+
+        // Feedback visual
+        if (falta === 0) {
+            cellFalta.parentElement.className = "status-ok";
+        } else if (falta > 0) {
+            cellFalta.parentElement.className = "status-erro";
+        } else {
+            cellFalta.parentElement.className = ""; 
+        }
+
+        // Salvar no objeto global e no LocalStorage
+        if (salvar) {
+            dadosSalvos[idx] = {
+                inicial: inicial,
+                rumb: rumb, ord: ord, ordPassado: ordPassado, ras: ras, proeis: proeis,
+                perm: perm, guard: guard, baixa: baixa
+            };
+            localStorage.setItem('db_contagem_rumb', JSON.stringify(dadosSalvos));
+        }
+    }
+
+    // Função para limpar colunas não marcadas
+    function iniciarNovoDia() {
+        if(!confirm("Tem certeza? Isso zerará todas as colunas que NÃO estão marcadas com 'Manter'.")) return;
+
+        // Verifica o estado dos checkboxes no cabeçalho
+        const manterInicial = document.getElementById('chk-inicial').checked;
+        const manterRumb = document.getElementById('chk-rumb').checked;
+        const manterOrd = document.getElementById('chk-ord').checked;
+        const manterOrdPassado = document.getElementById('chk-ord-passado').checked;
+        const manterRas = document.getElementById('chk-ras').checked;
+        const manterProeis = document.getElementById('chk-proeis').checked;
+        const manterPerm = document.getElementById('chk-perm').checked;
+        const manterGuard = document.getElementById('chk-guard').checked;
+        const manterBaixa = document.getElementById('chk-baixa').checked;
+
+        // Itera sobre as linhas para limpar
+        materiaisPadrao.forEach((item, index) => {
+            if(!manterInicial) document.getElementById(`inicial-${index}`).value = 0; 
+            if(!manterRumb) document.getElementById(`rumb-${index}`).value = 0;
+            if(!manterOrd) document.getElementById(`ord-${index}`).value = 0;
+            if(!manterOrdPassado) document.getElementById(`ordPassado-${index}`).value = 0;
+            if(!manterRas) document.getElementById(`ras-${index}`).value = 0;
+            if(!manterProeis) document.getElementById(`proeis-${index}`).value = 0;
+            if(!manterPerm) document.getElementById(`perm-${index}`).value = 0;
+            if(!manterGuard) document.getElementById(`guard-${index}`).value = 0;
+            if(!manterBaixa) document.getElementById(`baixa-${index}`).value = 0;
+
+            // Recalcula e salva
+            calcular(index, true);
+        });
+
+        // Atualiza a data para hoje
+        document.getElementById('dataAtual').valueAsDate = new Date();
+    }
+
+    // Novas funções para Exportar e Importar JSON
+    function exportarDados() {
+        const dataObj = {
+            data: document.getElementById('dataAtual').value,
+            responsavel: document.getElementById('responsavel').value,
+            dados: dadosSalvos
+        };
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dataObj, null, 2));
+        const downloadAnchorNode = document.createElement('a');
+        downloadAnchorNode.setAttribute("href", dataStr);
+        
+        const dataNome = dataObj.data ? dataObj.data : 'sem_data';
+        downloadAnchorNode.setAttribute("download", "contagem_rumb_" + dataNome + ".json");
+        document.body.appendChild(downloadAnchorNode);
+        downloadAnchorNode.click();
+        downloadAnchorNode.remove();
+    }
+
+    function importarDados(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const obj = JSON.parse(e.target.result);
+                
+                if(obj.dados) {
+                    dadosSalvos = obj.dados;
+                    localStorage.setItem('db_contagem_rumb', JSON.stringify(dadosSalvos));
+                }
+                
+                if(obj.data) {
+                    document.getElementById('dataAtual').value = obj.data;
+                }
+                
+                if(obj.responsavel) {
+                    document.getElementById('responsavel').value = obj.responsavel;
+                }
+                
+                renderizarTabela();
+                alert("Arquivo importado com sucesso!");
+            } catch (error) {
+                alert("Erro ao importar. O arquivo selecionado não é válido.");
+            }
+        };
+        reader.readAsText(file);
+        
+        // Reseta o input para permitir importar o mesmo arquivo novamente, se necessário
+        event.target.value = '';
+    }
+
+    // Inicialização
+    document.getElementById('dataAtual').valueAsDate = new Date();
+    renderizarTabela();
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Radar de Pendências e Auditoria - RUMB</title>
+    <link rel="shortcut icon" type="imagex/png" href="../IMAGENS/caveira.ico">
+
+<style>
+  /* --- ESTILOS GERAIS E FUNDO --- */
+  body { 
+    font-family: 'Segoe UI', Roboto, Arial, sans-serif; 
+    background-color: #0f172a; /* Cor de fundo sólida caso a imagem falhe */
+    color: #f1f5f9; 
+    margin: 0; 
+    padding: 20px; 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    position: relative; /* Necessário para o fundo funcionar */
+    overflow-x: hidden;
+  }
+
+  /* Configuração da Imagem de Fundo (Caveira como Marca D'água) */
+  body::before {
+      content: "";
+      position: fixed; /* Fica fixo na tela, não rola */
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      /* Substitua se quiser outra imagem de fundo */
+      background-image: url('caveira-armada.png'); 
+      background-position: center center;
+      background-repeat: no-repeat;
+      /* 'cover' preenche a tela, 'contain' mostra a imagem inteira no centro */
+      background-size: cover; 
+      opacity: 0.15; /* Deixa bem transparente para não atrapalhar o texto */
+      filter: grayscale(100%) contrast(120%); /* Deixa preto e branco e com mais contraste */
+      z-index: -1; /* Fica atrás de tudo */
+      pointer-events: none;
+  }
+
+  /* --- CABEÇALHO REFORMULADO --- */
+  .header {
+    width: 100%;
+    max-width: 900px;
+    margin-bottom: 25px;
+    border-bottom: 3px solid #b45309; /* Linha laranja mais grossa */
+    padding-bottom: 15px;
+    background: rgba(15, 23, 42, 0.8); /* Fundo semi-transparente para melhorar leitura */
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+  }
+
+  .header-title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+  }
+
+  .header-logo {
+      width: 70px; /* Tamanho dos logos laterais */
+      height: auto;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+  }
+
+  .header h1 {
+      margin: 0 15px;
+      color: #ffd700; /* Dourado */
+      text-transform: uppercase;
+      font-size: 24px;
+      text-align: center;
+      flex-grow: 1; /* Ocupa o espaço central */
+      letter-spacing: 1px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+  }
+
+  .header p {
+      margin: 0;
+      color: #cbd5e1;
+      font-size: 14px;
+      text-align: center;
+      font-weight: 500;
+  }
+
+  /* --- ÁREA DE CONTROLE (BUSCA E UPLOAD) --- */
+  .control-panel {
+    width: 100%;
+    max-width: 700px;
+    background: rgba(30, 41, 59, 0.95); /* Fundo mais sólido */
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    border: 1px solid #334155;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    backdrop-filter: blur(5px); /* Efeito de desfoque no fundo */
+  }
+
+  /* ÁREA DE UPLOAD (AUDITORIA) */
+  .upload-area {
+    border: 2px dashed #475569;
+    padding: 15px;
+    border-radius: 8px;
+    background: rgba(15, 23, 42, 0.6);
+    transition: 0.3s;
+  }
+  .upload-area:hover { border-color: #ffd700; background: rgba(24, 34, 54, 0.8); }
+  
+  .upload-label {
+    cursor: pointer;
+    display: block;
+    color: #94a3b8;
+    font-size: 13px;
+    font-weight: bold;
+  }
+  .upload-label span { color: #ffd700; font-size: 15px; display: block; margin-bottom: 5px; }
+  
+  #fileInput { display: none; }
+
+  /* CAMPO DE BUSCA */
+  .search-box label { display: block; margin-bottom: 8px; color: #fff; font-weight: bold; font-size: 14px; }
+  
+  input[type="text"] {
+    width: 90%;
+    padding: 12px;
+    font-size: 16px;
+    text-align: center;
+    border-radius: 5px;
+    border: 2px solid #475569;
+    background: #334155;
+    color: white;
+    text-transform: uppercase;
+    outline: none;
+  }
+  input[type="text"]:focus { border-color: #38bdf8; background: #475569; }
+
+  /* MENSAGENS DE STATUS */
+  #statusMsg { font-size: 13px; margin-top: 5px; min-height: 20px; font-weight: 500; }
+  .msg-local { color: #38bdf8; }
+  .msg-arquivo { color: #ffd700; font-weight: bold; }
+
+  /* RESULTADOS */
+  #resultados {
+    width: 100%;
+    max-width: 800px;
+    margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .card {
+    background: rgba(30, 41, 59, 0.95); /* Fundo semi-transparente */
+    border-left: 6px solid;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+    position: relative;
+    animation: fadeIn 0.3s ease-in-out;
+    backdrop-filter: blur(5px);
+  }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* CORES DOS LIVROS */
+  .bord-ordinario { border-color: #b8860b; }
+  .bord-proeis { border-color: #0074D9; }
+  .bord-gas { border-color: #FF851B; }
+  .bord-perm { border-color: #a855f7; }
+  .bord-apto { border-color: #dc2626; }
+  
+  .tag { font-size: 10px; padding: 3px 7px; border-radius: 3px; font-weight: bold; color: white; text-transform: uppercase; margin-right: 5px; box-shadow: 1px 1px 3px rgba(0,0,0,0.3);}
+  .bg-ordinario { background: #b8860b; color: black; }
+  .bg-proeis { background: #0074D9; }
+  .bg-gas { background: #FF851B; color: black; }
+  .bg-perm { background: #a855f7; }
+  .bg-apto { background: #dc2626; }
+
+  .policial-info { font-size: 17px; font-weight: bold; color: #f8fafc; margin-top: 8px; text-shadow: 1px 1px 2px black;}
+  .rg-info { font-size: 13px; color: #cbd5e1; font-weight: normal; }
+  
+  .detalhes { font-size: 13px; color: #cbd5e1; margin-top: 10px; padding-top: 10px; border-top: 1px solid #475569; }
+  .item-destaque { color: #ffd700; font-weight: bold; font-size: 15px; }
+
+  .data-hora { float: right; font-size: 12px; color: #ff4d4d; font-weight: bold; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 4px;}
+
+  .no-results { text-align: center; color: #cbd5e1; font-size: 16px; margin-top: 20px; border: 2px dashed #475569; padding: 20px; border-radius: 10px; background: rgba(15, 23, 42, 0.6); }
+
+  .btn-voltar {
+    margin-top: 30px;
+    background: #334155;
+    color: white;
+    text-decoration: none;
+    padding: 12px 24px;
+    border-radius: 5px;
+    font-weight: bold;
+    font-size: 13px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    transition: 0.2s;
+  }
+  .btn-voltar:hover { background: #475569; transform: translateY(-2px); }
+
+</style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="header-title-row">
+        <a href="../dashboard.html">
+<img src="logo_pmerj.png" alt="Logo PMERJ" class="header-logo" title="Voltar ao Painel"></a>
+        
+        <h1>AUDITORIA DE PENDÊNCIAS</h1>
+        
+        <img src="escudo.png" alt="Escudo RUMB" class="header-logo">
+    </div>
+    <p>3ª UPP/19º BPM - CIA UPP TABAJARAS - VERIFICAÇÃO INTEGRADA</p>
+  </div>
+
+
+  <div class="control-panel">
+    
+    <div class="upload-area">
+      <label for="fileInput" class="upload-label">
+        <span>📂 MODO AUDITORIA (POR ARQUIVO)</span>
+        Clique aqui para selecionar seus arquivos de Backup (.json)<br>
+        (Você pode selecionar vários de uma vez)
+      </label>
+      <input type="file" id="fileInput" multiple accept=".json" onchange="carregarArquivos(this)">
+    </div>
+
+    <div id="statusMsg" class="msg-local">📡 Modo Atual: Monitoramento via Navegador (Local)</div>
+
+    <div class="search-box">
+      <label>PESQUISAR POLICIAL (RG OU NOME):</label>
+      <input type="text" id="searchInput" placeholder="DIGITE PARA FILTRAR..." onkeyup="aplicarFiltro()">
+    </div>
+  </div>
+
+  <div id="resultados"></div>
+
+  <a href="../dashboard.html" class="btn-voltar">VOLTAR AO PAINEL</a>
+
+<script>
+  // --- MESMO SCRIPT DE ANTES (SEM ALTERAÇÕES NA LÓGICA) ---
+  let DADOS_GLOBAIS = [];
+
+  function identificarOrigem(registro) {
+    if (registro.armario) return { tipo: 'APTO C / RETENÇÃO', classe: 'bord-apto', bg: 'bg-apto', item: registro.numArma, statusKey: 'GUARDADO' };
+    if (registro.patrimonio) return { tipo: 'ESPARGIDOR (GÁS)', classe: 'bord-gas', bg: 'bg-gas', item: `GÁS: ${registro.patrimonio}`, statusKey: 'Cautelado' };
+    if (registro.dataAt && registro.rumb) return { tipo: 'PROEIS', classe: 'bord-proeis', bg: 'bg-proeis', item: registro.arma, statusKey: 'Cautelado' };
+    if (registro.nomeEscala) return { tipo: 'PERMANENTE', classe: 'bord-perm', bg: 'bg-perm', item: registro.armaInd, statusKey: 'ABERTO' };
+    if (registro.cop1 || registro.armaInd) return { tipo: 'SERVIÇO (ORD/COMP)', classe: 'bord-ordinario', bg: 'bg-ordinario', item: registro.armaInd, statusKey: 'ABERTO' };
+    return { tipo: 'DESCONHECIDO', classe: '', bg: '', item: '???', statusKey: 'ABERTO' };
+  }
+
+  window.onload = function() {
+    carregarDoLocalStorage();
+  };
+
+  function carregarDoLocalStorage() {
+    DADOS_GLOBAIS = [];
+    const chaves = [
+      'livroRazaoRUMB_v2', 'livroCautela_Ras-Compulsorio', 'livroCautela_PROEIS', 
+      'livroCautela_GAS', 'livroCautela_Permanente', 'livroCautela_apto-c'
+    ];
+    chaves.forEach(key => {
+      const raw = localStorage.getItem(key);
+      if(raw) {
+        try {
+          const arr = JSON.parse(raw);
+          if(Array.isArray(arr)) DADOS_GLOBAIS = DADOS_GLOBAIS.concat(arr);
+        } catch(e) {}
+      }
+    });
+    document.getElementById('statusMsg').innerHTML = "📡 Modo Atual: Monitoramento via Navegador (Local)";
+    document.getElementById('statusMsg').className = "msg-local";
+    aplicarFiltro();
+  }
+
+  function carregarArquivos(input) {
+    const arquivos = input.files;
+    if(arquivos.length === 0) return;
+    DADOS_GLOBAIS = [];
+    let lidos = 0;
+    Array.from(arquivos).forEach(arquivo => {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const json = JSON.parse(e.target.result);
+          if(Array.isArray(json)) DADOS_GLOBAIS = DADOS_GLOBAIS.concat(json);
+        } catch(err) { console.error("Erro ao ler arquivo: " + arquivo.name); }
+        lidos++;
+        if(lidos === arquivos.length) {
+          document.getElementById('statusMsg').innerHTML = `📂 Modo Auditoria: Analisando ${arquivos.length} arquivo(s) carregado(s).`;
+          document.getElementById('statusMsg').className = "msg-arquivo";
+          aplicarFiltro();
+          alert(`Leitura concluída! ${DADOS_GLOBAIS.length} registros importados para análise.`);
+        }
+      };
+      reader.readAsText(arquivo);
+    });
+  }
+
+  function aplicarFiltro() {
+    const termo = document.getElementById('searchInput').value.toUpperCase().trim();
+    const container = document.getElementById('resultados');
+    container.innerHTML = "";
+    if(termo.length < 2) {
+      container.innerHTML = '<div class="no-results">⌨️ Digite o RG ou Nome para pesquisar...</div>';
+      return;
+    }
+    let encontrados = 0;
+    DADOS_GLOBAIS.forEach(reg => {
+      const config = identificarOrigem(reg);
+      if(reg.status !== config.statusKey) return; 
+      const nome = (reg.nome || reg.nomePolicial || reg.nomeEscala || '').toUpperCase();
+      const rg = (reg.rg || '').toUpperCase();
+      if(nome.includes(termo) || rg.includes(termo)) {
+        criarCard(reg, config, container);
+        encontrados++;
+      }
+    });
+    if(encontrados === 0) {
+      container.innerHTML = '<div class="no-results">✅ Nada consta (Pendências) para os dados pesquisados.</div>';
+    }
+  }
+
+  function criarCard(reg, config, container) {
+    const div = document.createElement('div');
+    div.className = `card ${config.classe}`;
+    let data = reg.dataS || reg.dataC || reg.dataCautela || reg.dataAt || '??';
+    let hora = reg.horaS || reg.horaC || reg.horaCautela || '??';
+    if(data.includes('-') && data.length === 10) data = data.split('-').reverse().join('/');
+    const nome = reg.nome || reg.nomePolicial || reg.nomeEscala || 'S/ NOME';
+    const gh = reg.gh || '';
+    const rg = reg.rg || 'S/ RG';
+    let extras = "";
+    if(reg.obs) extras += ` | Obs: ${reg.obs}`;
+    if(reg.modelo) extras += ` | Mod: ${reg.modelo}`;
+    if(reg.cop1) extras += ` | COP: ${reg.cop1}`;
+    if(reg.armario) extras += ` | Armário: ${reg.armario}`;
+
+    div.innerHTML = `
+      <div class="data-hora">Desde: ${data} às ${hora}</div>
+      <div><span class="tag ${config.bg}">${config.tipo}</span></div>
+      <div class="policial-info">
+        ${gh} ${nome} <span class="rg-info">(RG: ${rg})</span>
+      </div>
+      <div class="detalhes">
+        PENDÊNCIA: <span class="item-destaque">${config.item || 'MATERIAL DIVERSO'}</span>
+        <br><span style="color:#cbd5e1; font-size:11px;">${extras}</span>
+      </div>
+    `;
+    container.appendChild(div);
+  }
+</script>
+</body>
+</html>

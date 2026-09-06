@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Protocolo Energia LIGHT - UPP PAVÃO</title>
+    <link rel="shortcut icon" type="imagex/png" href="../IMAGENS/caveira.ico">
+
+<style>
+  /* ESTILO GERAL */
+  body { 
+    font-family: 'Segoe UI', Arial, sans-serif; 
+    background: #001f3f; 
+    color: #fff; 
+    padding: 20px; 
+    padding-top: 140px; /* ESPAÇO PARA O CABEÇALHO NÃO COBRIR O CONTEÚDO */
+    font-size: 12px; 
+  }
+  
+  /* CABEÇALHO FIXO */
+  .header { 
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    background: #001f3f; /* COR SÓLIDA IGUAL AO FUNDO */
+    z-index: 1000; /* CAMADA SUPERIOR */
+    box-sizing: border-box; /* PREVINE QUE O PADDING AUMENTE A LARGURA TOTAL */
+    padding: 10px 20px;
+    
+    display: grid; 
+    grid-template-columns: 70px 1fr 70px; 
+    align-items: center; 
+    border-bottom: 3px solid #b8860b; 
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5); /* SOMBRA PARA DESTAQUE */
+  }
+
+  .titulo h1 { text-align: center; font-size: 20px; margin: 0; color: #f0f0f0; text-transform: uppercase; letter-spacing: 1px; }
+  .titulo p { text-align: center; margin: 5px 0; color: #b8860b; font-weight: bold; }
+
+  /* CARTÃO DE DADOS (LIGHT) */
+  .info-card {
+    background: #001226;
+    border: 1px solid #b8860b;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .info-item { background: #00284d; padding: 8px; border-radius: 4px; border-left: 3px solid #0074D9; }
+  .info-label { color: #7FDBFF; font-size: 9px; font-weight: bold; display: block; margin-bottom: 2px; }
+  .info-value { color: #fff; font-size: 13px; font-weight: bold; letter-spacing: 0.5px; }
+
+  /* FORMULÁRIO DE RELATO */
+  .form-container { background: #001226; padding: 20px; border-radius: 8px; border: 1px solid #0074D9; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+  
+  .bloco-titulo { 
+    background: linear-gradient(90deg, #b8860b, #5e4605); 
+    color: #000; 
+    padding: 6px; 
+    font-weight: bold; 
+    text-align: center; 
+    margin: 15px 0 10px 0; 
+    text-transform: uppercase; 
+    font-size: 12px;
+  }
+
+  .campo-grupo { margin-bottom: 12px; }
+  label { font-size: 10px; margin-bottom: 4px; display:block; color: #7FDBFF; font-weight: bold; }
+  input, select, textarea { width: 98%; padding: 10px; border-radius: 4px; border: 1px solid #004080; background: #001830; color: #fff; font-size: 13px; }
+  input:focus, textarea:focus { border-color: #b8860b; outline: none; }
+  textarea { height: 80px; resize: none; }
+
+  /* BOTÕES DE AÇÃO */
+  .btn-area { margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap; }
+  button { padding: 12px 20px; cursor: pointer; font-weight: bold; border-radius: 4px; border: none; text-transform: uppercase; font-size: 11px; color: white; flex: 1; }
+  
+  .btn-zap { background: #25D366; color: #000; } 
+  .btn-zap:hover { background: #128C7E; }
+  
+  .btn-email { background: #0074D9; } 
+  .btn-email:hover { background: #0056a3; }
+
+  .btn-salvar { background: #b8860b; color: #000; }
+  .btn-salvar:hover { background: #d4af37; }
+
+  /* Novos Botões de Backup */
+  .btn-backup { background: #059669; } 
+  .btn-backup:hover { background: #047857; }
+
+  .btn-restore { background: #dc2626; } 
+  .btn-restore:hover { background: #b91c1c; }
+
+  /* HISTÓRICO */
+  table { width: 100%; border-collapse: collapse; margin-top: 25px; background: white; color: black; }
+  th, td { border: 1px solid #ccc; padding: 8px; text-align: left; font-size: 11px; }
+  th { background: #001f3f; color: white; text-transform: uppercase; }
+  tr:nth-child(even) { background: #f0f8ff; }
+
+  @media print {
+    .form-container, .btn-area, .no-print { display: none; }
+    body { background: white; color: black; padding: 0; }
+    .header { position: relative; border-bottom: 1px solid #000; }
+    th { background: #ddd !important; color: black; border: 1px solid #000; }
+    td { border: 1px solid #000; }
+  }
+
+</style>
+</head>
+<body>
+
+<div class="header">
+  <a href="../dashboard.html"><img src="caveira.png" width="60" alt="RUMB" title="Voltar ao Painel"></a> 
+  <div class="titulo">
+    <h1>Polícia Militar do Estado do Rio de Janeiro</h1>
+    <p>PROTOCOLO DE ACIONAMENTO DE EMERGÊNCIA - LIGHT</p>
+  </div>
+  <img src="pmerj.png" width="60" alt="PMERJ">
+</div>
+
+<div class="info-card">
+  <div class="info-item"><span class="info-label">INSTALAÇÃO</span><span class="info-value">0420485966</span></div>
+  <div class="info-item"><span class="info-label">CONTA CONTRATO</span><span class="info-value">70000812011</span></div>
+  <div class="info-item"><span class="info-label">CLIENTE (COD)</span><span class="info-value">33438713</span></div>
+  <div class="info-item"><span class="info-label">CNPJ</span><span class="info-value">32.690.668.0001-02</span></div>
+  <div class="info-item" style="grid-column: span 2;"><span class="info-label">ENDEREÇO</span><span class="info-value">ESTRADA DO CANTAGALO, S/N, LT.1 - QD.13 (UPP PAVÃO) - CEP: 22.071-060</span></div>
+</div>
+
+<div class="form-container">
+  <form id="formLight">
+    
+    <div class="bloco-titulo">1. RELATO DA OCORRÊNCIA (O QUE HOUVE?)</div>
+    
+    <div class="campo-grupo">
+      <label>TIPO DE FALHA:</label>
+      <select id="tipoFalha">
+        <option value="FALTA DE ENERGIA TOTAL">FALTA DE ENERGIA TOTAL (APAGÃO)</option>
+        <option value="OSCILAÇÃO DE ENERGIA">OSCILAÇÃO DE ENERGIA (LUZ FRACA/FORTE)</option>
+        <option value="MEIA FASE">MEIA FASE / FASE CAÍDA</option>
+        <option value="PIQUE DE LUZ">QUEDA REPENTINA E RETORNO (PIQUE)</option>
+        <option value="CABO PARTIDO">CABO PARTIDO NA VIA</option>
+      </select>
+    </div>
+
+    <div class="campo-grupo">
+      <label>DESCRIÇÃO DETALHADA (Para constar no chamado):</label>
+      <textarea id="descricao" placeholder="Ex: Houve um estalo no poste e a luz acabou na base toda. Estamos operando com gerador (ou sem luz). Risco de perda de equipamentos..."></textarea>
+    </div>
+
+    <div class="bloco-titulo">2. RESPONSÁVEL PELO RELATO</div>
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+      <div class="campo-grupo">
+        <label>QUEM ESTÁ RELATANDO (RUMB/CMT):</label>
+        <input type="text" id="responsavel" placeholder="Graduação e Nome" required>
+      </div>
+      <div class="campo-grupo">
+        <label>HORA DO OCORRIDO:</label>
+        <input type="time" id="horaOcorrido" required>
+      </div>
+    </div>
+
+    <div class="btn-area">
+      <button type="button" class="btn-zap" onclick="acionarZap()">📱 ENVIAR ZAP LIGHT</button>
+      <button type="button" class="btn-email" onclick="acionarEmail()">📧 ENVIAR E-MAIL</button>
+      <button type="submit" class="btn-salvar">💾 SALVAR NO LIVRO</button>
+      
+      <button type="button" class="btn-backup" onclick="fazerBackup()">💾 BACKUP (DOWNLOAD)</button>
+      <input type="file" id="fileBackup" style="display:none" onchange="restaurarBackup(this)">
+      <button type="button" class="btn-restore" onclick="document.getElementById('fileBackup').click()">📂 RESTAURAR REGISTROS</button>
+    </div>
+  </form>
+</div>
+
+<h3 style="margin-top:30px; border-bottom:1px solid #b8860b; padding-bottom:5px;">HISTÓRICO DE QUEDAS DE ENERGIA</h3>
+<button onclick="limparHistorico()" style="background:#b91c1c; font-size:9px; border:none; color:white; padding:5px; margin-bottom:5px; cursor:pointer;">LIMPAR REGISTROS</button>
+<table id="tabelaHistorico">
+  <thead>
+    <tr>
+      <th>DATA</th>
+      <th>HORA</th>
+      <th>TIPO DE FALHA</th>
+      <th>RELATO</th>
+      <th>QUEM RELATOU</th>
+    </tr>
+  </thead>
+  <tbody id="tbodyHistorico"></tbody>
+</table>
+
+<script>
+  // DADOS DA LIGHT
+  const DADOS = {
+    inst: "0420485966",
+    conta: "70000812011",
+    cliente: "33438713",
+    cnpj: "32.690.668.0001-02",
+    end: "ESTRADA DO CANTAGALO, S/N, LT.1 - QD.13 - CEP: 22.071-060",
+    zap: "5521999816059",
+    email: "GRANDESCLIENTES@LIGHT.COM.BR"
+  };
+
+  // Preenche hora atual automaticamente
+  document.getElementById('horaOcorrido').value = new Date().toLocaleTimeString('pt-BR').slice(0,5);
+
+  function gerarMensagem() {
+    const tipo = document.getElementById('tipoFalha').value;
+    const desc = document.getElementById('descricao').value;
+    const resp = document.getElementById('responsavel').value;
+    const hora = document.getElementById('horaOcorrido').value;
+    const dataHoje = new Date().toLocaleDateString('pt-BR');
+
+    // MENSAGEM PADRÃO
+    return `*ACIONAMENTO DE EMERGÊNCIA - UPP PAVÃO (PMERJ)*\n\n` +
+           `*DADOS DA UNIDADE:*\n` +
+           `INSTALAÇÃO: ${DADOS.inst}\n` +
+           `CONTA CONTRATO: ${DADOS.conta}\n` +
+           `CLIENTE: ${DADOS.cliente}\n` +
+           `ENDEREÇO: ${DADOS.end}\n\n` +
+           `*OCORRÊNCIA:*\n` +
+           `DATA: ${dataHoje} - HORA: ${hora}\n` +
+           `MOTIVO: ${tipo}\n` +
+           `RELATO: ${desc}\n\n` +
+           `Solicitamos prioridade no atendimento para evitar prejuízo aos equipamentos de segurança pública.\n` +
+           `Responsável pelo contato: ${resp}`;
+  }
+
+  function acionarZap() {
+    const msg = gerarMensagem();
+    const url = `https://wa.me/${DADOS.zap}?text=${encodeURIComponent(msg)}`;
+    window.open(url, '_blank');
+  }
+
+  function acionarEmail() {
+    const tipo = document.getElementById('tipoFalha').value;
+    const msg = gerarMensagem();
+    const assunto = `EMERGÊNCIA - FALTA DE LUZ - INST: ${DADOS.inst} - UPP PAVÃO`;
+    const url = `mailto:${DADOS.email}?subject=${encodeURIComponent(assunto)}&body=${encodeURIComponent(msg)}`;
+    window.location.href = url;
+  }
+
+  // LOGICA DE SALVAMENTO (HISTÓRICO)
+  const form = document.getElementById('formLight');
+  let registros = JSON.parse(localStorage.getItem('registro_energia_light')) || [];
+
+  form.onsubmit = (e) => {
+    e.preventDefault();
+    const novo = {
+      data: new Date().toLocaleDateString('pt-BR'),
+      hora: document.getElementById('horaOcorrido').value,
+      tipo: document.getElementById('tipoFalha').value,
+      desc: document.getElementById('descricao').value,
+      resp: document.getElementById('responsavel').value.toUpperCase()
+    };
+    
+    registros.push(novo);
+    localStorage.setItem('registro_energia_light', JSON.stringify(registros));
+    renderizar();
+    alert("Ocorrência salva no histórico para fins de controle.");
+  };
+
+  function renderizar() {
+    const tbody = document.getElementById('tbodyHistorico');
+    tbody.innerHTML = '';
+    registros.slice().reverse().forEach(r => {
+      tbody.innerHTML += `
+        <tr>
+          <td>${r.data}</td>
+          <td>${r.hora}</td>
+          <td style="font-weight:bold; color:#b91c1c">${r.tipo}</td>
+          <td>${r.desc}</td>
+          <td>${r.resp}</td>
+        </tr>
+      `;
+    });
+  }
+  
+  function limparHistorico() {
+    if(confirm("Deseja apagar todo o histórico de quedas de luz?")) {
+      localStorage.removeItem('registro_energia_light');
+      registros = [];
+      renderizar();
+    }
+  }
+
+  // --- FUNÇÕES DE BACKUP ADICIONADAS ---
+  function fazerBackup() {
+    const dados = localStorage.getItem('registro_energia_light');
+    if (!dados || dados === '[]') { alert("Nada para salvar!"); return; }
+    
+    const blob = new Blob([dados], {type: "application/json"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Protocolo_Energia_RUMB_${new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
+
+  function restaurarBackup(input) {
+    const file = input.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        const json = JSON.parse(e.target.result);
+        if (Array.isArray(json)) {
+          if(confirm("ATENÇÃO: Isso substituirá o histórico atual pelos dados do arquivo. Continuar?")) {
+            registros = json;
+            localStorage.setItem('registro_energia_light', JSON.stringify(registros));
+            renderizar();
+            alert("Backup restaurado com sucesso!");
+          }
+        } else {
+          alert("Arquivo inválido.");
+        }
+      } catch (err) {
+        alert("Erro ao ler arquivo: " + err);
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  renderizar();
+</script>
+</body>
+</html>
