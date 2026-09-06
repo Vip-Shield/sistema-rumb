@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cautela de Arma Particular - RUMB</title>
+    <link rel="shortcut icon" type="imagex/png" href="../IMAGENS/caveira.ico">
+
+<style>
+  /* --- ESTILO TÁTICO --- */
+  body { 
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+    background: #1a1a1d; 
+    color: #e0e0e0; 
+    padding: 20px; 
+    padding-top: 100px; 
+    font-size: 12px;
+    margin: 0;
+  }
+
+  /* Imagem de Fundo (Escudo) */
+  body::before {
+    content: "";
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 600px;
+    height: 600px;
+    background-image: url('escudo.png'); 
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    opacity: 0.1;
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  /* HEADER */
+  .header { 
+    position: fixed; top: 0; left: 0; width: 100%;
+    background: #1a1a1d; z-index: 1000; 
+    padding: 10px 20px; border-bottom: 3px solid #c3073f;
+    display: flex; justify-content: space-between; align-items: center;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+    box-sizing: border-box;
+  }
+  .titulo h1 { color: #c3073f; font-size: 20px; margin: 0; text-transform: uppercase; letter-spacing: 1px; text-align: center; }
+  .titulo p { color: #fff; font-size: 11px; margin: 2px 0 0 0; text-align: center; font-weight: bold; }
+
+  .logo-rumb-right {
+    width: 60px; height: 60px; display: flex; 
+    align-items: center; justify-content: center; overflow: hidden;
+  }
+  .logo-rumb-right img {
+    width: 100%; height: 100%; object-fit: contain;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+  }
+
+  /* CONTAINER PRINCIPAL */
+  .main-container { max-width: 1200px; margin: 0 auto; position: relative; z-index: 1; }
+
+  /* FORMULÁRIO */
+  .painel-cadastro {
+    background: #2b2b2d; padding: 15px; border-radius: 6px;
+    border: 1px solid #444; margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  }
+  .painel-titulo { 
+    color: #ffd700; font-size: 14px; font-weight: bold; 
+    margin-bottom: 10px; border-bottom: 1px dashed #555; padding-bottom: 5px; 
+    display: flex; justify-content: space-between;
+  }
+
+  .grid-form { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
+  .grid-third { grid-column: span 2; }
+  .grid-half { grid-column: span 3; }
+  .grid-full { grid-column: span 6; } /* Novo estilo para linha inteira */
+
+  label { display: block; color: #aaa; margin-bottom: 3px; font-weight: bold; font-size: 10px; }
+  input, select { 
+    width: 100%; padding: 8px; background: #151516; 
+    border: 1px solid #555; color: white; border-radius: 4px; 
+    box-sizing: border-box; font-weight: bold;
+  }
+  
+  /* Ícone de calendário no input date fica branco */
+  input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    cursor: pointer;
+  }
+
+  .btn { padding: 10px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; text-transform: uppercase; color: white; transition: 0.2s; }
+  .btn:hover { opacity: 0.9; }
+  .btn-save { background: #15803d; width: 100%; margin-top: 10px; }
+  
+  .toolbar {
+    display: flex; justify-content: space-between; align-items: center;
+    background: #4e4e50; padding: 10px; border-radius: 6px; margin-bottom: 10px;
+    border: 1px solid #6f2232;
+  }
+  
+  table { width: 100%; border-collapse: collapse; background: #fff; color: #000; white-space: nowrap; }
+  th, td { border: 1px solid #999; padding: 6px 8px; text-align: left; font-size: 11px; }
+  th { background: #6f2232; color: white; text-transform: uppercase; }
+  
+  .status-guardada { background: #dcfce7 !important; color: #14532d; font-weight: bold; }
+  .status-devolvida { background: #f3f4f6 !important; color: #6b7280; text-decoration: line-through; }
+
+  /* MODAL */
+  .modal-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 2000;
+  }
+  .modal-content {
+    background: #2b2b2d; padding: 20px; border-radius: 8px; border: 2px solid #c3073f; width: 300px;
+  }
+  .btn-baixa { background: #c3073f; color: white; font-weight: bold; border:none; padding: 5px 10px; cursor: pointer; border-radius: 3px; font-size: 10px;}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <a href="../dashboard.html"><img src="logo_pmerj.png" height="50" alt="PMERJ" onerror="this.style.display='none'"></a>
+  <div class="titulo">
+    <h1>Cautela de Arma Particular</h1>
+    <p>RESERVA DE ARMAMENTO E EQUIPAMENTOS - RUMB</p>
+  </div>
+  <div class="logo-rumb-right">
+    <img src="caveira-armada.png" alt="Logo RUMB" onerror="this.style.display='none'">
+  </div>
+</div>
+
+<div class="main-container">
+
+  <div class="painel-cadastro">
+    <div class="painel-titulo">
+      <span>NOVA CAUTELA (ENTRADA NO RUMB)</span>
+      <span id="relogio" style="color:#fff;">--:--</span>
+    </div>
+    
+    <div class="grid-form">
+      <div>
+        <label>GH:</label>
+        <select id="gh">
+          <option value="">Selecione</option>
+          <option>SD</option><option>CB</option><option>3º SGT</option><option>2º SGT</option>
+          <option>1º SGT</option><option>SUBTEN</option><option>ASP</option><option>TEN</option>
+          <option>CAP</option><option>MAJ</option><option>TEN CEL</option><option>CEL</option>
+        </select>
+      </div>
+      <div class="grid-third">
+        <label>RG:</label>
+        <input type="text" id="rg" list="listaRGs" oninput="autoPreencherPorRG()" placeholder="Digite ou selecione..." autocomplete="off">
+        <datalist id="listaRGs"></datalist>
+      </div>
+      <div class="grid-half">
+        <label>NOME DE GUERRA:</label>
+        <input type="text" id="nome" list="listaNomes" oninput="autoPreencherPorNome()" placeholder="Digite ou selecione..." autocomplete="off">
+        <datalist id="listaNomes"></datalist>
+      </div>
+      
+      <div>
+        <label>CALIBRE:</label>
+        <select id="calibre">
+          <option>.40</option><option>9mm</option><option>.380</option><option>.38</option><option>.357</option><option>.45</option>
+        </select>
+      </div>
+      <div>
+        <label>ARMÁRIO:</label>
+        <input type="text" id="armario" placeholder="Ex: A-01">
+      </div>
+      <div class="grid-third">
+        <label>Nº DA ARMA (SERIAL):</label>
+        <input type="text" id="serial" style="text-transform: uppercase;">
+      </div>
+      <div class="grid-third">
+        <label>DATA/HORA (OPCIONAL):</label>
+        <input type="datetime-local" id="dataHoraCustom">
+      </div>
+
+      <div class="grid-full">
+        <label>RUMB (RECEBEDOR):</label>
+        <input type="text" id="rumbIn" placeholder="Quem recebe a arma?">
+      </div>
+    </div>
+    <button class="btn btn-save" onclick="registrarEntrada()">💾 REGISTRAR ENTRADA</button>
+  </div>
+
+  <div class="toolbar">
+    <div class="search-box" style="flex:1; margin-right:15px;">
+      <input type="text" id="inputBusca" onkeyup="filtrarTabela()" placeholder="🔍 BUSCAR POR NOME, RG OU SERIAL..." style="background:#fff; color:#000;">
+    </div>
+    <div class="tool-btns">
+      <button class="btn" style="background:#0056b3; font-size:10px;" onclick="fazerBackup()">SALVAR ARQUIVO</button>
+      <input type="file" id="inputFile" style="display:none" onchange="restaurarBackup(this)">
+      <button class="btn" style="background:#d97706; font-size:10px;" onclick="document.getElementById('inputFile').click()">IMPORTAR</button>
+      <button class="btn" style="background:#b91c1c; font-size:10px;" onclick="limparTudo()">LIMPAR TUDO</button>
+    </div>
+  </div>
+
+  <div class="table-responsive">
+    <table id="tabelaCautelas">
+      <thead>
+        <tr>
+          <th>AÇÃO</th><th>GH</th><th>RG</th><th>NOME DE ESCALA</th><th>CALIBRE</th><th>ARMÁRIO</th><th>Nº DA ARMA</th>
+          <th>DATA (ENT)</th><th>HORA (ENT)</th><th>RUMB (ENT)</th><th>DATA (DEV)</th><th>HORA (DEV)</th><th>RUMB (DEV)</th>
+        </tr>
+      </thead>
+      <tbody id="tbodyCautelas"></tbody>
+    </table>
+  </div>
+</div>
+
+<div id="modalBaixa" class="modal-overlay">
+  <div class="modal-content">
+    <h3 style="color:#c3073f; margin-top:0;">REALIZAR DEVOLUÇÃO</h3>
+    <label>RUMB (QUEM ESTÁ ENTREGANDO):</label>
+    <input type="text" id="rumbBaixaModal" placeholder="Identificação do Armeiro">
+    <input type="hidden" id="idBaixaSelecionado">
+    <button class="btn btn-save" onclick="confirmarBaixa()" style="background:#c3073f; margin-top:15px;">CONFIRMAR DEVOLUÇÃO</button>
+    <button class="btn" onclick="fecharModal()" style="background:#444; margin-top:5px; width:100%;">CANCELAR</button>
+  </div>
+</div>
+
+<script>
+  // --- BANCO DE DADOS FIXO DO EFETIVO ---
+  const DB_EFETIVO = [
+    {gh: "CB", rg: "103727", nome: "BIZONI"},
+    {gh: "CB", rg: "106561", nome: "MARCOS"},
+    {gh: "CB", rg: "105249", nome: "R. FILHO"},
+    {gh: "3º SGT", rg: "93998", nome: "F. PERES"},
+    {gh: "CB", rg: "101823", nome: "S. LEMOS"},
+    {gh: "SD", rg: "110297", nome: "L. BARBOSA"},
+    {gh: "CB", rg: "106260", nome: "BAPTISTA"},
+    {gh: "3º SGT", rg: "91071", nome: "DIAS"},
+    {gh: "CB", rg: "102704", nome: "J. ANDRÉ"},
+    {gh: "CB", rg: "106351", nome: "M. ARAUJO"},
+    {gh: "3º SGT", rg: "93752", nome: "CARDOSO"},
+    {gh: "CB", rg: "107520", nome: "T. RODRIGUES"},
+    {gh: "CB", rg: "107561", nome: "COUTINHO"},
+    {gh: "SD", rg: "110470", nome: "TELES"},
+    {gh: "CB", rg: "108677", nome: "ÉDVAN"},
+    {gh: "2º SGT", rg: "86367", nome: "REGALDINO"},
+    {gh: "3º SGT", rg: "92258", nome: "DOMINGOS"},
+    {gh: "2º SGT", rg: "85426", nome: "BRITO"},
+    {gh: "3º SGT", rg: "93341", nome: "L. FRANCISCO"},
+    {gh: "CB", rg: "108824", nome: "CARMO"},
+    {gh: "CB", rg: "107805", nome: "M. PAULO"},
+    {gh: "3º SGT", rg: "98339", nome: "SOUZA"},
+    {gh: "3º SGT", rg: "95629", nome: "FULLY"},
+    {gh: "CB", rg: "104953", nome: "PINHEIRO"},
+    {gh: "CB", rg: "103051", nome: "TIRADENTES"},
+    {gh: "CB", rg: "104291", nome: "FELIX"},
+    {gh: "3º SGT", rg: "98596", nome: "VIDAL"},
+    {gh: "CB", rg: "108190", nome: "UERBERT"},
+    {gh: "CB", rg: "102190", nome: "D. SILVA"},
+    {gh: "CB", rg: "109067", nome: "CAMILO"},
+    {gh: "CB", rg: "106467", nome: "L. SILVA"},
+    {gh: "SD", rg: "109738", nome: "MARIANO"},
+    {gh: "CB", rg: "105248", nome: "DE SOUZA"},
+    {gh: "3º SGT", rg: "93168", nome: "F."},
+    {gh: "CB", rg: "109109", nome: "RODRIGUES"},
+    {gh: "3º SGT", rg: "99164", nome: "R. MACHADO"},
+    {gh: "3º SGT", rg: "91783", nome: "CHARLES"},
+    {gh: "CB", rg: "106348", nome: "SOARES"},
+    {gh: "3º SGT", rg: "92732", nome: "MARCIO ESTEVÃO"},
+    {gh: "CB", rg: "105377", nome: "F. RIBEIRO"},
+    {gh: "SD", rg: "108664", nome: "SOUSA SILVA"},
+    {gh: "CB", rg: "105374", nome: "LAIA"},
+    {gh: "3º SGT", rg: "92490", nome: "VALIM"},
+    {gh: "CB", rg: "106650", nome: "MATHEUS"},
+    {gh: "3º SGT", rg: "96287", nome: "RODRIGUES"},
+    {gh: "2º SGT", rg: "85664", nome: "DENILSON"},
+    {gh: "3º SGT", rg: "96003", nome: "JONATHA"},
+    {gh: "CB", rg: "105391", nome: "HENRIQUE"},
+    {gh: "CB", rg: "106037", nome: "CAIQUE"},
+    {gh: "3º SGT", rg: "98202", nome: "CRISTIANO"},
+    {gh: "CB", rg: "108786", nome: "TORRES"},
+    {gh: "3º SGT", rg: "99488", nome: "DE PAULA"},
+    {gh: "3º SGT", rg: "91665", nome: "R. ALCANTARA"},
+    {gh: "3º SGT", rg: "100032", nome: "R. LACERDA"},
+    {gh: "3º SGT", rg: "100360", nome: "ULISSES"},
+    {gh: "CB", rg: "105375", nome: "RANGEL"},
+    {gh: "CB", rg: "104282", nome: "SILVA"},
+    {gh: "CB", rg: "102181", nome: "JUNIOR"},
+    {gh: "CB", rg: "106533", nome: "CORTEZ"},
+    {gh: "3º SGT", rg: "98121", nome: "JOHNATHAN"},
+    {gh: "3º SGT", rg: "96990", nome: "CLEISON"},
+    {gh: "SUBTEN", rg: "66381", nome: "J. MARCELO"},
+    {gh: "3º SGT", rg: "94010", nome: "R. SIMÕES"},
+    {gh: "3º SGT", rg: "95883", nome: "GIRARD"},
+    {gh: "CB", rg: "105284", nome: "LEONARDO"}
+
+  ];
+
+  let DB_CAUTELAS = JSON.parse(localStorage.getItem('db_cautela_part')) || [];
+  let DB_NOMES_SALVOS = JSON.parse(localStorage.getItem('db_nomes_part')) || [];
+
+  window.onload = function() {
+    renderizarTabela();
+    carregarDatalists();
+    setInterval(() => {
+        document.getElementById('relogio').innerText = new Date().toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
+    }, 1000);
+  };
+
+  function autoPreencherPorNome() {
+    const nomeDigitado = document.getElementById('nome').value.toUpperCase();
+    const policial = DB_EFETIVO.find(p => p.nome === nomeDigitado);
+    if (policial) {
+        document.getElementById('gh').value = policial.gh;
+        document.getElementById('rg').value = policial.rg;
+    }
+  }
+
+  function autoPreencherPorRG() {
+    const rgDigitado = document.getElementById('rg').value;
+    const policial = DB_EFETIVO.find(p => p.rg === rgDigitado);
+    if (policial) {
+        document.getElementById('gh').value = policial.gh;
+        document.getElementById('nome').value = policial.nome;
+    }
+  }
+
+  function registrarEntrada() {
+    const gh = document.getElementById('gh').value;
+    const rg = document.getElementById('rg').value;
+    const nome = document.getElementById('nome').value.toUpperCase();
+    const calibre = document.getElementById('calibre').value;
+    const armario = document.getElementById('armario').value.toUpperCase();
+    const serial = document.getElementById('serial').value.toUpperCase();
+    const rumbIn = document.getElementById('rumbIn').value.toUpperCase();
+    const dataHoraCustom = document.getElementById('dataHoraCustom').value;
+
+    if(!rg || !nome || !serial) {
+      alert("ERRO: Preencha RG, Nome e Nº da Arma!");
+      return;
+    }
+
+    // Lógica para Data e Hora (Customizada ou Atual)
+    let dataFinal, horaFinal;
+    if(dataHoraCustom) {
+      const dateObj = new Date(dataHoraCustom);
+      dataFinal = dateObj.toLocaleDateString('pt-BR', {timeZone: 'UTC'}); // Ajuste para não voltar um dia dependendo do fuso
+      // Correção manual simples para horário local do input
+      const ano = dataHoraCustom.substring(0,4);
+      const mes = dataHoraCustom.substring(5,7);
+      const dia = dataHoraCustom.substring(8,10);
+      const hora = dataHoraCustom.substring(11,13);
+      const min = dataHoraCustom.substring(14,16);
+      
+      dataFinal = `${dia}/${mes}/${ano}`;
+      horaFinal = `${hora}:${min}`;
+    } else {
+      dataFinal = new Date().toLocaleDateString('pt-BR');
+      horaFinal = new Date().toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
+    }
+
+    const novo = {
+      id: Date.now(),
+      status: 'ABERTO',
+      gh: gh, rg: rg, nome: nome, calibre: calibre,
+      armario: armario, serial: serial, rumbIn: rumbIn,
+      dataIn: dataFinal,
+      horaIn: horaFinal,
+      rumbOut: '', dataOut: '', horaOut: ''
+    };
+
+    DB_CAUTELAS.push(novo);
+    localStorage.setItem('db_cautela_part', JSON.stringify(DB_CAUTELAS));
+
+    const existeNaFixa = DB_EFETIVO.some(p => p.nome === nome);
+    if(!existeNaFixa && !DB_NOMES_SALVOS.includes(nome)) {
+      DB_NOMES_SALVOS.push(nome);
+      DB_NOMES_SALVOS.sort();
+      localStorage.setItem('db_nomes_part', JSON.stringify(DB_NOMES_SALVOS));
+      carregarDatalists();
+    }
+
+    // Limpa campos
+    document.getElementById('serial').value = '';
+    document.getElementById('armario').value = '';
+    document.getElementById('dataHoraCustom').value = ''; // Limpa data customizada para não repetir
+    
+    alert("Arma cautelada com sucesso!");
+    renderizarTabela();
+  }
+
+  function renderizarTabela() {
+    const tbody = document.getElementById('tbodyCautelas');
+    tbody.innerHTML = '';
+    const listaOrdenada = DB_CAUTELAS.slice().sort((a,b) => (a.status === 'ABERTO' ? -1 : 1));
+
+    listaOrdenada.forEach(reg => {
+      const tr = document.createElement('tr');
+      tr.className = reg.status === 'FECHADO' ? 'status-devolvida' : 'status-guardada';
+      const acao = reg.status === 'ABERTO' 
+        ? `<button class="btn-baixa" onclick="abrirModalBaixa(${reg.id})">BAIXAR</button>` 
+        : '✅ DEVOLVIDA';
+
+      tr.innerHTML = `
+        <td style="text-align:center">${acao}</td>
+        <td>${reg.gh}</td><td>${reg.rg}</td><td>${reg.nome}</td>
+        <td>${reg.calibre}</td><td>${reg.armario}</td><td>${reg.serial}</td>
+        <td>${reg.dataIn}</td><td>${reg.horaIn}</td><td>${reg.rumbIn}</td>
+        <td>${reg.dataOut || '-'}</td><td>${reg.horaOut || '-'}</td><td>${reg.rumbOut || '-'}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  function abrirModalBaixa(id) {
+    document.getElementById('idBaixaSelecionado').value = id;
+    document.getElementById('rumbBaixaModal').value = ''; 
+    document.getElementById('modalBaixa').style.display = 'flex';
+    document.getElementById('rumbBaixaModal').focus();
+  }
+
+  function fecharModal() { document.getElementById('modalBaixa').style.display = 'none'; }
+
+  function confirmarBaixa() {
+    const id = document.getElementById('idBaixaSelecionado').value;
+    const rumbBaixa = document.getElementById('rumbBaixaModal').value.toUpperCase();
+    if(!rumbBaixa) return alert("Informe quem está recebendo a devolução!");
+
+    const index = DB_CAUTELAS.findIndex(c => c.id == id);
+    if(index > -1) {
+      DB_CAUTELAS[index].status = 'FECHADO';
+      DB_CAUTELAS[index].rumbOut = rumbBaixa;
+      DB_CAUTELAS[index].dataOut = new Date().toLocaleDateString('pt-BR');
+      DB_CAUTELAS[index].horaOut = new Date().toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
+      localStorage.setItem('db_cautela_part', JSON.stringify(DB_CAUTELAS));
+      fecharModal();
+      renderizarTabela();
+    }
+  }
+
+  function carregarDatalists() {
+    const listaNomes = document.getElementById('listaNomes');
+    const listaRGs = document.getElementById('listaRGs');
+    listaNomes.innerHTML = '';
+    listaRGs.innerHTML = '';
+    
+    DB_EFETIVO.forEach(policial => {
+      const optNome = document.createElement('option');
+      optNome.value = policial.nome;
+      optNome.label = `${policial.gh} - RG: ${policial.rg}`;
+      listaNomes.appendChild(optNome);
+
+      const optRG = document.createElement('option');
+      optRG.value = policial.rg;
+      optRG.label = `${policial.gh} ${policial.nome}`;
+      listaRGs.appendChild(optRG);
+    });
+
+    DB_NOMES_SALVOS.forEach(nome => {
+      if(!DB_EFETIVO.some(p => p.nome === nome)) {
+        const opt = document.createElement('option');
+        opt.value = nome;
+        listaNomes.appendChild(opt);
+      }
+    });
+  }
+
+  function filtrarTabela() {
+    const termo = document.getElementById('inputBusca').value.toUpperCase();
+    const linhas = document.querySelectorAll('#tbodyCautelas tr');
+    linhas.forEach(tr => {
+      tr.style.display = tr.innerText.toUpperCase().includes(termo) ? '' : 'none';
+    });
+  }
+
+  function fazerBackup() {
+    if(DB_CAUTELAS.length === 0) return alert("Nada para salvar.");
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(DB_CAUTELAS));
+    const el = document.createElement('a');
+    el.href = dataStr;
+    el.download = "backup_rumb_particular_" + new Date().toLocaleDateString('pt-BR').replace(/\//g,'-') + ".json";
+    document.body.appendChild(el);
+    el.click();
+    el.remove();
+  }
+
+  function restaurarBackup(input) {
+    const file = input.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        const dados = JSON.parse(e.target.result);
+        if(Array.isArray(dados)) {
+          DB_CAUTELAS = dados;
+          localStorage.setItem('db_cautela_part', JSON.stringify(DB_CAUTELAS));
+          renderizarTabela();
+          alert("Backup restaurado com sucesso!");
+        } else { alert("Arquivo inválido!"); }
+      } catch(err) { alert("Erro ao ler arquivo."); }
+    };
+    reader.readAsText(file);
+  }
+
+  function limparTudo() {
+    if(confirm("TEM CERTEZA? Isso apagará todos os registros.")) {
+      localStorage.removeItem('db_cautela_part');
+      DB_CAUTELAS = [];
+      renderizarTabela();
+    }
+  }
+</script>
+</body>
+</html>

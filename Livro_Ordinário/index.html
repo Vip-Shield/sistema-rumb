@@ -1,0 +1,1192 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Serviço Ordinário - RUMB</title>
+    <link rel="shortcut icon" type="imagex/png" href="../IMAGENS/caveira.ico">
+
+<style>
+  /* ESTILO GERAL */
+  body { 
+    font-family: 'Segoe UI', Arial, sans-serif; 
+    background: #0d1b2a; 
+    color: #fff; 
+    margin: 0; 
+    padding: 0; 
+    font-size: 11px; 
+  }
+  
+  /* --- CABEÇALHO FIXO --- */
+  .fixed-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: #0d1b2a;
+    z-index: 1000;
+    padding: 10px 20px 5px 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+    box-sizing: border-box; 
+  }
+
+  .header { 
+    display: grid; 
+    grid-template-columns: 70px 1fr 70px; 
+    align-items: center; 
+    border-bottom: 3px solid #b8860b; 
+    padding-bottom: 10px; 
+    margin-bottom: 10px; 
+  }
+  
+  .titulo h1 { text-align: center; font-size: 20px; margin: 0; color: #f0f0f0; text-transform: uppercase; letter-spacing: 1px; }
+  .titulo p { text-align: center; margin: 5px 0; color: #b8860b; font-weight: bold; }
+
+  .rumb-info {
+    text-align: center; 
+    color: #ffd700; 
+    font-size: 14px;
+    padding-bottom: 5px;
+  }
+
+  /* --- ÁREA DE CONTEÚDO (ROLAGEM) --- */
+  .content-wrapper {
+    margin-top: 160px; 
+    padding: 20px;
+  }
+
+  /* FORMULÁRIO */
+  .form-container { background: #1b263b; padding: 20px; border-radius: 8px; border: 1px solid #1f3c88; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+  
+  .bloco-titulo { 
+    background: linear-gradient(90deg, #1f3c88, #0d1b2a); 
+    color: #ffd700; 
+    padding: 6px; 
+    font-weight: bold; 
+    text-align: center; 
+    margin: 15px 0 10px 0; 
+    border-left: 5px solid #b8860b;
+    text-transform: uppercase; 
+    font-size: 12px;
+  }
+
+  .grid-campos { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; }
+  .campo-grupo { display: flex; flex-direction: column; }
+  
+  label { font-size: 10px; margin-bottom: 4px; color: #aabbd1; font-weight: bold; }
+  input, select { padding: 8px; border-radius: 4px; border: 1px solid #415a77; background: #0f1c2e; color: #fff; font-size: 12px; transition: border-color 0.3s; }
+  input:focus, select:focus { border-color: #ffd700; outline: none; }
+
+  /* BOTÕES */
+  .btn-area { margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap; }
+  button { padding: 10px 20px; cursor: pointer; font-weight: bold; border-radius: 4px; border: none; text-transform: uppercase; font-size: 11px; color: white;}
+  
+  .btn-salvar { background: #b8860b; color: #000; }
+  .btn-salvar:hover { background: #d4af37; }
+
+  .btn-filter-open { background: #e0a800; color: #000; }
+  .btn-filter-open:hover { background: #c69500; }
+  
+  .btn-filter-all { background: #17a2b8; color: #fff; }
+  .btn-filter-all:hover { background: #138496; }
+  
+  .btn-print { background: #415a77; }
+  .btn-print:hover { background: #2c3e50; }
+
+  .btn-backup { background: #059669; }
+  .btn-backup:hover { background: #047857; }
+
+  .btn-restore { background: #dc2626; }
+  .btn-restore:hover { background: #b91c1c; }
+
+  /* BARRA DE PESQUISA E CONTADOR */
+  .search-container { margin-top: 25px; margin-bottom: 5px; display: flex; flex-direction: column; gap: 8px;}
+  
+  .contador-box { align-self: flex-start; background: #b8860b; color: #000; padding: 6px 12px; border-radius: 4px; font-weight: bold; font-size: 12px; box-shadow: 0 0 8px rgba(184, 134, 11, 0.5); }
+
+  #inputBusca { 
+    width: 100%; 
+    padding: 12px; 
+    background: #15202b; 
+    border: 1px solid #b8860b; 
+    color: white; 
+    border-radius: 5px; 
+    font-weight: bold;
+    font-size: 13px;
+    box-sizing: border-box;
+  }
+  #inputBusca::placeholder { color: #8899a6; }
+  
+  /* Esconde o X padrão em alguns navegadores para padronizar com o type="search" */
+  #inputBusca::-webkit-search-cancel-button {
+      -webkit-appearance: searchfield-cancel-button;
+      cursor: pointer;
+  }
+
+  /* TABELA */
+  table { width: 100%; border-collapse: collapse; margin-top: 5px; background: white; color: black; box-shadow: 0 2px 5px rgba(0,0,0,0.2); table-layout: auto; }
+  th, td { border: 1px solid #ccc; padding: 6px; text-align: center; font-size: 10px; }
+  th { background: #1f3c88; color: white; text-transform: uppercase; letter-spacing: 0.5px; }
+  
+  .col-rumb { background-color: #fcf8e3; font-weight: bold; color: #8a6d3b; }
+  .col-cop { color: #b91c1c; font-weight: bold; }
+  
+  /* NOVA CLASSE PARA OBSERVAÇÕES NA TABELA */
+  .col-obs { color: #d35400; font-weight: bold; max-width: 120px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: help; }
+  
+  tr:nth-child(even) { background: #f8f9fa; }
+  .btn-baixa { background: #15803d; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 10px; font-weight:bold;}
+  .btn-aviso { background: #eab308; color: black; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 10px; font-weight:bold;}
+  
+  /* NOVOS BOTÕES INCORPORADOS */
+  .btn-zap { background: #25D366; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 10px; margin-left: 2px; font-weight: bold; }
+  .btn-editar { background: #f59e0b; color: white; border: none; padding: 4px 6px; border-radius: 3px; cursor: pointer; font-size: 10px; margin-left: 2px; font-weight: bold; }
+  .btn-excluir { background: #ef4444; color: white; border: none; padding: 4px 6px; border-radius: 3px; cursor: pointer; font-size: 10px; margin-left: 2px; font-weight: bold; }
+  
+  @media print {
+    .fixed-header { position: static; box-shadow: none; padding: 0; width: 100%; }
+    .content-wrapper { margin-top: 0; padding: 0; }
+    .form-container, .btn-area, .search-container, .no-print, .btn-zap, .btn-baixa, .btn-editar, .btn-excluir, .btn-aviso { display: none; }
+    body { background: white; color: black; padding: 0; margin: 0; }
+    th { background: #ddd !important; color: black; border: 1px solid #000; }
+    td { border: 1px solid #000; }
+  }
+
+  /* MODAL DE NOTIFICAÇÃO */
+  #modalNotificacao {
+    display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    background: #1b263b; padding: 20px; border: 2px solid #b8860b; border-radius: 8px;
+    z-index: 2000; width: 450px; box-shadow: 0 0 15px rgba(0,0,0,0.8);
+  }
+  #modalOverlay {
+    display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.7); z-index: 1999;
+  }
+</style>
+</head>
+<body>
+
+<div class="fixed-header">
+  <div class="header">
+    <a href="../dashboard.html"><img src="caveira-armada.png" width="60" alt="RUMB" title="Voltar ao Painel"></a> 
+    <div class="titulo">
+      <h1>Polícia Militar do Estado do Rio de Janeiro</h1>
+      <p>LIVRO DE CAUTELA ORDINÁRIO - UPP TABAJARAS / RUMB</p>
+    </div>
+    <img src="logo_pmerj.png" width="60" alt="PMERJ">
+  </div>
+
+  <div class="rumb-info">
+    RUMB NO MOMENTO (PREVISÃO): <span id="displayRumbAtual" style="font-weight:bold; border-bottom:1px solid #ffd700;">---</span>
+  </div>
+</div>
+
+<div class="content-wrapper">
+  
+  <div class="form-container no-print">
+    <form id="formMaterial">
+      
+      <div class="bloco-titulo">1. IDENTIFICAÇÃO DO POLICIAL (CAUTELA)</div>
+      <div class="grid-campos">
+        <div class="campo-grupo">
+          <label>RG (Digite para buscar)</label>
+          <input type="text" id="rg" required placeholder="00.000" list="listaRg" autocomplete="off">
+          <datalist id="listaRg"></datalist>
+        </div>
+        <div class="campo-grupo"><label>GH</label><input type="text" id="gh" required placeholder="Ex: CB"></div>
+        <div class="campo-grupo" style="flex-grow: 2;">
+          <label>NOME DE GUERRA</label>
+          <input type="text" id="nomePolicial" list="listaNomes" required placeholder="Digite o nome do policial..." autocomplete="off">
+          <datalist id="listaNomes"></datalist>
+        </div>
+        
+        <div class="campo-grupo">
+          <label>LOCAL DE SERVIÇO</label>
+          <input type="text" id="local" list="listaLocais" placeholder="VTR / BASE" autocomplete="off">
+          <datalist id="listaLocais">
+            <option value="GTPP I - EUCLIDES"></option>
+            <option value="GTPP II - CABRITOS"></option>
+            <option value="GPP I - SÃO JOÃO BAPTISTA"></option>
+            <option value="GPP - TABAJARAS"></option>
+            <option value="FISCAL DE DIA"></option>
+            <option value="SOP"></option>
+            <option value="P2"></option>
+            <option value="CMT"></option>
+            <option value="ADM"></option>
+          </datalist>
+        </div>
+        
+        <div class="campo-grupo">
+          <label>Nº WHATSAPP</label>
+          <input type="text" id="zapInput" placeholder="Ex: 5521999999999">
+        </div>
+      </div>
+
+      <div class="bloco-titulo">2. ARMAMENTO E EQUIPAMENTO</div>
+      <div class="grid-campos">
+        <div class="campo-grupo">
+          <label>ARMA (SÉRIE)</label>
+          <input type="text" id="armaInd" list="listaArmaInd" autocomplete="off">
+        </div>
+        <div class="campo-grupo"><label>Q.MUNIÇÃO</label><input type="number" id="qmI" style="width:50px"></div>
+        <div class="campo-grupo"><label>Q.CARREGADOR</label><input type="number" id="qcI" style="width:50px"></div>
+        
+        <div class="campo-grupo">
+          <label>ARMA LONGA</label>
+          <input type="text" id="armaCol" list="listaArmaCol" autocomplete="off">
+        </div>
+        <div class="campo-grupo"><label>Q.MUNIÇÃO</label><input type="number" id="qmC" style="width:50px"></div>
+        <div class="campo-grupo"><label>Q.CARREGADOR</label><input type="number" id="qcC" style="width:50px"></div>
+        
+        <div class="campo-grupo"><label>TONFA</label><input type="text" id="tonfa"></div>
+        
+        <div class="campo-grupo">
+          <label>COLETE</label>
+          <input type="text" id="colete" list="listaColete" autocomplete="off">
+        </div>
+        
+        <div class="campo-grupo">
+          <label>RÁDIO HT</label>
+          <input type="text" id="radio" list="listaRadio" autocomplete="off">
+        </div>
+      </div>
+
+      <!-- Datalists para o Autocomplete -->
+      <datalist id="listaArmaInd"></datalist>
+      <datalist id="listaArmaCol"></datalist>
+      <datalist id="listaColete"></datalist>
+      <datalist id="listaRadio"></datalist>
+
+      <div class="bloco-titulo">3. CÂMERAS OPERACIONAIS (COP) E DETALHES</div>
+      <div class="grid-campos">
+        <div class="campo-grupo">
+          <label>COP 01 (SERIAL)</label>
+          <input type="text" id="cop1" list="lista-cops" placeholder="Digite ou selecione...">
+        </div>
+        <div class="campo-grupo">
+          <label>COP 02 (SERIAL)</label>
+          <input type="text" id="cop2" list="lista-cops" placeholder="Digite ou selecione...">
+        </div>
+        
+        <datalist id="lista-cops"></datalist>
+
+        <div class="campo-grupo" style="grid-column: span 3;">
+          <label>OBSERVAÇÕES / AVARIAS / BATERIAS</label>
+          <input type="text" id="obs" placeholder="Alguma alteração no material ou bateria extra?">
+        </div>
+      </div>
+
+      <div class="bloco-titulo">4. DATA, HORA E RESPONSÁVEL (ENTREGA)</div>
+      <div class="grid-campos">
+        <div class="campo-grupo">
+            <label style="color: #ffd700;">DATA SAÍDA</label>
+            <input type="date" id="dataSaida" required>
+        </div>
+        <div class="campo-grupo">
+            <label style="color: #ffd700;">HORA SAÍDA</label>
+            <input type="time" id="horaSaida" required>
+        </div>
+        <div class="campo-grupo" style="flex-grow: 2;">
+            <label style="color: #ffd700;">QUARTILHEIRO (ENTREGANDO)</label>
+            <input type="text" id="rumbSaidaInput" required style="background-color: #fcf8e3; color: #8a6d3b; font-weight: bold; border: 1px solid #ffd700;" placeholder="Quem está entregando o material...">
+        </div>
+      </div>
+
+      <div class="btn-area">
+        <button type="submit" class="btn-salvar" id="btnSalvar">📝 REGISTRAR SAÍDA</button>
+        
+        <button type="button" class="btn-filter-open" onclick="renderizar(true)">🔴 VER APENAS ABERTAS</button>
+        <button type="button" class="btn-filter-all" onclick="renderizar(false)">📘 VER TODAS</button>
+
+        <button type="button" class="btn-print" onclick="window.print()">🖨️ IMPRIMIR</button>
+        
+        <button type="button" class="btn-backup" onclick="fazerBackup()">💾 SALVAR BACKUP</button>
+        <input type="file" id="fileInput" style="display:none" onchange="restaurarBackup(this)">
+        <button type="button" class="btn-restore" onclick="document.getElementById('fileInput').click()">📂 IMPORTAR</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="search-container no-print">
+    <div class="contador-box" id="contadorAbertas">🚨 CAUTELAS EM ABERTO: 0</div>
+    <input type="search" id="inputBusca" placeholder="🔍 BUSCAR REGISTRO (Digite RG, Nome, Arma, Serial, Obs ou RUMB...)" onkeyup="renderizar(filtroAbertas)" onsearch="renderizar(filtroAbertas)">
+  </div>
+
+  <table id="tabelaMateriais">
+    <thead>
+      <tr>
+        <th colspan="4" style="background:#0d1b2a">POLICIAL</th>
+        <th colspan="3">INDIVIDUAL</th>
+        <th colspan="3">COLETIVA</th> <th colspan="3">OUTROS</th>
+        <th colspan="2">CÂMERAS</th>
+        <th colspan="4" style="background:#b8860b; color:black">SAÍDA (CAUTELA)</th>
+        <th colspan="3" style="background:#15803d; color:white">RETORNO (BAIXA)</th>
+      </tr>
+      <tr>
+        <th>GH</th><th>RG</th><th>NOME</th><th>LOCAL</th>
+        <th>ARMA</th><th>QM</th><th>QC</th>
+        <th>ARMA</th><th>QM</th><th>QC</th>
+        <th>TONFA</th><th>COL.</th><th>HT</th>
+        <th>COP I</th><th>COP II</th>
+        <th>DATA</th><th>HORA</th><th>OBS...</th><th>RUMB (ENTREGOU)</th>
+        <th>DATA</th><th>HORA</th><th>RUMB (RECEBEU)</th>
+      </tr>
+    </thead>
+    <tbody id="tabelaCorpo"></tbody>
+  </table>
+
+</div>
+
+<div id="modalOverlay" onclick="fecharModal()"></div>
+
+<div id="modalNotificacao">
+  <h3 style="color:#ffd700; margin-top:0; border-bottom:1px solid #415a77; padding-bottom:5px; text-transform:uppercase;">⚠️ Gerar Aviso de Pendência</h3>
+  
+  <label style="color:#aabbd1; font-weight:bold; font-size:11px;">SELECIONE O MATERIAL PENDENTE:</label>
+  <select id="tipoAviso" style="width:100%; margin:10px 0; padding:8px; background:#0f1c2e; color:#fff; border:1px solid #415a77; border-radius:4px;">
+    <option value="arma">🔫 Arma de Fogo (Individual ou Longa)</option>
+    <option value="colete">🦺 Colete Balístico</option>
+    <option value="radio">📻 Rádio HT</option>
+    <option value="cop">🎥 Câmera Operacional (COP)</option>
+    <option value="bateria">🔋 Bateria / Material Extra (Obs)</option>
+  </select>
+  
+  <label style="color:#aabbd1; font-weight:bold; font-size:11px;">MENSAGEM GERADA:</label>
+  <textarea id="textoAviso" rows="9" style="width:100%; box-sizing:border-box; background:#0d1b2a; color:#fff; border:1px solid #415a77; border-radius:4px; padding:10px; font-size:12px; margin-top:5px; margin-bottom:15px; resize:none;"></textarea>
+  
+  <div style="display:flex; gap:10px; justify-content:flex-end;">
+    <button onclick="fecharModal()" style="background:#dc2626; padding:8px 15px; color:white; border:none; border-radius:3px; cursor:pointer; font-weight:bold;">CANCELAR</button>
+    <button onclick="copiarAviso()" style="background:#415a77; padding:8px 15px; color:white; border:none; border-radius:3px; cursor:pointer; font-weight:bold;">📋 COPIAR</button>
+    <button onclick="enviarAvisoZap()" style="background:#25D366; padding:8px 15px; color:white; border:none; border-radius:3px; cursor:pointer; font-weight:bold;">📱 ENVIAR PRO ZAP</button>
+  </div>
+</div>
+
+<script>
+  // --- INTEGRAÇÃO DA ESCALA COMPLETA COM CAMPO ZAP ---
+  const efetivoEscala = [
+    { "gh": "3° SGT", "rg": "93606", "nome": "A. ALCANTARA", "local": "GPP III - CANTAGALO", "zap": "" },
+    { "gh": "2° SGT", "rg": "83708", "nome": "A. MENDES", "local": "SOP", "zap": "" },
+    { "gh": "3° SGT", "rg": "99242", "nome": "ADRIEL", "local": "GPP II - PAVÃOZINHO", "zap": "" },
+    { "gh": "3° SGT", "rg": "100000", "nome": "ALACRINO", "local": "RUMB", "zap": "" },
+    { "gh": "3° SGT", "rg": "99791", "nome": "ALMEIDA", "local": "GPP V", "zap": "" },
+    { "gh": "1° SGT", "rg": "77614", "nome": "ALZIR", "local": "SUPERVISÃO OPERACIONAL", "zap": "" },
+    { "gh": "3° SGT", "rg": "98939", "nome": "ANAVANTE", "local": "MANUTENÇÃO VTR", "zap": "" },
+    { "gh": "CB", "rg": "105341", "nome": "AZEVEDO", "local": "PRESO", "zap": "" },
+    { "gh": "CB", "rg": "106260", "nome": "BAPTISTA", "local": "GPPI-PAVÃO", "zap": "" },
+    { "gh": "CB", "rg": "109414", "nome": "BIANCHI", "local": "GPP V", "zap": "" },
+    { "gh": "2° SGT", "rg": "85426", "nome": "BRITO", "local": "GPP II - PAVÃOZINHO", "zap": "" },
+    { "gh": "3° SGT", "rg": "92119", "nome": "CAIO", "local": "MOT. DA SUPERVISÃO", "zap": "" },
+    { "gh": "CB", "rg": "106037", "nome": "CAIQUE", "local": "GTPPI-PAVAO", "zap": "" },
+    { "gh": "SD", "rg": "109754", "nome": "CAMELO", "local": "GPP V", "zap": "" },
+    { "gh": "CB", "rg": "109067", "nome": "CAMILO", "local": "GTPPI-PAVAO", "zap": "" },
+    { "gh": "3° SGT", "rg": "93752", "nome": "CARDOSO", "local": "GPP III-CANTAGALO", "zap": "" },
+    { "gh": "CB", "rg": "108824", "nome": "CARMO", "local": "GTPPI-PAVAO", "zap": "" },
+    { "gh": "3° SGT", "rg": "91783", "nome": "CHARLES", "local": "GTPP III-COPACABANA", "zap": "" },
+    { "gh": "3° SGT", "rg": "96990", "nome": "CLEISON", "local": "GTPP III-COPACABANA", "zap": "" },
+    { "gh": "1° SGT", "rg": "73888", "nome": "COIMBRA", "local": "A DISP CPP-SEI N 110944529", "zap": "" },
+    { "gh": "3° SGT", "rg": "91131", "nome": "CONDE", "local": "SOP", "zap": "" },
+    { "gh": "CB", "rg": "106533", "nome": "CORTEZ", "local": "GTPP III-COPACABANA", "zap": "" },
+    { "gh": "CB", "rg": "107561", "nome": "COUTINHO", "local": "GPP II-PAVÃOZINHO", "zap": "" },
+    { "gh": "3° SGT", "rg": "98202", "nome": "CRISTIANO", "local": "GTPPI-PAVAO", "zap": "" },
+    { "gh": "SD", "rg": "110433", "nome": "D. SANTOS", "local": "GPP IV", "zap": "" },
+    { "gh": "CB", "rg": "102190", "nome": "D. SILVA", "local": "GTPP II-CANTAGALO", "zap": "" },
+    { "gh": "CB", "rg": "107510", "nome": "DA SILVA", "local": "SOP", "zap": "" },
+    { "gh": "CB", "rg": "104197", "nome": "DA SILVA", "local": "GPP III-CANTAGALO", "zap": "" },
+    { "gh": "3° SGT", "rg": "97196", "nome": "DAN", "local": "RUMB", "zap": "" },
+    { "gh": "3° SGT", "rg": "99488", "nome": "DE PAULA", "local": "GTPP I-PAVAO", "zap": "" },
+    { "gh": "CB", "rg": "105248", "nome": "DE SOUZA", "local": "GTPP II-CANTAGALO", "zap": "" },
+    { "gh": "2 SGT", "rg": "85664", "nome": "DENILSON", "local": "GTPP III - COPACABANA", "zap": "" },
+    { "gh": "3° SGT", "rg": "91071", "nome": "DIAS", "local": "GPPI-PAVÃO", "zap": "" },
+    { "gh": "3° SGT", "rg": "92258", "nome": "DOMINGOS", "local": "GPP II - PAVÃOZINHO", "zap": "" },
+    { "gh": "SD", "rg": "110796", "nome": "ERICA", "local": "SOP", "zap": "" },
+    { "gh": "3 SGT", "rg": "93168", "nome": "F. ABREU", "local": "GTPP II-CANTAGALO", "zap": "" },
+    { "gh": "3° SGT", "rg": "93998", "nome": "F. PERES", "local": "GPP II-PAVÃOZINHO", "zap": "" },
+    { "gh": "CB", "rg": "105377", "nome": "F. RIBEIRO", "local": "GTPP II-CANTAGALO", "zap": "" },
+    { "gh": "CB", "rg": "104291", "nome": "FELIX", "local": "GTPP III - COPACABANA", "zap": "" },
+    { "gh": "3° SGT", "rg": "93331", "nome": "FERREIRA", "local": "SOP", "zap": "" },
+    { "gh": "3° SGT", "rg": "95629", "nome": "FULLY", "local": "GTPP III - COPACABANA", "zap": "" },
+    { "gh": "3° SGT", "rg": "93081", "nome": "GUEDES", "local": "SOP", "zap": "" },
+    { "gh": "CB", "rg": "105391", "nome": "HENRIQUE", "local": "GTPPI-PAVAO", "zap": "" },
+    { "gh": "2° SGT", "rg": "86615", "nome": "ISAIAS", "local": "SUPERVISÃO OPERACIONAL", "zap": "" },
+    { "gh": "3° SGT", "rg": "91115", "nome": "ITALO", "local": "GPP III-CANTAGALO", "zap": "" },
+    { "gh": "CB", "rg": "102704", "nome": "J. ANDRÉ", "local": "GPP III-CANTAGALO", "zap": "" },
+    { "gh": "SUBTEN", "rg": "66381", "nome": "J. MARCELO", "local": "SUPERVISÃO OPERACIONAL", "zap": "" },
+    { "gh": "3° SGT", "rg": "91049", "nome": "JHONATHAN", "local": "AUX DESPACHANTE", "zap": "" },
+    { "gh": "CB", "rg": "102712", "nome": "JOAQUIM", "local": "GPP II - PAVÃOZINHO", "zap": "" },
+    { "gh": "3° SGT", "rg": "98121", "nome": "JOHNATHAN", "local": "GTPP III-COPACABANA", "zap": "" },
+    { "gh": "3° SGT", "rg": "96003", "nome": "JONATHA", "local": "GTPPI-PAVAO", "zap": "" },
+    { "gh": "SD", "rg": "110387", "nome": "JOSUÉ", "local": "GPP IV", "zap": "" },
+    { "gh": "SD", "rg": "110594", "nome": "JULIANA FERREIRA", "local": "MANUTENÇÃO VTR", "zap": "" },
+    { "gh": "CB", "rg": "108292", "nome": "JULIANO", "local": "GPP IV", "zap": "" },
+    { "gh": "CB", "rg": "102181", "nome": "JUNIOR", "local": "GTPP III-COPACABANA", "zap": "" },
+    { "gh": "SD", "rg": "110297", "nome": "L. BARBOSA", "local": "GPPI-PAVÃO", "zap": "" },
+    { "gh": "3° SGT", "rg": "93341", "nome": "L. FRANCISCO", "local": "GPP II - PAVÃOZINHO", "zap": "" },
+    { "gh": "CB", "rg": "106467", "nome": "L. SILVA", "local": "GTPPI-PAVAO", "zap": "" },
+    { "gh": "3° SGT", "rg": "95837", "nome": "LACERDA", "local": "RUMB", "zap": "" },
+    { "gh": "CB", "rg": "105374", "nome": "LAIA", "local": "GTPP II-CANTAGALO", "zap": "" },
+    { "gh": "CB", "rg": "105284", "nome": "LEONARDO", "local": "AUX DESPACHANTE", "zap": "" },
+    { "gh": "CB", "rg": "106351", "nome": "M. ARAUJO", "local": "GPP III-CANTAGALO", "zap": "" },
+    { "gh": "3° SGT", "rg": "99226", "nome": "M. JUNIOR", "local": "GPPI-PAVÃO", "zap": "" },
+    { "gh": "CB", "rg": "107805", "nome": "M. PAULO", "local": "GTPPI-PAVAO", "zap": "" },
+    { "gh": "CB", "rg": "109510", "nome": "MAGANO", "local": "GPPI-PAVÃO", "zap": "" },
+    { "gh": "3° SGT", "rg": "95714", "nome": "MALAQUIAS", "local": "GPP IV", "zap": "" },
+    { "gh": "3° SGT", "rg": "92732", "nome": "MARCIO ESTEVÃO", "local": "GTPP III-COPACABANA", "zap": "" },
+    { "gh": "CB", "rg": "106561", "nome": "MARCOS", "local": "GPP II - PAVÃOZINHO", "zap": "" },
+    { "gh": "SD", "rg": "109738", "nome": "MARIANO", "local": "GTPPI-PAVAO", "zap": "" },
+    { "gh": "CB", "rg": "106650", "nome": "MATHEUS", "local": "GTPP III - COPACABANA", "zap": "" },
+    { "gh": "SUBTEN", "rg": "70372", "nome": "MENDES", "local": "SUPERVISÃO OPERACIONAL", "zap": "" },
+    { "gh": "3° SGT", "rg": "100228", "nome": "MIRANDA", "local": "GPP V", "zap": "" },
+    { "gh": "3° SGT", "rg": "98408", "nome": "NASCIMENTO", "local": "GPP III-CANTAGALO", "zap": "" },
+    { "gh": "CB", "rg": "104953", "nome": "PINHEIRO", "local": "GTPP III - COPACABANA", "zap": "" },
+    { "gh": "3° SGT", "rg": "91665", "nome": "R. ALCANTARA", "local": "GTPP I-PAVAO", "zap": "" },
+    { "gh": "CB", "rg": "105249", "nome": "R. FILHO", "local": "GPP II - PAVÃOZINHO", "zap": "" },
+    { "gh": "3° SGT", "rg": "100032", "nome": "R. LACERDA", "local": "GTPP I-PAVAO", "zap": "" },
+    { "gh": "3° SGT", "rg": "99164", "nome": "R. MACHADO", "local": "GTPP III-COPACABANA", "zap": "" },
+    { "gh": "3° SGT", "rg": "94010", "nome": "R. SIMÕES", "local": "RUMB", "zap": "" },
+    { "gh": "CB", "rg": "105375", "nome": "RANGEL", "local": "GTPP II CANTAGALO", "zap": "" },
+    { "gh": "2° SGT", "rg": "86367", "nome": "REGALDINO", "local": "GPP II - PAVÃOZINHO", "zap": "" },
+    { "gh": "CB", "rg": "109109", "nome": "RODRIGUES", "local": "GTPP II-CANTAGALO", "zap": "" },
+    { "gh": "3° SGT", "rg": "96287", "nome": "RODRIGUES", "local": "GTPP III - COPACABANA", "zap": "" },
+    { "gh": "CB", "rg": "101823", "nome": "S. LEMOS", "local": "GPPI-PAVÃO", "zap": "" },
+    { "gh": "2° SGT", "rg": "85458", "nome": "SANTOS", "local": "MOT. DA SUPERVISÃO", "zap": "" },
+    { "gh": "SUBTEN", "rg": "65727", "nome": "SANTΑΝΑ", "local": "MANUTENÇÃO VTR", "zap": "" },
+    { "gh": "CB", "rg": "104282", "nome": "SILVA", "local": "GTPP II CANTAGALO", "zap": "" },
+    { "gh": "3° SGT", "rg": "96541", "nome": "SILVEIRA", "local": "GPPI-PAVÃO", "zap": "" },
+    { "gh": "CB", "rg": "106348", "nome": "SOARES", "local": "GTPP III-COPACABANA", "zap": "" },
+    { "gh": "SD", "rg": "108664", "nome": "SOUSA SILVA", "local": "GTPP II-CANTAGALO", "zap": "" },
+    { "gh": "3° SGT", "rg": "98339", "nome": "SOUZA", "local": "GTPP I-PAVÃO", "zap": "" },
+    { "gh": "3° SGT", "rg": "98607", "nome": "SOUZA", "local": "CURSO BEPE - SEI 119739909", "zap": "" },
+    { "gh": "CB", "rg": "107520", "nome": "T. RODRIGUES", "local": "GPP II-PAVÃOZINHO", "zap": "" },
+    { "gh": "SD", "rg": "110470", "nome": "TELES", "local": "GPPI - PAVÃO", "zap": "" },
+    { "gh": "CB", "rg": "103051", "nome": "TIRADENTES", "local": "GTPP III - COPACABANA", "zap": "" },
+    { "gh": "CB", "rg": "108786", "nome": "TORRES", "local": "GTPP I - PAVÃO", "zap": "" },
+    { "gh": "CB", "rg": "101752", "nome": "TRINDADE", "local": "GPP III-CANTAGALO", "zap": "" },
+    { "gh": "SD", "rg": "109908", "nome": "TRIUMPHO", "local": "RUMB", "zap": "" },
+    { "gh": "CB", "rg": "108190", "nome": "UERBERT", "local": "GTPP II-CANTAGALO", "zap": "" },
+    { "gh": "3° SGT", "rg": "100360", "nome": "ULISSES", "local": "GTPP II CANTAGALO", "zap": "" },
+    { "gh": "3° SGT", "rg": "92490", "nome": "VALIM", "local": "GTPP III - COPACABANA", "zap": "" },
+    { "gh": "3° SGT", "rg": "98596", "nome": "VIDAL", "local": "GTPP II-CANTAGALO", "zap": "" },
+    { "gh": "2° SGT", "rg": "85995", "nome": "VINICIUS", "local": "SUPERVISÃO OPERACIONAL", "zap": "" },
+    { "gh": "SUBTEN", "rg": "76452", "nome": "WAGNER", "local": "SOP", "zap": "" },
+    { "gh": "CB", "rg": "108677", "nome": "ÉDVAN", "local": "GPP III - CANTAGALO", "zap": "" },
+    { "gh": "CB", "rg": "103727", "nome": "ΒΙΖΟΝΙ", "local": "GPP II-PAVÃOZINHO", "zap": "" },
+    { "gh": "SUBTEN", "rg": "68831", "nome": "GOMES", "local": "GTPP I - PAVÃO", "zap": "" },
+    { "gh": "3º SGT PM", "rg": "100348", "nome": "CABRAL", "local": "GTPP II - COPACABANA", "zap": "5521964995943" },
+    { "gh": "CB", "rg": "107871", "nome": "CORREIA", "local": "GPP III - GALO", "zap": "5521998518107" },     { "gh": "CB", "rg": "108663", "nome": "ANTÔNIO ANDRÉ D", "local": "GTPP I - EUCLIDES", "zap": "5521965997857" },
+    { "gh": "CB PM", "rg": "108663", "nome": "ANTÔNIO ANDRÉ D", "local": "GTPP I - EUCLIDES", "zap": "5521965997857" },
+    { "gh": "3º SGT PM", "rg": "96097", "nome": "GATTO", "local": "GTPP I - EUCLIDES", "zap": "5521964941521" },
+    { "gh": "3º SGT PM", "rg": "104072", "nome": "FLÁVIO LUIZ", "local": "GTPP I - EUCLIDES", "zap": "5521982893878" },
+    { "gh": "3º SGT PM", "rg": "96253", "nome": "SILVA GOMES", "local": "GTPP I - EUCLIDES", "zap": "5521964011713" },
+    { "gh": "3º SGT PM", "rg": "98382", "nome": "NETO", "local": "GTPP I - EUCLIDES", "zap": "5521983796752" },
+    { "gh": "3º SGT PM", "rg": "94429", "nome": "MOURA", "local": "GTPP I - EUCLIDES", "zap": "5521964211720" },
+    { "gh": "3º SGT PM", "rg": "103265", "nome": "ORTIZ", "local": "GTPP I - EUCLIDES", "zap": "5522992868403" },
+    { "gh": "3º SGT PM", "rg": "102571", "nome": "L. MACHADO", "local": "GTPP I - EUCLIDES", "zap": "5521964747153" },
+    { "gh": "CB PM", "rg": "108023", "nome": "ALESSANDRO", "local": "GTPP I - EUCLIDES", "zap": "5521975051238" },
+{ "gh": "3º SGT PM", "rg": "103353", "nome": "CHELQUE", "local": "GTPP I - EUCLIDES", "zap": "5521964121798" },
+    { "gh": "3º SGT PM", "rg": "95976", "nome": "PATRICK", "local": "GTPP II - CABRITOS", "zap": "5521964310826" },
+    { "gh": "3º SGT PM", "rg": "101187", "nome": "ROBERTO", "local": "GTPP II - CABRITOS", "zap": "5521964196915" },
+    { "gh": "3º SGT PM", "rg": "102430", "nome": "INOCENCIO", "local": "GTPP II - CABRITOS", "zap": "5521971002524" },
+    { "gh": "3º SGT PM", "rg": "103780", "nome": "W. MARINHO", "local": "GTPP II - CABRITOS", "zap": "5521993769598" },
+    { "gh": "1 SGT PM", "rg": "77200", "nome": "PRADO", "local": "FISCAL", "zap": "5521964648351" },
+    { "gh": "3º SGT PM", "rg": "101492", "nome": "LEANDRO BAPTISTA", "local": "SOP", "zap": "5521991122289" },
+    { "gh": "CB PM", "rg": "109091", "nome": "DAMASCENO", "local": "SOP", "zap": "" },
+    { "gh": "SUBTEN PM", "rg": "69814", "nome": "JANDELSON", "local": "FISCAL DE DIA", "zap": "5521970139016" },
+    { "gh": "CB PM", "rg": "92907", "nome": "VARJÃO", "local": "GPP S.J. BAPTISTA", "zap": "5521983630383" },
+    { "gh": "CB PM", "rg": "103190", "nome": "CASTRO", "local": "GTPP CABRITOS", "zap": "5521964544472" },
+    { "gh": "3º SGT PM", "rg": "101235", "nome": "XIMENES", "local": "GTPP CABRITOS", "zap": "5521983232636" },
+    { "gh": "3º SGT PM", "rg": "93330", "nome": "DA LUZ", "local": "GTPP CABRITOS", "zap": "5521964265794" },
+    { "gh": "3º SGT PM", "rg": "93977", "nome": "S. OLIVEIRA", "local": "GTPP CABRITOS", "zap": "5521993803418" },
+    { "gh": "3º SGT PM", "rg": "92721", "nome": "L. HENRIQUE", "local": "APOIO", "zap": "5521999999999" },
+    { "gh": "SD PM", "rg": "111386", "nome": "PEREIRA", "local": "APOIO", "zap": "5521999999999" },
+    { "gh": "CB PM", "rg": "105219", "nome": "LUCAS", "local": "SOP", "zap": "5521998145601" },
+    { "gh": "3º SGT PM", "rg": "97864", "nome": "BARRETO", "local": "GPP TABAJARAS", "zap": "5521971961216" },
+    { "gh": "CB PM", "rg": "104788", "nome": "MOGADO", "local": "GPP TABAJARAS", "zap": "5521999999999" },
+    { "gh": "3º SGT PM", "rg": "99934", "nome": "BAIA", "local": "GPP S. J. BAPTISTA", "zap": "5521964025323" },
+    { "gh": "SD PM", "rg": "112350", "nome": "GILVAN FLOR", "local": "GPP S. J. BAPTISTA", "zap": "5521999678068" },
+    { "gh": "1º SGT PM", "rg": "77200", "nome": "PRADO", "local": "FISCAL DE DIA / PERMANÊNCIA", "zap": "5521964648351" },
+    { "gh": "3º SGT PM", "rg": "92931", "nome": "DE ANDRADE", "local": " GPP IV TABAJARAS", "zap": "5521964490314" },
+ { "gh": "3º SGT PM", "rg": "96396", "nome": "ANA CAROLINA", "local": "SARGENTEANTE", "zap": "5521970243046" },
+ { "gh": "3º SGT PM", "rg": "90431", "nome": "GELSON", "local": "AUX", "zap": "5521971775779" },
+ { "gh": "SD PM", "rg": "110134", "nome": "LIMA", "local": "GTPP I - EUCLIDES", "zap": "5521970336379" },
+ { "gh": "SUBTEN PM", "rg": "70428", "nome": "SIRLEY", "local": "SUPERVISÃO", "zap": "5521964776159" },
+ { "gh": "3º SGT PM", "rg": "92156", "nome": "GRANJA", "local": "GTPP", "zap": "5521975935737" },
+ { "gh": "3º SGT PM", "rg": "92156", "nome": "P. SANTANA", "local": "FISCAL DE DIA", "zap": "5521970090987" },
+ { "gh": "CB PM", "rg": "106071", "nome": "ANDERSON", "local": "GPP", "zap": "5521964914757" },
+ { "gh": "CB PM", "rg": "112377", "nome": "MATOS", "local": "GPP I - S. J. BAPTISTA", "zap": "5522997390919" },
+ { "gh": "CB PM", "rg": "106876", "nome": "CRISTIANO", "local": "GPP I - S. J. BAPTISTA", "zap": "5521976679870" },
+ { "gh": "SD PM", "rg": "112380", "nome": "DYLLAN", "local": "GPP I - S. J. BAPTISTA", "zap": "5522998279364" },
+ { "gh": "3º SGT PM", "rg": "100941", "nome": "REIS", "local": "GPP I - S. J. BAPTISTA", "zap": "5521964362726" },
+ { "gh": "CB PM", "rg": "105154", "nome": "IMBUZEIRO", "local": "GPP IV - TABAJARAS", "zap": "5521969299623" },
+ { "gh": "3º SGT PM", "rg": "98071", "nome": "LUÍS", "local": "GPP I - BAPTISTA", "zap": "5521996001871" },
+ { "gh": "CB PM", "rg": "107521", "nome": "PANTOJA", "local": "GPP I - BAPTISTA", "zap": "5521980815284" },
+ { "gh": "CB PM", "rg": "106304", "nome": "DE OLIVEIRA", "local": "GPP I - BAPTISTA", "zap": "5521969069838" },
+ { "gh": "3º SGT PM", "rg": "103097", "nome": "ALBUQUERQUE", "local": "GPP I - BAPTISTA", "zap": "5521970375724" }
+  ];
+
+  // --- NOVA FUNÇÃO DE BUSCA AUTOMÁTICA (AUTOCOMPLETE DUPLO) ---
+  function activarBuscaAutomatica() {
+    const dlRg = document.getElementById('listaRg');
+    const dlNome = document.getElementById('listaNomes');
+    const unicos = new Set();
+    
+    efetivoEscala.forEach(p => {
+      const chave = p.rg + p.nome;
+      if (!unicos.has(chave)) {
+        unicos.add(chave);
+        
+        // Povoa lista de RGs
+        const optR = document.createElement('option');
+        optR.value = p.rg; 
+        optR.label = `${p.nome} (${p.gh})`; 
+        dlRg.appendChild(optR);
+        
+        // Povoa lista de Nomes
+        const optN = document.createElement('option');
+        optN.value = p.nome; 
+        optN.label = `${p.gh} - RG: ${p.rg}`; 
+        dlNome.appendChild(optN);
+      }
+    });
+
+    const inputRg = document.getElementById('rg');
+    const inputNome = document.getElementById('nomePolicial');
+    const inputGh = document.getElementById('gh');
+    const inputLocal = document.getElementById('local');
+    const inputZap = document.getElementById('zapInput');
+
+    // Ao digitar/selecionar o RG
+    inputRg.addEventListener('input', function() {
+        const val = this.value;
+        const found = efetivoEscala.find(p => p.rg === val);
+
+        if (found) {
+            inputNome.value = found.nome;
+            inputGh.value = found.gh;
+            inputLocal.value = found.local;
+            inputZap.value = found.zap || '';
+            this.style.borderColor = '#4caf50'; 
+            setTimeout(() => this.style.borderColor = '#415a77', 1500);
+        }
+    });
+
+    // Ao digitar/selecionar o NOME
+    inputNome.addEventListener('input', function() {
+        const val = this.value.toUpperCase(); // Prevenção para caixa alta
+        const found = efetivoEscala.find(p => p.nome === val);
+
+        if (found) {
+            inputRg.value = found.rg;
+            inputGh.value = found.gh;
+            inputLocal.value = found.local;
+            inputZap.value = found.zap || '';
+            this.style.borderColor = '#4caf50'; 
+            setTimeout(() => this.style.borderColor = '#415a77', 1500);
+        }
+    });
+  }
+
+  // --- NOVA ESCALA RUMB (24x72 horas) ---
+  const dbRumb = {
+      sekiguchi: { posto: "2º SGT PM", nome: "SEKIGUCHI" },
+      george: { posto: "2º SGT PM", nome: "GEORGE" },
+      simoes: { posto: "3º SGT PM", nome: "R. SIMÕES" },
+      bruno: { posto: "2º SGT PM", nome: "BRUNO LIMA" }
+  };
+
+  const sequenciaEscala = [
+      dbRumb.sekiguchi, // 0: 18/07 05h
+      dbRumb.george,    // 1: 19/07 05h
+      dbRumb.simoes,    // 2: 20/07 05h
+      dbRumb.bruno      // 3: 21/07 05h
+  ];
+
+  // Data âncora: 18 de Julho de 2026, 05:00:00 (Atenção: Janeiro é 0, logo Julho é 6 no JS)
+  const dataAncora = new Date(2026, 6, 18, 5, 0, 0);
+
+  function calcularRumbPorData(dataObj) {
+      const diffMs = dataObj.getTime() - dataAncora.getTime();
+      
+      // Converte a diferença de milissegundos para horas exatas
+      const diffHoras = Math.floor(diffMs / (1000 * 60 * 60));
+      
+      // Divide por 24 para determinar quantos dias se passaram desde a âncora
+      const offsetTurnos = Math.floor(diffHoras / 24);
+      
+      // Pega o resto da divisão por 4 (quantidade de policiais na escala 24x72)
+      // A fórmula ((x % 4) + 4) % 4 previne erros caso retorne dias negativos
+      const indiceTurno = ((offsetTurnos % 4) + 4) % 4;
+      
+      return sequenciaEscala[indiceTurno].nome;
+  }
+
+  function atualizarRumbAutomatico() {
+      const inputData = document.getElementById('dataSaida').value;
+      const inputHora = document.getElementById('horaSaida').value;
+
+      if (!inputData || !inputHora) return;
+
+      const partesData = inputData.split('-');
+      const partesHora = inputHora.split(':');
+      
+      const dataSelecionada = new Date(
+          partesData[0], 
+          partesData[1] - 1, 
+          partesData[2], 
+          partesHora[0], 
+          partesHora[1], 
+          0
+      );
+
+      document.getElementById('rumbSaidaInput').value = calcularRumbPorData(dataSelecionada);
+  }
+
+  function atualizarBannerRumbAtual() {
+      document.getElementById('displayRumbAtual').innerText = calcularRumbPorData(new Date());
+  }
+  
+  setInterval(atualizarBannerRumbAtual, 1000);
+
+  const seriaisCop = [
+    "01 - J32840821", "02 - J33583945", "03 - J30911918", "04 - J25656078", "05 - J33583817", "06 - J25656201", 
+    "07 - J25656140", "08 - J16688176", "09 - J16688329", "10 - J24884419", "11 - J16688112", "12 - J16688217", 
+    "13 - J17292213", "14 - J16688139", "15 - J33583852", "16 - J16688219", "17 - J24884620", "18 - J16688102", 
+    "19 - J25656198", "20 - J17292241", "21 - J24884338", "22 - J33583725", "23 - J33583812", "24 - J33583750",
+    "25 - J33583975", "26 - J30313691", "27 - J24884393", "28 - J16046060", "29 - J16688120", "30 - J33583781", "31 - J33583938", "32 - J24884060",
+    "33 - J16688138", "34 - J32841250", "35 - J24884617", "36 - J17292280", "37 - J16046199", "38 - J17292235",
+    "39 - J17292275", "40 - J16688201", "41 - J24884061", "42 - J33583742", "43 - J15634783", "44 - J16046173",
+    "45 - J16344240", "46 - J16344577", "47 - J32345866", "48 - J16688351", "49 - J30913118", "50 - J16046234",
+    "51 - J16654122", "52 - J33583803", "53 - J32612221", "54 - J30911909", "55 - J24884369", "56 - J30912289",
+    "57 - J33583794", "58 - J30914427", "59 - J32923637", "60 - J32970633", "61 - J24884222", "62 - J32841027",
+    "63 - J17292254", "64 - J12957374"
+  ];
+
+  function popularSelects() {
+    const datalist = document.getElementById('lista-cops');
+    seriaisCop.sort().forEach(serial => {
+      const option = document.createElement('option');
+      option.value = serial;
+      datalist.appendChild(option);
+    });
+  }
+
+  // --- INÍCIO DOS DADOS DE AUTOCOMPLETAR (RUMB) ---
+  const listaArmasIndividuais = [
+    // PT.100
+    "40740", "40949", "41872", "40743", "40745", "41869", "41876", "40744", "40956", "40748", "40747", "40952", "40594", "40598", "40746", "40742", "40741", "40739", "40957", "41878",
+    // IMBEL MDS
+    "28715", "28739", "28732", "28734", "28723", "28706", "16717", "28747", "28729", "28722"
+  ];
+
+  const listaArmasLongas = [
+    // Fuzil 5.56
+    "08080", "07916", "11759", "JFA07926", "JFA07925", "JCA00599", "JAA00378", "JAA01715",
+    // Fuzil 7.62
+    "274925", "278660", "160252", "106715", "106910", "151215", "27510", "278642", "274909", "03993", "04349", "27472", "106673", "277187", "106991", "159880", "JAA04110",
+    // Espingarda
+    "SEPM-00267Y"
+  ];
+
+  const listaColetes = [
+    // M
+    "351364", "351365", "351033", "351032", "351362", "351363", "351044", "351045", "351354", "351355", "351462", "351463", "351492", "351493", "350926", "350927", "351460", "351461", "351458", "351459",
+    // G
+    "2763625", "2763626", "2763605", "2763606", "2763663", "2763664", "2763641", "276342", "2763235", "2763236", "2763379", "2763308", "2763631", "2763632", "2763309", "2764285", "2764286", "2764414", "2764415", "2764416",
+    // GG
+    "2765915", "2765916", "2765941", "2765942", "2765897", "2765898", "2765895", "2765985", "2765896", "2765986", "2766031", "2766032", "2765919", "2765920", "2765929", "2765930", "2765955", "2765956", "2767312", "2767313", "2767320", "2767321", "2766990", "2766991", "2767262", "2767263", "2767258", "2767259", "2767272", "2767273", "2766693", "2766694", "2767930", "2767931", "2768102", "2768103", "2768316"
+  ];
+
+  const listaRadios = [
+    "2130606", "2130607", "2130608", "2130609", "2130610", "2131250", "2131251", "2131252", "2131253", "2131254", "2131255", "2131256", "2131257", "2130096", "2130097", "2130098", "2130099", "21300100", "2130100", "2130101", "2130102"
+  ];
+
+  function popularMateriais() {
+    // Popula Armas Individuais
+    const dlArmaInd = document.getElementById('listaArmaInd');
+    listaArmasIndividuais.forEach(item => {
+      const option = document.createElement('option');
+      option.value = item;
+      dlArmaInd.appendChild(option);
+    });
+
+    // Popula Armas Longas
+    const dlArmaCol = document.getElementById('listaArmaCol');
+    listaArmasLongas.forEach(item => {
+      const option = document.createElement('option');
+      option.value = item;
+      dlArmaCol.appendChild(option);
+    });
+
+    // Popula Coletes
+    const dlColete = document.getElementById('listaColete');
+    listaColetes.forEach(item => {
+      const option = document.createElement('option');
+      option.value = item;
+      dlColete.appendChild(option);
+    });
+
+    // Popula Rádios
+    const dlRadio = document.getElementById('listaRadio');
+    listaRadios.forEach(item => {
+      const option = document.createElement('option');
+      option.value = item;
+      dlRadio.appendChild(option);
+    });
+  }
+  // --- FIM DOS DADOS DE AUTOCOMPLETAR ---
+
+  const form = document.getElementById('formMaterial');
+  let registros = JSON.parse(localStorage.getItem('livroRazaoRUMB_v2')) || [];
+  let filtroAbertas = false;
+  let indexEmEdicao = -1; 
+
+  form.onsubmit = (e) => {
+    e.preventDefault();
+    const c1 = document.getElementById('cop1').value;
+    const c2 = document.getElementById('cop2').value;
+    if(c1 !== "" && c1 === c2) { alert("ERRO: Mesma COP selecionada duas vezes!"); return; }
+
+    const dataS_Input = document.getElementById('dataSaida').value; 
+    const horaS_Input = document.getElementById('horaSaida').value;
+    const dataFormatada = dataS_Input.split('-').reverse().join('/');
+
+    const novoRegistro = {
+      gh: document.getElementById('gh').value.toUpperCase(),
+      rg: document.getElementById('rg').value,
+      nomePolicial: document.getElementById('nomePolicial').value.toUpperCase(),
+      local: document.getElementById('local').value.toUpperCase(),
+      zap: document.getElementById('zapInput').value.replace(/\D/g, ''), // Salva apenas os números
+      
+      armaInd: document.getElementById('armaInd').value,
+      qmI: document.getElementById('qmI').value,
+      qcI: document.getElementById('qcI').value,
+      
+      armaCol: document.getElementById('armaCol').value,
+      qmC: document.getElementById('qmC').value,
+      qcC: document.getElementById('qcC').value, 
+      
+      tonfa: document.getElementById('tonfa').value,
+      colete: document.getElementById('colete').value,
+      radio: document.getElementById('radio').value,
+      cop1: c1, cop2: c2, obs: document.getElementById('obs').value,
+      
+      dataS: dataFormatada,
+      horaS: horaS_Input,
+      rumbSaida: document.getElementById('rumbSaidaInput').value.toUpperCase(),
+      
+      status: 'ABERTO'
+    };
+
+    // LÓGICA DE ATUALIZAÇÃO DO REGISTRO EM EDIÇÃO
+    if (indexEmEdicao >= 0) {
+      novoRegistro.status = registros[indexEmEdicao].status;
+      novoRegistro.dataR = registros[indexEmEdicao].dataR;
+      novoRegistro.horaR = registros[indexEmEdicao].horaR;
+      novoRegistro.rumbEntrada = registros[indexEmEdicao].rumbEntrada;
+      
+      registros[indexEmEdicao] = novoRegistro;
+      
+      indexEmEdicao = -1;
+      const btnSubmit = document.getElementById('btnSalvar');
+      btnSubmit.innerHTML = '📝 REGISTRAR SAÍDA';
+      btnSubmit.style.background = '#b8860b';
+    } else {
+      registros.push(novoRegistro);
+    }
+
+    salvar();
+    renderizar(filtroAbertas);
+    
+    form.reset();
+    document.getElementById('gh').focus();
+    
+    document.getElementById('dataSaida').valueAsDate = new Date();
+    document.getElementById('horaSaida').value = new Date().toLocaleTimeString('pt-BR').slice(0,5);
+    atualizarRumbAutomatico();
+  };
+
+  // FUNÇÕES DE EDIÇÃO, EXCLUSÃO E ZAP
+  function excluirRegistro(index) {
+    if(confirm("⚠️ Tem certeza que deseja EXCLUIR definitivamente este registro do livro?")) {
+      registros.splice(index, 1);
+      salvar();
+      renderizar(filtroAbertas);
+    }
+  }
+
+  function editarRegistro(index) {
+    const r = registros[index];
+    
+    document.getElementById('gh').value = r.gh || '';
+    document.getElementById('rg').value = r.rg || '';
+    document.getElementById('nomePolicial').value = r.nomePolicial || '';
+    document.getElementById('local').value = r.local || '';
+    document.getElementById('zapInput').value = r.zap || '';
+    
+    document.getElementById('armaInd').value = r.armaInd || '';
+    document.getElementById('qmI').value = r.qmI || '';
+    document.getElementById('qcI').value = r.qcI || '';
+    document.getElementById('armaCol').value = r.armaCol || '';
+    document.getElementById('qmC').value = r.qmC || '';
+    document.getElementById('qcC').value = r.qcC || '';
+    document.getElementById('tonfa').value = r.tonfa || '';
+    document.getElementById('colete').value = r.colete || '';
+    document.getElementById('radio').value = r.radio || '';
+    document.getElementById('cop1').value = r.cop1 || '';
+    document.getElementById('cop2').value = r.cop2 || '';
+    document.getElementById('obs').value = r.obs || '';
+    
+    if(r.dataS) {
+       const d = r.dataS.split('/');
+       if(d.length === 3) document.getElementById('dataSaida').value = `${d[2]}-${d[1]}-${d[0]}`;
+    }
+    document.getElementById('horaSaida').value = r.horaS || '';
+    document.getElementById('rumbSaidaInput').value = r.rumbSaida || '';
+
+    indexEmEdicao = index;
+    
+    const btnSubmit = document.getElementById('btnSalvar');
+    btnSubmit.innerHTML = '🔄 ATUALIZAR REGISTRO';
+    btnSubmit.style.background = '#f59e0b';
+    
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function enviarZap(index) {
+    const r = registros[index];
+    let texto = `*PMERJ - RUMB | REGISTRO DE CAUTELA*
+
+`;
+    texto += `👮‍♂️ *Policial:* ${r.gh} ${r.nomePolicial}
+`;
+    texto += `📄 *RG:* ${r.rg}
+`;
+    if(r.local) texto += `📍 *Local de Serviço:* ${r.local}
+`;
+    if(r.cop1 || r.cop2) {
+        texto += `🎥 *Câmera(s):* `;
+        if(r.cop1) texto += `${r.cop1} `;
+        if(r.cop2) texto += `| ${r.cop2}`;
+        texto += `
+`;
+    }
+    texto += `📅 *Data:* ${r.dataS}
+`;
+    texto += `⏰ *Hora:* ${r.horaS}
+`;
+    
+    let numero = (r.zap || "").replace(/\D/g, '');
+    
+    // Se digitou sem o DDI (55) mas com DDD (11 números), adiciona o 55 automaticamente
+    if(numero.length === 11) {
+        numero = "55" + numero;
+    }
+    
+    let url = `https://api.whatsapp.com/send?text=${encodeURIComponent(texto)}`;
+    
+    // Se existir o número salvo, tenta enviar diretamente para ele
+    if(numero.length >= 10) {
+        url = `https://api.whatsapp.com/send?phone=${numero}&text=${encodeURIComponent(texto)}`;
+    }
+    
+    window.open(url, '_blank');
+  }
+
+  function receberMaterial(indexReal) {
+    const agora = new Date();
+    const sugestaoRumb = calcularRumbPorData(agora);
+    const quemRecebeu = prompt("Quem está recebendo o material?", sugestaoRumb);
+    
+    if (quemRecebeu === null) return; 
+    if (quemRecebeu.trim() === "") { alert("Nome inválido!"); return; }
+
+    registros[indexReal].dataR = agora.toLocaleDateString('pt-BR');
+    registros[indexReal].horaR = agora.toLocaleTimeString('pt-BR').slice(0,5);
+    registros[indexReal].rumbEntrada = quemRecebeu.toUpperCase();
+    registros[indexReal].status = 'FECHADO';
+    
+    salvar();
+    renderizar(filtroAbertas);
+  }
+
+  function salvar() {
+    localStorage.setItem('livroRazaoRUMB_v2', JSON.stringify(registros));
+  }
+
+  function renderizar(apenasAbertas = false) {
+    filtroAbertas = apenasAbertas;
+    const termo = document.getElementById('inputBusca') ? document.getElementById('inputBusca').value.toUpperCase() : "";
+    
+    const tbody = document.getElementById('tabelaCorpo');
+    tbody.innerHTML = '';
+
+    const listaComIndices = registros.map((r, index) => ({...r, indexOriginal: index}));
+    let listaExibicao = listaComIndices;
+    
+    if (apenasAbertas) {
+      listaExibicao = listaExibicao.filter(r => r.status === 'ABERTO');
+    }
+
+    const abertasCount = registros.filter(r => r.status === 'ABERTO').length;
+    const contadorElement = document.getElementById("contadorAbertas");
+    if(contadorElement) {
+        contadorElement.innerText = `🚨 CAUTELAS EM ABERTO: ${abertasCount}`;
+    }
+
+    if (termo) {
+      listaExibicao = listaExibicao.filter(r => {
+        const textoRegistro = JSON.stringify(Object.values(r)).toUpperCase();
+        return textoRegistro.includes(termo);
+      });
+    }
+
+    // --- NOVA LÓGICA: Geração da data de hoje para comparação ---
+    const dataAtual = new Date();
+    const dia = String(dataAtual.getDate()).padStart(2, '0');
+    const mes = String(dataAtual.getMonth() + 1).padStart(2, '0');
+    const ano = dataAtual.getFullYear();
+    const dataHojeFormatada = `${dia}/${mes}/${ano}`;
+
+    listaExibicao.slice().reverse().forEach((r) => {
+      let btnAcoes = '';
+      if (r.status === 'ABERTO') {
+        btnAcoes = `
+          <div style="display:flex; flex-direction:column; gap:4px; align-items:center;">
+            <button class="btn-baixa" onclick="receberMaterial(${r.indexOriginal})">BAIXAR</button>
+            <button class="btn-aviso" onclick="abrirModalAviso(${r.indexOriginal})">⚠️ AVISO</button>
+          </div>
+        `;
+      } else {
+        btnAcoes = r.rumbEntrada;
+      }
+
+      // --- NOVA LÓGICA: Estilo diferenciado para serviços passados ---
+      let estiloTr = '';
+      if (r.dataS !== dataHojeFormatada) {
+          // Serviço passado: fica bem apagado (transparente e acinzentado)
+          estiloTr = 'opacity: 0.45; background: #e2e8f0; filter: grayscale(80%);';
+      } else if (r.status === 'FECHADO') {
+          // Serviço de hoje e que já foi fechado
+          estiloTr = 'opacity: 0.7; background: #e0ffe0;';
+      }
+
+      tbody.innerHTML += `
+        <tr style="${estiloTr}">
+          <td>${r.gh}</td><td>${r.rg}</td><td style="text-align:left">${r.nomePolicial}</td><td>${r.local}</td>
+          <td>${r.armaInd || '-'}</td><td>${r.qmI || ''}</td><td>${r.qcI || ''}</td>
+          <td>${r.armaCol || '-'}</td><td>${r.qmC || ''}</td><td>${r.qcC || ''}</td>
+          <td>${r.tonfa || '-'}</td><td>${r.colete || '-'}</td><td>${r.radio || '-'}</td>
+          <td class="col-cop">${r.cop1 || ''}</td><td class="col-cop">${r.cop2 || ''}</td>
+          <td>${r.dataS}</td><td>${r.horaS}</td>
+          <td class="col-obs" title="${r.obs || ''}">${r.obs || '-'}</td>
+          <td class="col-rumb">${r.rumbSaida}</td>
+          <td>${r.dataR || ''}</td><td>${r.horaR || ''}</td>
+          <td class="col-rumb" style="display: flex; gap: 4px; justify-content: center; align-items: center; flex-wrap: wrap; padding: 4px;">
+            ${btnAcoes}
+            <button class="btn-editar" onclick="editarRegistro(${r.indexOriginal})" title="Editar Informações">✏️</button>
+            <button class="btn-excluir" onclick="excluirRegistro(${r.indexOriginal})" title="Apagar Registro">🗑️</button>
+            <button class="btn-zap" onclick="enviarZap(${r.indexOriginal})" title="Enviar recibo p/ WhatsApp">📱</button>
+          </td>
+        </tr>`;
+    });
+  }
+
+  // --- LÓGICA DO MODAL DE AVISO (COBRANÇA) ---
+  let registroAtualParaAviso = null;
+
+  function abrirModalAviso(indexOriginal) {
+    registroAtualParaAviso = registros[indexOriginal];
+    document.getElementById('modalNotificacao').style.display = 'block';
+    document.getElementById('modalOverlay').style.display = 'block';
+    gerarMensagem();
+  }
+
+  function fecharModal() {
+    document.getElementById('modalNotificacao').style.display = 'none';
+    document.getElementById('modalOverlay').style.display = 'none';
+    registroAtualParaAviso = null;
+  }
+
+  document.getElementById('tipoAviso').addEventListener('change', gerarMensagem);
+
+  function gerarMensagem() {
+    if(!registroAtualParaAviso) return;
+    const r = registroAtualParaAviso;
+    const tipo = document.getElementById('tipoAviso').value;
+    let mensagem = "";
+
+    if (tipo === 'arma') {
+      const armaInfo = r.armaInd ? r.armaInd : (r.armaCol ? r.armaCol : "(NÃO ESPECIFICADA NA CAUTELA)");
+      mensagem = `À atenção do(a) ${r.gh} ${r.nomePolicial}, RG ${r.rg}.
+
+Informo que, conforme verificação no sistema da Reserva Única de Material Bélico (RUMB), consta em aberto a devolução do armamento ${armaInfo}. Solicito o seu comparecimento imediato à reserva para a entrega do material e devida baixa no livro. O descumprimento desta rotina caracteriza transgressão disciplinar.`;
+    } 
+    else if (tipo === 'colete') {
+      const coleteInfo = r.colete ? r.colete : "(NÃO ESPECIFICADO NA CAUTELA)";
+      mensagem = `À atenção do(a) ${r.gh} ${r.nomePolicial}, RG ${r.rg}.
+
+Comunico que o Colete Balístico nº ${coleteInfo}, retirado sob sua cautela no início do serviço, ainda não foi devolvido à reserva. Solicito o retorno imediato à RUMB para a entrega do equipamento e regularização da pendência na sua ficha de material.`;
+    }
+    else if (tipo === 'radio') {
+      const radioInfo = r.radio ? r.radio : "(NÃO ESPECIFICADO NA CAUTELA)";
+      mensagem = `À atenção do(a) ${r.gh} ${r.nomePolicial}, RG ${r.rg}.
+
+Consta em nossos registros a ausência de devolução do Rádio HT ${radioInfo}. Solicito a apresentação do referido equipamento na RUMB de imediato, a fim de garantir a disponibilidade do material para o próximo turno e a devida baixa da sua cautela no sistema.`;
+    }
+    else if (tipo === 'cop') {
+      const copInfo = r.cop1 ? r.cop1 : (r.cop2 ? r.cop2 : "(NÃO ESPECIFICADA NA CAUTELA)");
+      mensagem = `À atenção do(a) ${r.gh} ${r.nomePolicial}, RG ${r.rg}.
+
+Informo que consta pendente a devolução da Câmera Operacional (COP) serial ${copInfo}, cautelada em seu nome. O equipamento deve ser devolvido imediatamente à RUMB para o devido descarregamento de imagens, processo de recarga e baixa no livro de controle.`;
+    }
+    else if (tipo === 'bateria') {
+      const obsInfo = r.obs ? r.obs : "Bateria Extra / Outros (Verificar)";
+      mensagem = `À atenção do(a) ${r.gh} ${r.nomePolicial}, RG ${r.rg}.
+
+Conforme constado no campo de observações da sua cautela de saída, informo que o material: "${obsInfo}" não foi entregue junto aos demais equipamentos no término do seu serviço. Determino o comparecimento imediato à RUMB para a entrega do item faltante e o fechamento completo da sua cautela.`;
+    }
+
+    document.getElementById('textoAviso').value = mensagem;
+  }
+
+  function copiarAviso() {
+    const textarea = document.getElementById('textoAviso');
+    textarea.select();
+    document.execCommand('copy');
+    alert("Aviso copiado com sucesso! Agora é só colar no WhatsApp.");
+    fecharModal();
+  }
+
+  // --- NOVA FUNÇÃO PARA ENVIAR O AVISO DIRETO PARA O POLICIAL ---
+  function enviarAvisoZap() {
+    if (!registroAtualParaAviso) return;
+    
+    const r = registroAtualParaAviso;
+    const texto = document.getElementById('textoAviso').value;
+    
+    // Pega o número de telefone da cautela e remove caracteres especiais
+    let numero = (r.zap || "").replace(/\D/g, '');
+    
+    // Se digitou o DDD (11 números), adiciona o 55 (Brasil) automaticamente
+    if(numero.length === 11) {
+        numero = "55" + numero;
+    }
+    
+    // Se não tiver número, abre o WhatsApp apenas com o texto para você escolher o contato
+    let url = `https://api.whatsapp.com/send?text=${encodeURIComponent(texto)}`;
+    
+    // Se tiver número válido, direciona a conversa diretamente para o policial
+    if(numero.length >= 10) {
+        url = `https://api.whatsapp.com/send?phone=${numero}&text=${encodeURIComponent(texto)}`;
+    }
+    
+    window.open(url, '_blank');
+    fecharModal();
+  }
+
+  // --- FUNÇÕES DE BACKUP ---
+  function fazerBackup() {
+    salvar();
+    const dados = localStorage.getItem('livroRazaoRUMB_v2');
+    if (!dados || dados === '[]') { alert("Nada para salvar!"); return; }
+    
+    const blob = new Blob([dados], {type: "application/json"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `backup_rumb_${new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
+
+  function restaurarBackup(input) {
+    const file = input.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        const json = JSON.parse(e.target.result);
+        if (Array.isArray(json)) {
+          if(confirm("ATENÇÃO: Isso substituirá a tabela atual pelos dados do arquivo. Continuar?")) {
+            registros = json;
+            salvar();
+            renderizar(false);
+            alert("Backup restaurado com sucesso!");
+          }
+        } else {
+          alert("Arquivo inválido.");
+        }
+      } catch (err) {
+        alert("Erro ao ler arquivo: " + err);
+      }
+      input.value = "";
+    };
+    reader.readAsText(file);
+  }
+
+  // --- FUNÇÃO DE BAIXA AUTOMÁTICA (48 HORAS) ---
+  function checarBaixaAutomatica() {
+    let houveAlteracao = false;
+    const agora = new Date();
+
+    registros.forEach((r) => {
+      // Verifica apenas os registros que ainda estão abertos
+      if (r.status === 'ABERTO' && r.dataS && r.horaS) {
+        const partesData = r.dataS.split('/');
+        const partesHora = r.horaS.split(':');
+        
+        // Cria um objeto Date com a data e hora de saída
+        const dataSaida = new Date(
+          partesData[2], 
+          partesData[1] - 1, // Mês no JS começa em 0
+          partesData[0], 
+          partesHora[0], 
+          partesHora[1], 
+          0
+        );
+
+        // Calcula a diferença em horas
+        const diffMs = agora.getTime() - dataSaida.getTime();
+        const diffHoras = diffMs / (1000 * 60 * 60);
+
+        // Se passou de 48 horas, dá a baixa automática
+        if (diffHoras >= 48) {
+          r.status = 'FECHADO';
+          r.dataR = agora.toLocaleDateString('pt-BR');
+          r.horaR = agora.toLocaleTimeString('pt-BR').slice(0,5);
+          r.rumbEntrada = 'SISTEMA (BAIXA AUTOMÁTICA)';
+          houveAlteracao = true;
+        }
+      }
+    });
+
+    // Se alguma cautela foi fechada, salva e re-renderiza a tabela
+    if (houveAlteracao) {
+      salvar();
+    }
+  }
+
+  popularSelects();
+  popularMateriais();
+  activarBuscaAutomatica(); 
+  
+  // Roda a verificação de 48h ao iniciar e depois a cada 1 minuto
+  checarBaixaAutomatica();
+  setInterval(() => {
+      checarBaixaAutomatica();
+      renderizar(filtroAbertas);
+  }, 60000); // 60.000 ms = 1 minuto
+
+  renderizar(false);
+  
+  document.getElementById('dataSaida').valueAsDate = new Date();
+  document.getElementById('horaSaida').value = new Date().toLocaleTimeString('pt-BR').slice(0,5);
+  atualizarBannerRumbAtual();
+  atualizarRumbAutomatico();
+
+  document.getElementById('dataSaida').addEventListener('change', atualizarRumbAutomatico);
+  document.getElementById('horaSaida').addEventListener('change', atualizarRumbAutomatico);
+
+</script>
+</body>
+</html>

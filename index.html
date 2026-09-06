@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | RUMB Almoxarifado</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --pmerj-blue: #002D5E;
+            --pmerj-gold: #E58A13;
+            --pmerj-dark: #001a36;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle at center, #002D5E 0%, #000c1a 100%);
+            font-family: 'Segoe UI', sans-serif;
+            color: white;
+            overflow: hidden;
+        }
+
+        /* Marca d'água de fundo */
+        .watermark {
+            position: absolute;
+            width: 80%;
+            max-width: 500px;
+            opacity: 0.05;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .login-container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 400px;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            text-align: center;
+        }
+
+        .login-container::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 5px;
+            background: var(--pmerj-gold);
+            border-radius: 20px 20px 0 0;
+        }
+
+        .logo-pmerj {
+            width: 80px;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 0 10px rgba(229, 138, 19, 0.3));
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        p.subtitle {
+            font-size: 0.8rem;
+            color: var(--pmerj-gold);
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .input-group i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--pmerj-gold);
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 15px 15px 15px 45px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: white;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        .input-group input:focus {
+            border-color: var(--pmerj-gold);
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 15px;
+            background: var(--pmerj-gold);
+            border: none;
+            border-radius: 10px;
+            color: var(--pmerj-blue);
+            font-weight: bold;
+            font-size: 1rem;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-login:hover {
+            background: #ffb347;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(229, 138, 19, 0.4);
+        }
+
+        .footer-links {
+            margin-top: 25px;
+            font-size: 0.8rem;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.5);
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: var(--pmerj-gold);
+        }
+
+        /* Efeito de carregamento simulado */
+        .loading-bar {
+            width: 0%;
+            height: 2px;
+            background: var(--pmerj-gold);
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            transition: width 0.5s;
+        }
+    </style>
+</head>
+<body>
+
+    <img src="caveira-armada.jpg" class="watermark" alt="">
+
+    <div class="login-container">
+        <img src="logo_pmerj.png" alt="Logo PMERJ" class="logo-pmerj">
+        <h2>Acesso Restrito</h2>
+        <p class="subtitle">Gestão RUMB | Almoxarifado</p>
+
+        <form id="loginForm">
+            <div class="input-group">
+                <i class="fas fa-id-badge"></i>
+                <input type="text" placeholder="RE ou Nome de Usuário" required>
+            </div>
+            
+            <div class="input-group">
+                <i class="fas fa-lock"></i>
+                <input type="password" placeholder="Senha de Acesso" required>
+            </div>
+
+            <button type="submit" class="btn-login" id="loginBtn">
+                <i class="fas fa-sign-in-alt"></i> Autenticar
+            </button>
+            <div class="loading-bar" id="loadBar"></div>
+        </form>
+
+        <div class="footer-links">
+            <a href="#">Esqueceu a senha?</a> • <a href="#">Suporte TI</a>
+        </div>
+    </div>
+
+    <script>
+		/* --- Início do código login --- */
+    // 1. Definição das senhas (Sua senha e a de terceiros)
+    const usuariosPermitidos = {
+        "Simoes": "2501",        // Sua senha pessoal
+        "visitante1": "rumb2026",        // Senha para um terceiro
+        "operador": "pmerj123",           // Outra senha diferente
+	"Dan": "12345",           // Quartilheiro - RUMB
+	"Alacrino": "12345",      // Quartilheiro - RUMB
+	"Lacerda": "12345",      // Quartilheiro - RUMB
+	"Triumpho": "12345"      // Quartilheiro - RUMB
+    };
+		/* --- Final do Código Login --- */
+
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // 2. Captura os valores digitados
+        const usuarioDigitado = document.querySelector('input[type="text"]').value;
+        const senhaDigitada = document.querySelector('input[type="password"]').value;
+        
+        const btn = document.getElementById('loginBtn');
+        const bar = document.getElementById('loadBar');
+
+        // 3. Verifica se as credenciais batem com o que definimos acima
+        if (usuariosPermitidos[usuarioDigitado] && usuariosPermitidos[usuarioDigitado] === senhaDigitada) {
+            
+            // Salva o nome do usuário para usar no index.html (Opcional)
+            localStorage.setItem('usuarioAtivo', usuarioDigitado);
+
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Autenticando...';
+            bar.style.width = '100%';
+
+            setTimeout(() => {
+                window.location.href = 'dashboard.html';
+            }, 1500);
+
+        } else {
+            // Se errar a senha ou o usuário
+            alert("Acesso Negado: Usuário ou Senha incorretos.");
+            btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Tentar Novamente';
+            bar.style.width = '0%';
+        }
+    });
+</script>
+</body>
+</html>

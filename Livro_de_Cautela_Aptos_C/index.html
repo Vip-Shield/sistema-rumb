@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Cautela APTOS "C" - RUMB</title>
+    <link rel="shortcut icon" type="imagex/png" href="../IMAGENS/caveira.ico">
+
+<style>
+  /* ESTILO GERAL */
+  body { 
+    font-family: 'Segoe UI', Arial, sans-serif; 
+    background: #2b1b1b; 
+    color: #fff; 
+    padding: 20px; 
+    padding-top: 130px; 
+    font-size: 11px; 
+  }
+  
+  /* CABEÇALHO FIXO */
+  .header { 
+    position: fixed; 
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: #2b1b1b; 
+    z-index: 1000; 
+    box-sizing: border-box; 
+    padding: 10px 20px;
+    
+    display: grid; 
+    grid-template-columns: 70px 1fr 70px; 
+    align-items: center; 
+    border-bottom: 3px solid #e63946; 
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5); 
+  }
+
+  .titulo h1 { text-align: center; font-size: 20px; margin: 0; color: #f0f0f0; text-transform: uppercase; letter-spacing: 1px; }
+  .titulo p { text-align: center; margin: 5px 0; color: #e63946; font-weight: bold; }
+
+  /* FORMULÁRIO */
+  .form-container { background: #3d2b2b; padding: 20px; border-radius: 8px; border: 1px solid #e63946; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+  
+  .bloco-titulo { 
+    background: linear-gradient(90deg, #501b1d, #2b1b1b); 
+    color: #ffd700; 
+    padding: 6px; 
+    font-weight: bold; 
+    text-align: center; 
+    margin: 15px 0 10px 0; 
+    border-left: 5px solid #e63946;
+    text-transform: uppercase; 
+    font-size: 12px;
+  }
+
+  .grid-campos { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; }
+  .campo-grupo { display: flex; flex-direction: column; }
+  
+  label { font-size: 10px; margin-bottom: 4px; color: #ffadad; font-weight: bold; }
+  input, select { padding: 8px; border-radius: 4px; border: 1px solid #8d5a5a; background: #201010; color: #fff; font-size: 12px; }
+  input:focus { border-color: #ffd700; outline: none; }
+
+  /* BOTÕES DE AÇÃO */
+  .btn-area { margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  button { padding: 10px 20px; cursor: pointer; font-weight: bold; border-radius: 4px; border: none; text-transform: uppercase; font-size: 11px; color: white;}
+  
+  .btn-salvar { background: #e63946; color: #fff; transition: 0.3s; }
+  .btn-salvar:hover { background: #c1121f; }
+  
+  .btn-print { background: #415a77; }
+  .btn-print:hover { background: #2c3e50; }
+
+  .btn-backup { background: #059669; }
+  .btn-restore { background: #b91c1c; }
+
+  /* Botão Relatório Geral de WhatsApp */
+  .btn-zap-todos { background: #128C7E; margin-left: auto; }
+  .btn-zap-todos:hover { background: #075E54; }
+
+  /* Botão Relatório Apenas Guardadas */
+  .btn-zap-guardadas { background: #005c4b; color: white; margin-left: 5px; }
+  .btn-zap-guardadas:hover { background: #014c3d; }
+
+  /* Botões de Ações da Tabela */
+  .btn-zap { background: #25D366; color: white; border: none; padding: 4px 6px; border-radius: 3px; cursor: pointer; font-size: 10px; margin-left: 5px; }
+  .btn-zap:hover { background: #128C7E; }
+  .btn-editar { background: #ff851b; color: white; border: none; padding: 4px 6px; border-radius: 3px; cursor: pointer; font-size: 10px; margin-left: 5px; }
+  .btn-editar:hover { background: #e67300; }
+  .btn-excluir { background: #dc2626; color: white; border: none; padding: 4px 6px; border-radius: 3px; cursor: pointer; font-size: 10px; margin-left: 5px; }
+  .btn-excluir:hover { background: #991b1b; }
+  .btn-cancelar-edicao { background: #85144b; display: none; color: white; }
+  .btn-cancelar-edicao:hover { background: #72113f; }
+
+  /* ÁREA DE PESQUISA E FILTROS */
+  .search-container { margin-top: 20px; margin-bottom: 10px; display: flex; flex-direction: column; gap: 8px;}
+  
+  .filter-area { display: flex; gap: 10px; margin-bottom: 8px; }
+
+  /* Contador de Guardadas */
+  .contador-box { align-self: flex-start; background: #ffd700; color: #000; padding: 6px 12px; border-radius: 4px; font-weight: bold; font-size: 12px; box-shadow: 0 0 8px rgba(255, 215, 0, 0.5); display: inline-block; margin-bottom: 5px; }
+
+  /* Botões de Filtro (Tema Vermelho) */
+  .btn-filter { 
+    background: #3d2b2b; 
+    border: 1px solid #e63946; 
+    color: #e63946; 
+    flex-grow: 1;
+    transition: all 0.2s;
+  }
+  .btn-filter:hover { background: #501b1d; }
+  
+  /* Estado Ativo do Filtro */
+  .btn-filter.active { 
+    background: #e63946; 
+    color: #fff; 
+    box-shadow: 0 0 8px rgba(230, 57, 70, 0.6);
+  }
+
+  #inputBusca { width: 100%; padding: 10px; background: #501b1d; border: 1px solid #e63946; color: white; border-radius: 5px; font-weight: bold; box-sizing: border-box; }
+  #inputBusca::placeholder { color: #ffadad; }
+
+  /* TABELA */
+  table { width: 100%; border-collapse: collapse; margin-top: 5px; background: white; color: black; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+  th, td { border: 1px solid #ccc; padding: 6px; text-align: center; font-size: 10px; }
+  th { background: #501b1d; color: white; text-transform: uppercase; letter-spacing: 0.5px; }
+  
+  .col-destaque { background-color: #ffe6e6; font-weight: bold; color: #800f2f; }
+  
+  tr:nth-child(even) { background: #fff0f0; }
+  .btn-devolver { background: #15803d; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 10px; }
+  
+  /* MODAL (JANELA DE BAIXA) */
+  .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 1000; }
+  .modal-box { background: #3d2b2b; padding: 20px; border: 2px solid #e63946; border-radius: 8px; width: 300px; color: white; }
+  .modal-box h3 { text-align: center; color: #e63946; margin-top: 0; }
+  .modal-box button { width: 100%; margin-top: 10px; }
+  .btn-cancelar { background: #555; }
+
+  @media print {
+    .form-container, .btn-area, .search-container, .no-print { display: none; }
+    body { background: white; color: black; padding: 0; }
+    /* Ajuste para impressão não cortar o topo */
+    .header { position: relative; border-bottom: 1px solid #000; }
+    th { background: #ddd !important; color: black; border: 1px solid #000; }
+    td { border: 1px solid #000; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <a href="../dashboard.html"><img src="caveira-armada.png" width="60" alt="RUMB" title="Voltar ao Painel" onerror="this.style.display='none'"></a>
+  <div class="titulo">
+    <h1>Polícia Militar do Estado do Rio de Janeiro</h1>
+    <p>LIVRO DE CAUTELA (ARMAMENTO PARTICULAR) - APTOS "C", LTS E PSIQUIATRIA</p>
+  </div>
+  <img src="logo_pmerj.png" width="60" alt="PMERJ" onerror="this.style.display='none'">
+</div>
+
+<div class="form-container">
+  <form id="formParticular">
+    <input type="hidden" id="editIndex" value="-1">
+    
+    <div class="bloco-titulo">1. DADOS DO PROPRIETÁRIO (POLICIAL)</div>
+    <div class="grid-campos">
+      <div class="campo-grupo"><label>GH</label><input type="text" id="gh" required placeholder="Ex: SD"></div>
+      <div class="campo-grupo"><label>RG</label><input type="text" id="rg" required placeholder="00.000"></div>
+      <div class="campo-grupo" style="flex-grow: 2;"><label>NOME DE ESCALA</label><input type="text" id="nomePolicial" required placeholder="Nome de Guerra"></div>
+    </div>
+
+    <div class="bloco-titulo">2. DADOS DO ARMAMENTO (ENTRADA NA RESERVA)</div>
+    <div class="grid-campos">
+      <div class="campo-grupo"><label>CALIBRE</label><input type="text" id="calibre" placeholder=".40, 9mm..."></div>
+      <div class="campo-grupo"><label>ARMÁRIO/LOCAL</label><input type="text" id="armario" placeholder="Ex: A-10"></div>
+      <div class="campo-grupo"><label>MODELO DA ARMA</label><input type="text" id="modeloArma" placeholder="Ex: G22, PT100..."></div>
+      <div class="campo-grupo"><label>NÚMERO DA ARMA (SÉRIE)</label><input type="text" id="numArma" required></div>
+      <div class="campo-grupo" style="flex-grow: 2;"><label>CARREGADORES E MUNIÇÕES</label><input type="text" id="municoes" placeholder="Ex: 2 Carregadores, 30 munições"></div>
+    </div>
+
+    <div class="bloco-titulo">3. DATA E RESPONSÁVEL (RUMB)</div>
+    <div class="grid-campos">
+        <div class="campo-grupo">
+            <label style="color: #ffd700;">DATA CAUTELA</label>
+            <input type="date" id="dataCautela" required>
+        </div>
+        <div class="campo-grupo">
+            <label style="color: #ffd700;">HORA</label>
+            <input type="time" id="horaCautela" required>
+        </div>
+        <div class="campo-grupo" style="flex-grow: 2;">
+            <label style="color: #ffd700;">NOME DO RUMB (QUEM RECEBEU)</label>
+            <input type="text" id="rumbRecebeu" required placeholder="Armeiro que está guardando a arma...">
+        </div>
+    </div>
+
+    <div class="btn-area">
+      <button type="submit" id="btnSalvar" class="btn-salvar">📥 REGISTRAR CAUTELA (GUARDAR)</button>
+      <button type="button" class="btn-cancelar-edicao" id="btnCancelarEdicao" onclick="cancelarEdicao()">❌ CANCELAR EDIÇÃO</button>
+      <button type="button" class="btn-print" onclick="window.print()">🖨️ IMPRIMIR</button>
+      <button type="button" class="btn-backup" onclick="fazerBackup()">💾 SALVAR BACKUP</button>
+      <input type="file" id="fileInput" style="display:none" onchange="restaurarBackup(this)">
+      <button type="button" class="btn-restore" onclick="document.getElementById('fileInput').click()">📂 IMPORTAR</button>
+      
+      <button type="button" class="btn-zap-todos no-print" onclick="enviarZapTodos()">📱 ZAP: RELATÓRIO GERAL</button>
+      <button type="button" class="btn-zap-guardadas no-print" onclick="enviarZapGuardadas()">📱 ZAP: SÓ GUARDADAS</button>
+    </div>
+  </form>
+</div>
+
+<div class="search-container">
+  <div class="contador-box" id="contadorAbertas">🚨 ARMAMENTOS GUARDADOS: 0</div>
+  
+  <div class="filter-area">
+    <button class="btn-filter active" id="btnTodas" onclick="setFiltro('TODOS')">👀 VER TODAS</button>
+    <button class="btn-filter" id="btnGuardadas" onclick="setFiltro('GUARDADO')">⚠️ VER APENAS GUARDADAS</button>
+  </div>
+
+  <input type="text" id="inputBusca" placeholder="🔍 BUSCAR REGISTRO (Digite RG, Nome, Arma ou RUMB...)" onkeyup="filtrarTabela()">
+</div>
+
+<table id="tabelaMateriais">
+  <thead>
+    <tr>
+      <th colspan="3" style="background:#2b1b1b">PROPRIETÁRIO</th>
+      <th colspan="5">ARMAMENTO</th> <th colspan="3" style="background:#b8860b; color:black">CAUTELA (ENTRADA)</th>
+      <th colspan="3" style="background:#15803d; color:white">DEVOLUÇÃO (SAÍDA)</th>
+    </tr>
+    <tr>
+      <th>GH</th><th>RG</th><th>NOME ESCALA</th>
+      <th>CALIBRE</th><th>ARMÁRIO</th><th>MODELO</th><th>NÚMERO ARMA</th><th>CARREG. / MUNIÇÕES</th> <th>DATA CAUTELA</th><th>HORA</th><th>RUMB RECEBEU</th>
+      <th>DATA DEVOL.</th><th>HORA</th><th>RUMB ENTREGOU</th>
+    </tr>
+  </thead>
+  <tbody id="tabelaCorpo"></tbody>
+</table>
+
+<div id="modalBaixa" class="modal-overlay">
+  <div class="modal-box">
+    <h3>DEVOLUÇÃO DE ARMA</h3>
+    <input type="hidden" id="indexBaixa">
+    
+    <label>DATA DA DEVOLUÇÃO:</label>
+    <input type="date" id="dataBaixa" style="width:90%; margin-bottom:10px;">
+    
+    <label>HORA DA DEVOLUÇÃO:</label>
+    <input type="time" id="horaBaixa" style="width:90%; margin-bottom:10px;">
+    
+    <label>QUEM ESTÁ ENTREGANDO (RUMB):</label>
+    <input type="text" id="rumbBaixa" placeholder="Nome do Armeiro" style="width:90%; margin-bottom:15px;">
+    
+    <button class="btn-salvar" onclick="confirmarBaixa()">CONFIRMAR ENTREGA</button>
+    <button class="btn-cancelar" onclick="fecharModal()">CANCELAR</button>
+  </div>
+</div>
+
+<script>
+  const form = document.getElementById('formParticular');
+  let registros = JSON.parse(localStorage.getItem('livroCautela_apto-c')) || [];
+  
+  let filtroAtual = 'TODOS';
+
+  document.getElementById('dataCautela').valueAsDate = new Date();
+  document.getElementById('horaCautela').value = new Date().toLocaleTimeString('pt-BR').slice(0,5);
+
+  form.onsubmit = (e) => {
+    e.preventDefault();
+    
+    const dataC = document.getElementById('dataCautela').value;
+    const horaC = document.getElementById('horaCautela').value;
+    const dataFormatada = dataC.split('-').reverse().join('/');
+
+    const novoRegistro = {
+      gh: document.getElementById('gh').value.toUpperCase(),
+      rg: document.getElementById('rg').value,
+      nomePolicial: document.getElementById('nomePolicial').value.toUpperCase(),
+      
+      calibre: document.getElementById('calibre').value.toUpperCase(),
+      armario: document.getElementById('armario').value.toUpperCase(),
+      modeloArma: document.getElementById('modeloArma').value.toUpperCase(),
+      numArma: document.getElementById('numArma').value.toUpperCase(),
+      municoes: document.getElementById('municoes').value.toUpperCase(),
+      
+      dataCautela: dataFormatada, 
+      horaCautela: horaC,
+      rumbRecebeu: document.getElementById('rumbRecebeu').value.toUpperCase()
+    };
+
+    const editIndex = document.getElementById('editIndex').value;
+
+    if (editIndex !== "-1") {
+      const index = parseInt(editIndex);
+      // Mantém os dados da devolução se já estiver finalizado
+      novoRegistro.status = registros[index].status;
+      novoRegistro.dataDevolucao = registros[index].dataDevolucao || '';
+      novoRegistro.horaDevolucao = registros[index].horaDevolucao || '';
+      novoRegistro.rumbEntregou = registros[index].rumbEntregou || '';
+
+      registros[index] = novoRegistro;
+      cancelarEdicao(); 
+    } else {
+      novoRegistro.status = 'GUARDADO';
+      registros.push(novoRegistro);
+      form.reset();
+      document.getElementById('dataCautela').valueAsDate = new Date();
+      document.getElementById('horaCautela').value = new Date().toLocaleTimeString('pt-BR').slice(0,5);
+    }
+
+    salvarERenderizar();
+    document.getElementById('gh').focus();
+  };
+
+  // --- LÓGICA DE WHATSAPP (INDIVIDUAL) ---
+  function enviarZap(index) {
+    const r = registros[index];
+    let mensagem = `*CAUTELA DE ARMAMENTO - PMERJ*\n\n`;
+    mensagem += `👮‍♂️ *Policial:* ${r.gh} ${r.nomePolicial} (RG: ${r.rg})\n`;
+    mensagem += `🔫 *Arma:* ${r.modeloArma || '-'} | *Calibre:* ${r.calibre || '-'} | *Série:* ${r.numArma}\n`;
+    mensagem += `📦 *Armário:* ${r.armario || '-'} | *Munições:* ${r.municoes || '-'}\n\n`;
+    mensagem += `📥 *Entrada na Reserva:* ${r.dataCautela} às ${r.horaCautela} (RUMB: ${r.rumbRecebeu})\n`;
+    
+    if (r.status === 'DEVOLVIDO') {
+       mensagem += `📤 *Saída da Reserva:* ${r.dataDevolucao} às ${r.horaDevolucao} (RUMB: ${r.rumbEntregou})\n`;
+       mensagem += `✅ *STATUS:* DEVOLVIDO\n`;
+    } else {
+       mensagem += `⚠️ *STATUS:* GUARDADO NA RESERVA\n`;
+    }
+
+    const textoCodificado = encodeURIComponent(mensagem);
+    window.open(`https://api.whatsapp.com/send?text=${textoCodificado}`, '_blank');
+  }
+
+  // --- LÓGICA DE WHATSAPP (GERAL - NOVA FUNÇÃO) ---
+  function enviarZapTodos() {
+    const guardadas = registros.filter(r => r.status === 'GUARDADO');
+    
+    if (guardadas.length === 0) {
+      alert("Não há armamentos guardados no momento para gerar o relatório.");
+      return;
+    }
+
+    let mensagem = `*RELATÓRIO DE ARMAMENTO EM RESERVA - PMERJ*\n`;
+    mensagem += `_LIVRO: CAUTELA PARTICULAR (APTOS "C", LTS e PSIQ)_\n\n`;
+    mensagem += `🚨 *Total de Armas Guardadas:* ${guardadas.length}\n\n`;
+    
+    guardadas.forEach((r, idx) => {
+      mensagem += `*${idx + 1}.* ${r.gh} ${r.nomePolicial} (RG: ${r.rg})\n`;
+      mensagem += `   🔫 *Arma:* ${r.modeloArma || '-'} | *Série:* ${r.numArma}\n`;
+      mensagem += `   📦 *Armário:* ${r.armario || '-'} | *Entrada:* ${r.dataCautela} às ${r.horaCautela}\n\n`;
+    });
+
+    const textoCodificado = encodeURIComponent(mensagem);
+    window.open(`https://api.whatsapp.com/send?text=${textoCodificado}`, '_blank');
+  }
+
+  // --- LÓGICA DE WHATSAPP (SOMENTE GUARDADAS) ---
+  function enviarZapGuardadas() {
+    const guardadas = registros.filter(r => r.status === 'GUARDADO');
+    
+    if (guardadas.length === 0) {
+      alert("Não há armamentos guardados na reserva no momento.");
+      return;
+    }
+
+    let mensagem = `*RELAÇÃO DE ARMAMENTOS GUARDADOS NA RESERVA*\n`;
+    mensagem += `_LIVRO: CAUTELA PARTICULAR (APTOS "C", LTS e PSIQ)_\n\n`;
+    mensagem += `🚨 *Total de Armas Guardadas:* ${guardadas.length}\n\n`;
+    
+    guardadas.forEach((r, idx) => {
+      mensagem += `*${idx + 1}.* ${r.gh} ${r.nomePolicial} (RG: ${r.rg})\n`;
+      mensagem += `   🔫 *Arma:* ${r.modeloArma || '-'} | *Série:* ${r.numArma}\n`;
+      mensagem += `   📦 *Armário:* ${r.armario || '-'} | *Entrada:* ${r.dataCautela} às ${r.horaCautela}\n\n`;
+    });
+
+    const textoCodificado = encodeURIComponent(mensagem);
+    window.open(`https://api.whatsapp.com/send?text=${textoCodificado}`, '_blank');
+  }
+
+  // --- LÓGICA DE EDIÇÃO ---
+  function editarRegistro(index) {
+    const r = registros[index];
+    document.getElementById('editIndex').value = index;
+
+    document.getElementById('gh').value = r.gh || '';
+    document.getElementById('rg').value = r.rg || '';
+    document.getElementById('nomePolicial').value = r.nomePolicial || '';
+    
+    document.getElementById('calibre').value = r.calibre || '';
+    document.getElementById('armario').value = r.armario || '';
+    document.getElementById('modeloArma').value = r.modeloArma || '';
+    document.getElementById('numArma').value = r.numArma || '';
+    document.getElementById('municoes').value = r.municoes || '';
+
+    // Converter DD/MM/YYYY de volta para YYYY-MM-DD no input
+    if (r.dataCautela) {
+      const partes = r.dataCautela.split('/');
+      if(partes.length === 3) {
+        document.getElementById('dataCautela').value = `${partes[2]}-${partes[1]}-${partes[0]}`;
+      }
+    }
+    document.getElementById('horaCautela').value = r.horaCautela || '';
+    document.getElementById('rumbRecebeu').value = r.rumbRecebeu || '';
+
+    const btnSalvar = document.getElementById('btnSalvar');
+    btnSalvar.innerHTML = '💾 ATUALIZAR REGISTRO';
+    btnSalvar.style.background = '#ff851b';
+    document.getElementById('btnCancelarEdicao').style.display = 'inline-block';
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function cancelarEdicao() {
+    document.getElementById('editIndex').value = '-1';
+    form.reset();
+    document.getElementById('dataCautela').valueAsDate = new Date();
+    document.getElementById('horaCautela').value = new Date().toLocaleTimeString('pt-BR').slice(0,5);
+
+    const btnSalvar = document.getElementById('btnSalvar');
+    btnSalvar.innerHTML = '📥 REGISTRAR CAUTELA (GUARDAR)';
+    btnSalvar.style.background = '#e63946';
+    document.getElementById('btnCancelarEdicao').style.display = 'none';
+  }
+
+  // --- LÓGICA DE EXCLUSÃO ---
+  function excluirRegistro(index) {
+    if(confirm("⚠️ ATENÇÃO: Tem certeza que deseja EXCLUIR este registro permanentemente?\nEsta ação não pode ser desfeita.")) {
+      if (document.getElementById('editIndex').value == index) {
+        cancelarEdicao();
+      }
+      registros.splice(index, 1);
+      salvarERenderizar();
+    }
+  }
+
+  // --- LÓGICA DE BAIXA ---
+  function abrirBaixa(index) {
+    document.getElementById('indexBaixa').value = index;
+    document.getElementById('dataBaixa').valueAsDate = new Date();
+    document.getElementById('horaBaixa').value = new Date().toLocaleTimeString('pt-BR').slice(0,5);
+    document.getElementById('rumbBaixa').value = "";
+    document.getElementById('modalBaixa').style.display = 'flex';
+  }
+
+  function fecharModal() {
+    document.getElementById('modalBaixa').style.display = 'none';
+  }
+
+  function confirmarBaixa() {
+    const index = document.getElementById('indexBaixa').value;
+    const dataB = document.getElementById('dataBaixa').value;
+    const horaB = document.getElementById('horaBaixa').value;
+    const rumbB = document.getElementById('rumbBaixa').value;
+
+    if (!dataB || !horaB || !rumbB) {
+        alert("Preencha todos os campos da devolução.");
+        return;
+    }
+
+    const dataFormatada = dataB.split('-').reverse().join('/');
+
+    registros[index].dataDevolucao = dataFormatada;
+    registros[index].horaDevolucao = horaB;
+    registros[index].rumbEntregou = rumbB.toUpperCase();
+    registros[index].status = 'DEVOLVIDO';
+
+    salvarERenderizar();
+    fecharModal();
+  }
+
+  // --- LÓGICA DE FILTROS ---
+  function setFiltro(tipo) {
+    filtroAtual = tipo;
+    
+    if(tipo === 'TODOS') {
+        document.getElementById('btnTodas').classList.add('active');
+        document.getElementById('btnGuardadas').classList.remove('active');
+    } else {
+        document.getElementById('btnTodas').classList.remove('active');
+        document.getElementById('btnGuardadas').classList.add('active');
+    }
+    
+    filtrarTabela();
+  }
+
+  function filtrarTabela() {
+    const termo = document.getElementById('inputBusca').value.toUpperCase();
+    const linhas = document.querySelectorAll('#tabelaCorpo tr');
+    
+    linhas.forEach(linha => {
+        const textoLinha = linha.innerText.toUpperCase();
+        const statusLinha = linha.getAttribute('data-status');
+        
+        const matchTexto = textoLinha.includes(termo);
+        let matchFiltro = true;
+        
+        if (filtroAtual === 'GUARDADO' && statusLinha !== 'GUARDADO') {
+            matchFiltro = false;
+        }
+
+        if(matchTexto && matchFiltro) {
+            linha.style.display = '';
+        } else {
+            linha.style.display = 'none';
+        }
+    });
+  }
+
+  function salvarERenderizar() {
+    localStorage.setItem('livroCautela_apto-c', JSON.stringify(registros));
+    const tbody = document.getElementById('tabelaCorpo');
+    tbody.innerHTML = '';
+    
+    const abertasCount = registros.filter(r => r.status === 'GUARDADO').length;
+    document.getElementById("contadorAbertas").innerText = `🚨 ARMAMENTOS GUARDADOS: ${abertasCount}`;
+    
+    registros.slice().reverse().forEach((r, iReal) => {
+      const indexOriginal = registros.length - 1 - iReal;
+      tbody.innerHTML += `
+        <tr data-status="${r.status}" style="${r.status === 'DEVOLVIDO' ? 'opacity:0.6; background:#e0ffe0' : ''}">
+          <td>${r.gh}</td>
+          <td>${r.rg}</td>
+          <td style="text-align:left; font-weight:bold;">${r.nomePolicial}</td>
+          
+          <td>${r.calibre || '-'}</td>
+          <td style="color:#b91c1c; font-weight:bold">${r.armario || '-'}</td>
+          <td>${r.modeloArma || '-'}</td>
+          <td>${r.numArma}</td>
+          <td style="font-size:9px;">${r.municoes || '-'}</td> 
+          
+          <td>${r.dataCautela}</td>
+          <td>${r.horaCautela}</td>
+          <td class="col-destaque">${r.rumbRecebeu}</td>
+          
+          <td>${r.dataDevolucao || ''}</td>
+          <td>${r.horaDevolucao || ''}</td>
+          
+          <td class="col-destaque" style="white-space: nowrap;">
+            ${r.status === 'GUARDADO' 
+              ? `<button class="btn-devolver no-print" onclick="abrirBaixa(${indexOriginal})">DEVOLVER</button>` 
+              : `<span style="margin-right: 5px;">${r.rumbEntregou}</span>`}
+            
+            <button class="btn-zap no-print" onclick="enviarZap(${indexOriginal})" title="Enviar Recibo pelo WhatsApp">📱</button>
+            <button class="btn-editar no-print" onclick="editarRegistro(${indexOriginal})" title="Editar Cautela">✏️</button>
+            <button class="btn-excluir no-print" onclick="excluirRegistro(${indexOriginal})" title="Excluir Cautela">🗑️</button>
+          </td>
+        </tr>`;
+    });
+    
+    filtrarTabela(); 
+  }
+
+  // --- BACKUP E RESTAURAÇÃO ---
+  function fazerBackup() {
+    const dados = localStorage.getItem('livroCautela_apto-c');
+    if (!dados || dados === '[]') { alert("Nada para salvar!"); return; }
+    const blob = new Blob([dados], {type: "application/json"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Livro_Particular_LTS-PSIQ_${new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
+
+  function restaurarBackup(input) {
+    const file = input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        const json = JSON.parse(e.target.result);
+        if (Array.isArray(json)) {
+          if(confirm("Substituir tabela atual pelos dados do arquivo?")) {
+            registros = json;
+            salvarERenderizar();
+            alert("Restaurado com sucesso!");
+          }
+        } else { alert("Arquivo inválido."); }
+      } catch (err) { alert("Erro: " + err); }
+      finally { input.value = ""; } 
+    };
+    reader.readAsText(file);
+  }
+
+  salvarERenderizar();
+</script>
+</body>
+</html>

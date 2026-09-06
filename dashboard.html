@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel RUMB - Almoxarifado PMERJ</title>
+    <link rel="shortcut icon" type="imagex/png" href="caveira.ico">
+
+
+    <link rel="manifest" href="manifest.json">
+
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="RUMB">
+<link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    
+    <style>
+        :root {
+            --pmerj-blue: #002D5E;
+            --pmerj-gold: #E58A13;
+            --pmerj-silver: #f4f4f4;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #001a36 0%, #002D5E 100%);
+            background-attachment: fixed;
+            color: white;
+            min-height: 100vh;
+        }
+
+        /* Fundo com a logo RUMB (Opacidade baixa) */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px;
+            height: 600px;
+            background: url('caveira-armada.jpg') no-repeat center;
+            background-size: contain;
+            opacity: 0.05;
+            z-index: -1;
+        }
+
+        header {
+            background: rgba(0, 45, 94, 0.9);
+            padding: 1rem 5%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 3px solid var(--pmerj-gold);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-area img {
+            height: 60px;
+        }
+
+        .header-title h1 {
+            font-size: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .container {
+            padding: 2rem 5%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .grid-apps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        /* Card Estilo Moderno */
+        .card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.15);
+            border-color: var(--pmerj-gold);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .card i {
+            font-size: 3rem;
+            color: var(--pmerj-gold);
+            text-shadow: 0 0 15px rgba(229, 138, 19, 0.4);
+        }
+
+        .card h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .card p {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        /* Botão Especial Site RUMB */
+        .site-rumb-container {
+            margin-top: 40px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .btn-site-rumb {
+            background: linear-gradient(90deg, var(--pmerj-gold), #ffb347);
+            color: var(--pmerj-blue);
+            padding: 15px 40px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 5px 20px rgba(229, 138, 19, 0.4);
+            transition: 0.3s;
+        }
+
+        .btn-site-rumb:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(229, 138, 19, 0.6);
+        }
+
+        .footer-status {
+            text-align: center;
+            margin-top: 50px;
+            font-size: 0.8rem;
+            color: var(--pmerj-silver);
+            opacity: 0.6;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo-area">
+            <img src="logo_pmerj.png" alt="Logo PMERJ">
+            <div class="header-title">
+                <h1>Almoxarifado</h1>
+                <p>Gestão Integrada RUMB</p>
+            </div>
+        </div>
+        <div class="user-info">
+            <i class="fas fa-user-shield"></i> Operador Online
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="grid-apps">
+            <a href="./Aplicação de busca Cameras do Serviço 3ª CIA UPP Pavão/index.html" class="card">
+                <i class="fas fa-search-location"></i>
+                <h3>Busca de COP</h3>
+                <p>Consulta de Câmeras Extraviadas</p>
+            </a>
+
+            <a href="./Aplicação de busca Nome Serviço 3ª CIA UPP Pavão/index.html" class="card">
+                <i class="fas fa-users"></i>
+                <h3>Busca de PPMM</h3>
+                <p>Localização de Efetivo</p>
+            </a>
+
+            <a href="./Aplicação de busca Materiais  do Serviço 3ª CIA UPP Pavão/index.html" class="card">
+                <i class="fas fa-boxes-stacked"></i>
+                <h3>Busca de Materiais</h3>
+                <p>Inventário e Estoque</p>
+            </a>
+
+            <a href="./CONTATO RUMB/index.html" class="card">
+                <i class="fas fa-address-book"></i>
+                <h3>Contatos RUMB</h3>
+                <p>Rede de Contatos das Unidades</p>
+            </a>
+
+<a href="./Armamento/index.html" class="card">
+                <i class="fa-solid fa-person-military-rifle"></i>
+                <h3>Busca de Armas</h3>
+                <p>Buscador Inteligente de Armamento</p>
+            </a>
+
+<a href="./Colete/index.html" class="card">
+<i class="fa-solid fa-vest"></i>
+                <h3>Busca de Coletes</h3>
+                <p>Buscador Inteligente de Coletes Balísticos</p>
+            </a>
+
+
+
+            <a href="./Livro_de_Cautela_PROEIS/index.html" class="card">
+                <i class="fa-solid fa-book"></i>
+                <h3>Livro de Cautela PROEIS</h3>
+                <p>Registro de Entrada e Saída</p>
+            </a>
+
+	<a href="./Livro_Ordinário/index.html" class="card">
+                <i class="fa-solid fa-book"></i>
+                <h3>Livro de Cautela ORDINÁRIO</h3>
+                <p>Registro de Entrada e Saída</p>
+            </a>
+
+            <a href="./Livro_de_Cautela_Permanente/index.html" class="card">
+                <i class="fas fa-lock"></i>
+                <h3>Livro de Cautela Permanente</h3>
+                <p>Carga Fixa da Unidade</p>
+            </a>
+
+		<a href="./Livro_de Cautela_Ras_Compulsório/index.html" class="card">
+                <i class="fa-solid fa-book"></i>
+                <h3>Livro de Cautela RAS COMPULSÓRIO / VOLUNTÁRIO</h3>
+                <p>Registro de Entrada e Saída</p>
+            </a>
+		
+<a href="./Livro_de_Cautela_Aptos_C/index.html" class="card">
+                <i class="fas fa-file-signature"></i>
+                <h3>Livro de Cautela Aptos "C"</h3>
+                <p>Registro de Entrada e Saída</p>
+            </a>
+
+<a href="./Livro_Cautela_Particular/index.html" class="card">
+<i class="fa-solid fa-person-rifle"></i>
+                <h3>Livro de Cautela Particular</h3>
+                <p>Registro de Arma Particular</p>
+            </a>
+
+<a href="./Espargidor_cautela/index.html" class="card">
+<i class="fa-solid fa-spray-can"></i>
+                <h3>Espargidor Cautela</h3>
+                <p>Permanente ao PPMM</p>
+            </a>
+
+
+<a href="./Pendência_PPMM/index.html" class="card">
+                <i class="fa-solid fa-people-robbery"></i>
+                <h3>Pendências PPMM</h3>
+                <p>Auditoria de Cautelas</p>
+            </a>
+
+
+            <a href="./Alterações_Serviços/index.html" class="card">
+                <i class="fa-solid fa-ban"></i>
+                <h3>Alterações e Avarias</h3>
+                <p>Protocolos a seguir</p>
+            </a>
+
+
+	<a href="./Protocolo_LIGHT/protocolo_light.html" class="card">
+                <i class="fa-solid fa-bolt-lightning"></i>
+                <h3>Protocolo LIGHT</h3>
+                <p>Em caso de queda de energia</p>
+            </a>
+
+<a href="./Profeta_Oráculo/profeta.html" class="card">
+                <i class="fa-solid fa-cross"></i>
+                <h3>PROFÉTA</h3>
+                <p>Previsão de Escala</p>
+            </a>
+
+<a href="./Arquivo_Papeleta-de-Serviço/index.html" class="card">
+                <i class="fa-solid fa-paperclip"></i>
+                <h3>Controle de Papeletas</h3>
+                <p>Arquivamento de Papeletas</p>
+            </a>
+
+	<a href="./Procedimentos/index.html" class="card">
+                <i class="fa-solid fa-bug"></i>
+                <h3>POP</h3>
+                <p>Procedimentos Operacionais Padrão</p>
+            </a>
+
+
+	<a href="./Recado_Importante/index.html" class="card">
+                <i class="fa-solid fa-helmet-safety"></i>
+                <h3>Passagem de Serviço</h3>
+                <p>Recado Importante</p>
+            </a>
+
+
+	<a href="./Contagem Diária/index.html" class="card">
+                <i class="fas fa-calendar-check"></i>
+                <h3>Contagem Diária</h3>
+                <p>Conferência de Turno</p>
+            </a>
+
+
+            <a href="./Overtime/index.html" class="card">
+                <i class="fa-solid fa-solidLarge fa-stopwatch">‌</i>
+                <h3>OverTime</h3>
+                <p>App o Quanto falta de extra</p>
+            </a>
+
+
+            <a href="./Mesclador_JSON_RUMB/index.html" class="card">
+                <i class="fa-solid fa-box-archive"></i>
+                <h3>Mesclador Backup</h3>
+                <p>Junta todos os backups em 1 só</p>
+            </a>
+
+         <a href="./Cautela_Bateria/Para_RUMB.html" class="card">
+                <i class="fa-solid fa-robot"></i>
+                <h3>Cautela de Bateria</h3>
+                <p>Automação de Cautela das baterias</p>
+            </a>
+
+		<a href="./AutoBodycam/index.html" class="card">
+		<i class="fa-solid fa-camera"></i>
+                <h3>Retardatários Cop</h3>
+                <p>Retirada de Câmeras dos Atrasados</p>
+            </a>
+
+<a href="./Achados_e_Perdidos/index.html" class="card">
+		<i class="fa-solid fa-shield-dog"></i>
+                <h3>Achados e Perdidos</h3>
+                <p>Achados e Sobressalentes</p>
+            </a>
+
+<a href="./Acautelamento_Material_Bélico/index.html" class="card">
+		<i class="fa-solid fa-lock"></i>
+                <h3>ARMÁRIO DE CAUTELAS</h3>
+                <p>Guarda de Materiais Bélicos</p>
+            </a>
+
+<a href="./Controle_Apoio/index.html" class="card">
+		<i class="fa-solid fa-car"></i>
+                <h3>Controle Apoio Externo</h3>
+                <p>Acautelamento de Fuzil</p>
+            </a>
+
+<a href="./Base_avançada_Tabajaras/index.html" class="card">
+		<i class="fa-solid fa-code"></i>
+                <h3>Controle Base Avançada Tabajaras</h3>
+                <p>Acautelamento de Fuzil</p>
+            </a>
+
+
+
+	
+	    <a href="#" class="card" style="opacity: 0.5; cursor: default;">
+                <i class="fas fa-plus-circle"></i>
+                <h3>Reservado</h3>
+                <p>Futuras Implementações</p>
+            </a>
+
+        </div>
+
+        <div class="site-rumb-container">
+            <a href="./SITE_RUMB/index.html" class="btn-site-rumb">
+                <i class="fas fa-globe"></i> Acessar Site Oficial RUMB
+            </a>
+        </div>
+
+        <div class="footer-status">
+            SISTEMA DE APOIO À DECISÃO - RUMB © 2026
+        </div>
+    </div>
+
+    <script>
+	// Lógica de Boas-vindas (Mantida a sua original)
+  const nome = localStorage.getItem('usuarioAtivo');
+  if(nome) {
+      // Dica: Fica mais bonito se você criar uma div no HTML para receber isso
+      // ao invés de jogar no body, mas o código funcional é este:
+      let msg = document.createElement('div');
+      msg.style.cssText = "background:var(--pmerj-gold); color:var(--pmerj-blue); padding:10px; text-align:center; font-weight:bold;";
+      msg.textContent = `Bem-vindo, Quartilheiro ${nome}`;
+      document.body.prepend(msg);
+  }
+
+  // Registro do PWA
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js')
+        .then(reg => console.log('Service Worker registrado com sucesso:', reg.scope))
+        .catch(err => console.error('Falha ao registrar Service Worker:', err));
+    });
+  }
+	/* --- Final do código --- */
+
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js')
+      .then(reg => console.log('Service Worker registrado!', reg))
+      .catch(err => console.error('Erro ao registrar Service Worker', err));
+  }
+</script>
+</body>
+</html>

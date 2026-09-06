@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Alterações & Avarias - RUMB</title>
+    <link rel="shortcut icon" type="imagex/png" href="../IMAGENS/caveira.ico">
+
+<style>
+  /* ESTILO GERAL - Visual Tático/Escuro */
+  body { 
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+    background: #1a1a1d; 
+    color: #e0e0e0; 
+    padding: 20px; 
+    padding-top: 110px; 
+    font-size: 12px; 
+  }
+  
+  /* CABEÇALHO FIXO */
+  .header { 
+    position: fixed; 
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: #1a1a1d; 
+    z-index: 1000; 
+    box-sizing: border-box; 
+    padding: 10px 20px; 
+    display: grid; 
+    grid-template-columns: 60px 1fr 60px; 
+    align-items: center; 
+    border-bottom: 2px solid #c3073f; 
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5); 
+  }
+
+  .titulo h1 { text-align: center; font-size: 18px; margin: 0; color: #c3073f; text-transform: uppercase; letter-spacing: 1px; }
+  .titulo p { text-align: center; margin: 5px 0; color: #950740; font-weight: bold; }
+
+  /* SELEÇÃO DE DEMANDA */
+  .menu-selection {
+    background: #4e4e50;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    margin-bottom: 20px;
+    border: 1px solid #6f2232;
+  }
+  
+  select {
+    padding: 10px;
+    font-size: 14px;
+    border-radius: 5px;
+    width: 100%;
+    max-width: 400px;
+    background: #1a1a1d;
+    color: white;
+    border: 1px solid #c3073f;
+    font-weight: bold;
+  }
+
+  /* ÁREA DO PROTOCOLO (DINÂMICA) */
+  .protocolo-container {
+    background: #2b2b2d;
+    padding: 20px;
+    border-radius: 8px;
+    border-left: 5px solid #c3073f;
+    margin-bottom: 20px;
+    display: none; 
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  }
+
+  .protocolo-titulo { font-size: 14px; color: #c3073f; font-weight: bold; text-transform: uppercase; margin-bottom: 10px; border-bottom: 1px solid #444; padding-bottom: 5px; }
+  .instrucao { margin-bottom: 15px; color: #fff; background: #333; padding: 10px; border-radius: 4px; border: 1px dashed #666; line-height: 1.5; }
+  
+  /* FORMULÁRIOS INTERNOS */
+  .campo-grupo { margin-bottom: 10px; }
+  label { display: block; color: #aaa; margin-bottom: 3px; font-weight: bold; font-size: 10px; }
+  input, textarea, select.form-control { width: 98%; padding: 8px; background: #1a1a1d; border: 1px solid #444; color: white; border-radius: 4px; box-sizing: border-box;}
+  textarea { height: 60px; resize: none; }
+  
+  /* CHECKBOX E RADIO CUSTOMIZADOS PARA ESPARGIDOR */
+  .checkbox-group {
+    background: #3a3a3c;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+  }
+  .checkbox-group label {
+    display: inline-flex;
+    align-items: center;
+    margin-right: 15px;
+    color: #fff;
+    cursor: pointer;
+    font-size: 11px;
+  }
+  .checkbox-group input[type="radio"], .checkbox-group input[type="checkbox"] {
+    width: auto;
+    margin-right: 5px;
+  }
+  .sub-titulo {
+    color: #ffd700;
+    font-size: 11px;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    border-bottom: 1px solid #555;
+    padding-bottom: 2px;
+  }
+
+  /* BOTÕES */
+  .btn-area { display: flex; gap: 10px; margin-top: 15px; }
+  button { padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; text-transform: uppercase; color: white; flex: 1; }
+  
+  .btn-email { background: #0056b3; } 
+  .btn-email:hover { background: #004494; }
+
+  .btn-salvar { background: #15803d; } 
+  .btn-salvar:hover { background: #166534; }
+
+  .btn-alerta { background: #b91c1c; }
+  .btn-alerta:hover { background: #991b1b; }
+
+  .btn-whatsapp { background: #25D366; }
+  .btn-whatsapp:hover { background: #1da851; }
+
+  /* BOTÕES DE AÇÕES DA TABELA */
+  .btn-acao {
+    padding: 6px 8px;
+    font-size: 12px;
+    margin: 2px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    color: white;
+    font-weight: bold;
+    flex: none;
+    display: inline-block;
+  }
+  .btn-acao-editar { background-color: #d97706; }
+  .btn-acao-editar:hover { background-color: #b45309; }
+  .btn-acao-apagar { background-color: #dc2626; }
+  .btn-acao-apagar:hover { background-color: #b91c1c; }
+  .btn-acao-email { background-color: #2563eb; }
+  .btn-acao-email:hover { background-color: #1d4ed8; }
+
+  /* TABELA DE REGISTROS */
+  table { width: 100%; border-collapse: collapse; margin-top: 10px; background: #fff; color: #000; }
+  th, td { border: 1px solid #999; padding: 6px; text-align: left; font-size: 11px; }
+  th { background: #6f2232; color: white; text-transform: uppercase; }
+  tr:nth-child(even) { background: #f2f2f2; }
+  
+  .status-email { color: blue; font-weight: bold; }
+  .status-avaria { color: #c3073f; font-weight: bold; }
+  .status-gas { color: #d97706; font-weight: bold; } 
+  .status-critico { color: #fff; background-color: #dc2626; font-weight: bold; padding: 2px 4px; border-radius: 3px; display: inline-block;} 
+  .status-alerta-email { color: #991b1b; background-color: #fecaca; font-weight: bold; padding: 2px 4px; border-radius: 3px; display: inline-block; border: 1px solid #ef4444; }
+  .status-pendencia-cop { color: #000; background-color: #fcd34d; font-weight: bold; padding: 2px 4px; border-radius: 3px; display: inline-block; border: 1px solid #d97706; }
+  
+  .col-acoes { text-align: center; white-space: nowrap; width: 110px; }
+
+  /* BARRA DE FERRAMENTAS */
+  .toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #444;
+    padding-bottom: 10px;
+    margin-top: 30px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .toolbar h3 { margin: 0; color: #e0e0e0; }
+  .toolbar-btns { display: flex; gap: 5px; }
+  .btn-tool { padding: 6px 12px; font-size: 10px; border-radius: 4px; cursor: pointer; border: none; color: white; font-weight: bold; }
+  .btn-backup { background: #059669; }
+  .btn-restore { background: #d97706; }
+  .btn-clear { background: #b91c1c; }
+  .btn-pdf { background: #2563eb; }
+
+  /* CONFIGURAÇÃO PARA IMPRESSÃO / GERAÇÃO DE PDF */
+  @media print {
+    body { 
+      background: white; 
+      color: black; 
+      padding: 0; 
+      padding-top: 10px;
+    }
+    .header, .menu-selection, #areaProtocolo, .toolbar-btns, .col-acoes { 
+      display: none !important; 
+    }
+    .toolbar { 
+      border-bottom: none; 
+      margin-top: 0; 
+      justify-content: center;
+    }
+    .toolbar h3 { 
+      color: black; 
+      font-size: 18px; 
+      text-align: center; 
+      margin-bottom: 15px;
+    }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { 
+      border: 1px solid #000; 
+      padding: 5px; 
+      font-size: 10px; 
+      color: black !important; 
+    }
+    th { 
+      background: #ccc !important; 
+      color: black !important; 
+      -webkit-print-color-adjust: exact; 
+      print-color-adjust: exact;
+    }
+    .status-critico, .status-alerta-email, .status-pendencia-cop { 
+      background: transparent; 
+      color: black; 
+      border: none; 
+      font-weight: bold; 
+    }
+  }
+
+</style>
+</head>
+<body>
+
+<div class="header">
+  <a href="../dashboard.html"><img src="caveira-armada.png" width="50" alt="RUMB" title="Voltar ao Painel"></a> 
+  <div class="titulo">
+    <h1>Controle de Alterações e Avarias</h1>
+    <p>PROTOCOLO DE MANUTENÇÃO E SUPORTE - UPP TABAJARAS</p>
+  </div>
+  <img src="logo_pmerj.png" width="50" alt="PMERJ">
+</div>
+
+<div class="menu-selection">
+  <label style="font-size: 14px; color: #ffffff; margin-bottom: 10px;">SELECIONE O MATERIAL COM ALTERAÇÃO:</label>
+  <select id="selectMaterial" onchange="carregarProtocolo()">
+    <option value="">-- CLIQUE PARA SELECIONAR --</option>
+    <option value="NAO_DEVOLUCAO" style="color:red; font-weight:bold;">🚨 NÃO DEVOLUÇÃO / RETENÇÃO DE ARMAMENTO</option>
+    <option value="NAO_DEVOLUCAO_COP" style="color:#d97706; font-weight:bold;">⚠️ NÃO DEVOLUÇÃO DA CÂMERA (COP)</option>
+    <option value="COP">CÂMERA OPERACIONAL (COP)</option>
+    <option value="BATERIA">BATERIA DE COP</option>
+    <option value="DOCKSTATION">DOCKSTATION (BASE)</option>
+    <option value="PISTOLA">PISTOLA</option>
+    <option value="FUZIL">FUZIL</option>
+    <option value="CARREGADOR">CARREGADOR (Armamento)</option>
+    <option value="COLETE">COLETE BALÍSTICO</option>
+    <option value="GAS">ESPARGIDOR DE GÁS/DOC</option>
+    <option value="OUTROS">OUTROS MATERIAIS</option>
+  </select>
+</div>
+
+<div id="areaProtocolo" class="protocolo-container">
+</div>
+
+<div class="toolbar">
+  <h3>LIVRO DE REGISTRO DE ALTERAÇÕES - RUMB</h3>
+  <div class="toolbar-btns">
+    <button class="btn-tool btn-pdf" onclick="window.print()">🖨️ GERAR PDF</button>
+    <button class="btn-tool btn-backup" onclick="fazerBackup()">💾 SALVAR BACKUP</button>
+    <input type="file" id="fileBackup" accept=".json" style="display:none" onchange="restaurarBackup(this)">
+    <button class="btn-tool btn-restore" onclick="document.getElementById('fileBackup').click()">📂 IMPORTAR</button>
+    <button class="btn-tool btn-clear" onclick="limparHistorico()">🗑️ LIMPAR</button>
+  </div>
+</div>
+
+<table id="tabelaHistorico">
+  <thead>
+    <tr>
+      <th style="width:110px">DATA/HORA</th>
+      <th>MATERIAL</th>
+      <th>SERIAL / ID</th>
+      <th style="background:#4e4e50; border:1px solid #fff;">USUÁRIO (QUEM ESTAVA)</th>
+      <th>ALTERAÇÃO / PROCEDIMENTO ADOTADO</th>
+      <th style="width:100px">QUARTILHEIRO / RUMB</th>
+      <th class="col-acoes">AÇÕES</th>
+    </tr>
+  </thead>
+  <tbody id="tbodyHistorico"></tbody>
+</table>
+
+<script>
+  // --- VARIÁVEIS GLOBAIS ---
+  let emailClicado = false; 
+
+  // --- CONFIGURAÇÃO DOS E-MAILS E ENDEREÇO ---
+  const EMAIL_ORIGEM = "rumb_upptabajaras@pmerj.rj.gov.br";
+  const EMAIL_DESTINO = "suportecop@pm.rj.gov.br";
+  const ENDERECO_UNIDADE = "Rua Vitória Régia, nº 814 - Lagoa - RJ";
+
+  // --- BANCO DE DADOS (EQUIPE RUMB) ---
+  const equipeRUMB = [
+    "3º SGT PM 94010 R. SIMÕES",
+    "2º SGT PM 85446 SEKIGUCHI",
+    "2º SGT PM 85538 GEORGE",
+    "2º SGT PM 85523 BRUNO LIMA",
+  ];
+
+  // --- BANCO DE DADOS SEMIAUTOMÁTICO (EFETIVO) ---
+  const efetivoRUMB = [
+    { nomeCompleto: "CB PM 101823 S. LEMOS", zap: "21969408254" },
+    { nomeCompleto: "SD PM 110297 L. BARBOSA", zap: "21991869919" },
+    { nomeCompleto: "CB PM 106260 BAPTISTA", zap: "21987347572" },
+    { nomeCompleto: "3º SGT PM 91071 DIAS", zap: "21970085762" },
+    { nomeCompleto: "CB PM 108786 TORRES", zap: "21982572969" },
+    { nomeCompleto: "3º SGT PM 99488 DE PAULA", zap: "24998426337" },
+    { nomeCompleto: "3º SGT PM 91665 R. ALCANTARA", zap: "21965040543" },
+    { nomeCompleto: "3º SGT PM 100032 R. LACERDA", zap: "21970297523" },
+    { nomeCompleto: "1º SGT PM 77614 ALZIR", zap: "21972711724" },
+    { nomeCompleto: "SUBTEN PM 66381 J. MARCELO", zap: "21964518575" },
+    { nomeCompleto: "3º SGT PM 94010 R. SIMÕES", zap: "21982539175" },
+    { nomeCompleto: "3º SGT PM 97196 DAN", zap: "21964827877" },
+    { nomeCompleto: "CB PM 106561 MARCOS", zap: "21999954971" },
+    { nomeCompleto: "3º SGT PM 99242 ADRIEL", zap: "21974085368" },
+    { nomeCompleto: "CB PM 105249 R. FILHO", zap: "21970072545" },
+    { nomeCompleto: "CB PM 102712 JOAQUIM", zap: "21964721739" },
+    { nomeCompleto: "3º SGT PM 100360 ULISSES", zap: "21987387179" },
+    { nomeCompleto: "CB PM 105375 RANGEL", zap: "21990454574" },
+    { nomeCompleto: "CB PM 102181 JUNIOR", zap: "21965845525" },
+    { nomeCompleto: "CB PM 106533 CORTEZ", zap: "21997773565" },
+    { nomeCompleto: "3º SGT PM 98121 JOHNATHAN", zap: "21964675646" },
+    { nomeCompleto: "3º SGT PM 96990 CLEISON", zap: "24998599248" },
+    { nomeCompleto: "CB PM 104197 DA SILVA", zap: "21979454227" },
+    { nomeCompleto: "3º SGT PM 98408 NASCIMENTO", zap: "21975524819" },
+    { nomeCompleto: "3º SGT PM 93752 CARDOSO", zap: "21960173981" },
+    { nomeCompleto: "2º SGT PM 85458 SANTOS", zap: "21969555411" },
+    { nomeCompleto: "CB PM 107510 DA SILVA", zap: "21973797765" },
+    { nomeCompleto: "SD PM 110796 ERICA", zap: "21976699905" },
+    { nomeCompleto: "2º SGT PM 83708 A. MENDES", zap: "21970777378" },
+    { nomeCompleto: "3º SGT PM 98607 SOUZA", zap: "21987222220" },
+    { nomeCompleto: "CB PM 102704 J. ANDRÉ", zap: "21973708392" },
+    { nomeCompleto: "CB PM 106351 M. ARAUJO", zap: "21982766602" },
+    { nomeCompleto: "CB PM 103727 BIZONI", zap: "21967098524" },
+    { nomeCompleto: "3º SGT PM 93998 F. PERES", zap: "21964544296" },
+    { nomeCompleto: "CB PM 107520 T. RODRIGUES", zap: "21984798140" },
+    { nomeCompleto: "CB PM 107561 COUTINHO", zap: "21975708723" },
+    { nomeCompleto: "CB PM 108292 JULIANO", zap: "21983673231" },
+    { nomeCompleto: "SD PM 110387 JOSUÉ", zap: "22998867687" },
+    { nomeCompleto: "CB PM 108824 CARMO", zap: "21996901647" },
+    { nomeCompleto: "CB PM 107805 M. PAULO", zap: "21976058456" },
+    { nomeCompleto: "3º SGT PM 98339 SOUZA", zap: "21996380102" },
+    { nomeCompleto: "3º SGT PM 95629 FULLY", zap: "21972738628" },
+    { nomeCompleto: "CB PM 104953 PINHEIRO", zap: "21993471036" },
+    { nomeCompleto: "CB PM 103051 TIRADENTES", zap: "22997162034" },
+    { nomeCompleto: "CB PM 104291 FELIX", zap: "21964649977" },
+    { nomeCompleto: "2º SGT PM 86615 ISAIAS", zap: "21966095717" },
+    { nomeCompleto: "1º SGT PM 73888 COIMBRA", zap: "21964106784" },
+    { nomeCompleto: "3º SGT PM 93331 FERREIRA", zap: "21964317876" },
+    { nomeCompleto: "3º SGT PM 98596 VIDAL", zap: "21995201781" },
+    { nomeCompleto: "CB PM 108190 UERBERT", zap: "24998521847" },
+    { nomeCompleto: "CB PM 102190 D. SILVA", zap: "32988415933" },
+    { nomeCompleto: "SD PM 110594 JULIANA FERREIRA", zap: "21970082257" },
+    { nomeCompleto: "SUBTEN PM 65727 SANTANA", zap: "21964523812" },
+    { nomeCompleto: "CB PM 105341 AZEVEDO", zap: "21987051213" },
+    { nomeCompleto: "3º SGT PM 100228 MIRANDA", zap: "21970129054" },
+    { nomeCompleto: "3º SGT PM 99791 ALMEIDA", zap: "21964023724" },
+    { nomeCompleto: "CB PM 105284 LEONARDO", zap: "24993289247" },
+    { nomeCompleto: "CB PM 109067 CAMILO", zap: "24988150463" },
+    { nomeCompleto: "CB PM 106467 L. SILVA", zap: "24992337100" },
+    { nomeCompleto: "SD PM 109738 MARIANO", zap: "21976083720" },
+    { nomeCompleto: "CB PM 105248 DE SOUZA", zap: "21987958625" },
+    { nomeCompleto: "3º SGT PM 93168 F. ABREU", zap: "21981867018" },
+    { nomeCompleto: "CB PM 109109 RODRIGUES", zap: "21983634551" },
+    { nomeCompleto: "SD PM 110470 TELES", zap: "21977287457" },
+    { nomeCompleto: "CB PM 108677 ÉDVAN", zap: "21974753248" },
+    { nomeCompleto: "3º SGT PM 91049 JHONATHAN", zap: "21964779101" },
+    { nomeCompleto: "2º SGT PM 86367 REGALDINO", zap: "21972332353" },
+    { nomeCompleto: "2º SGT PM 85426 BRITO", zap: "21982813420" },
+    { nomeCompleto: "3º SGT PM 93606 A. ALCANTARA", zap: "21964244240" },
+    { nomeCompleto: "CB PM 109510 MAGANO", zap: "21959330250" },
+    { nomeCompleto: "CB PM 109414 BIANCHI", zap: "21988766548" },
+    { nomeCompleto: "SD PM 109754 CAMELO", zap: "21975556121" },
+    { nomeCompleto: "SUBTEN PM 70372 MENDES", zap: "21972505349" },
+    { nomeCompleto: "SD PM 110433 D. SANTOS", zap: "21964415133" },
+    { nomeCompleto: "3º SGT PM 95714 MALAQUIAS", zap: "21969776346" },
+    { nomeCompleto: "SUBTEN PM 76452 WAGNER", zap: "21999910259" },
+    { nomeCompleto: "3º SGT PM 93081 GUEDES", zap: "21965734932" },
+    { nomeCompleto: "3º SGT PM 92119 CAIO", zap: "21964169731" },
+    { nomeCompleto: "3º SGT PM 100000 ALACRINO", zap: "21965769875" },
+    { nomeCompleto: "3º SGT PM 99164 R. MACHADO", zap: "21964402142" },
+    { nomeCompleto: "3º SGT PM 91783 CHARLES", zap: "21964908661" },
+    { nomeCompleto: "CB PM 106348 SOARES", zap: "22998067454" },
+    { nomeCompleto: "3º SGT PM 92732 MARCIO ESTEVÃO", zap: "21964575898" },
+    { nomeCompleto: "CB PM 105377 F. RIBEIRO", zap: "22974025744" },
+    { nomeCompleto: "SD PM 108664 SOUSA SILVA", zap: "21970189816" },
+    { nomeCompleto: "CB PM 105374 LAIA", zap: "21979497566" },
+    { nomeCompleto: "3º SGT PM 92490 VALIM", zap: "24974011575" },
+    { nomeCompleto: "CB PM 106650 MATHEUS", zap: "24999288510" },
+    { nomeCompleto: "3º SGT PM 96287 RODRIGUES", zap: "22992903559" },
+    { nomeCompleto: "2º SGT PM 85664 DENILSON", zap: "21969275748" },
+    { nomeCompleto: "3º SGT PM 92258 DOMINGOS", zap: "21980665400" },
+    { nomeCompleto: "3º SGT PM 93341 L. FRANCISCO", zap: "21965216019" },
+    { nomeCompleto: "SD PM 109908 TRIUMPHO", zap: "21964844022" },
+    { nomeCompleto: "3º SGT PM 91131 CONDE", zap: "21986584062" },
+    { nomeCompleto: "CB PM 101752 TRINDADE", zap: "21987761646" },
+    { nomeCompleto: "3º SGT PM 91115 ITALO", zap: "21977049221" },
+    { nomeCompleto: "3º SGT PM 96003 JONATHA", zap: "22999257764" },
+    { nomeCompleto: "CB PM 105391 HENRIQUE", zap: "21966613922" },
+    { nomeCompleto: "CB PM 106037 CAIQUE", zap: "21975473746" },
+    { nomeCompleto: "3º SGT PM 98202 CRISTIANO", zap: "24992449094" },
+    { nomeCompleto: "3º SGT PM 99226 M. JUNIOR", zap: "21969757501" },
+    { nomeCompleto: "3º SGT PM 96541 SILVEIRA", zap: "21964175093" },
+    { nomeCompleto: "2º SGT PM 85995 VINICIUS", zap: "21987631169" },
+    { nomeCompleto: "CB PM 105507 ALISSON", zap: "21997548077" },
+    { nomeCompleto: "3º SGT PM 98382 Neto", zap: "21983796752" }
+  ];
+
+  // --- BANCO DE DADOS SEMIAUTOMÁTICO (CÂMERAS COP) ---
+  const listaCamerasCOP = [
+    "J32840821", "J33583945", "J30911918", "J25656078", "J33583817", "J25656201", "J25656140", "J16688176", "J16688329", "J24884419", 
+    "J16688112", "J16688217", "J17292213", "J16688139", "J33583852", "J16688219", "J24884620", "J16688102", "J25656198", "J17292241", 
+
+    "J24884338", "J33583725", "J33583812", "J33583750", "J33583975", "J30313691", "J24884393", "J16046060", "J16688120", "J33583781", 
+    "J33583938", "J24884060", "J16688138", "J32841250", "J24884617", "J17292280", "J16046199", "J17292235", "J17292275", "J16688201", 
+
+    "J24884061", "J33583742", "J15634783", "J16046173", "J16344240", "J16344577", "J32345866", "J16688351", "J30913118", "J16046234", 
+    "J16654122", "J33583803", "J32612221", "J30911909", "J24884369", "J30912289", "J33583794", "J30914427", "J32923637", "J32970633", 
+    "J24884222", "J32841027", "J17292254", "J12957374"
+  ];
+
+  // INJETA OS DATALISTS NO HTML (POLICIAIS, CÂMERAS E RUMB)
+  function criarDatalists() {
+    let datalistPoliciais = document.createElement('datalist');
+    datalistPoliciais.id = 'listaPoliciais';
+    efetivoRUMB.forEach(policial => {
+        let option = document.createElement('option');
+        option.value = policial.nomeCompleto;
+        datalistPoliciais.appendChild(option);
+    });
+    document.body.appendChild(datalistPoliciais);
+
+    let datalistCameras = document.createElement('datalist');
+    datalistCameras.id = 'listaCameras';
+    listaCamerasCOP.forEach(camera => {
+        let option = document.createElement('option');
+        option.value = camera;
+        datalistCameras.appendChild(option);
+    });
+    document.body.appendChild(datalistCameras);
+
+    let datalistRumb = document.createElement('datalist');
+    datalistRumb.id = 'listaRumb';
+    equipeRUMB.forEach(membro => {
+        let option = document.createElement('option');
+        option.value = membro;
+        datalistRumb.appendChild(option);
+    });
+    document.body.appendChild(datalistRumb);
+  }
+
+  // FUNÇÃO QUE PREENCHE O WHATSAPP AUTOMATICAMENTE
+  function verificarAutopreenchimento(valor) {
+    const policialEncontrado = efetivoRUMB.find(p => p.nomeCompleto === valor);
+    if (policialEncontrado) {
+        const campoZap = document.getElementById('zapPolicial');
+        if (campoZap) {
+            campoZap.value = policialEncontrado.zap;
+        }
+    }
+  }
+
+  function carregarProtocolo() {
+    emailClicado = false; 
+    const tipo = document.getElementById('selectMaterial').value;
+    const container = document.getElementById('areaProtocolo');
+    
+    if (!tipo) {
+      container.style.display = 'none';
+      return;
+    }
+    
+    container.style.display = 'block';
+    let html = '';
+
+    const camposPessoasHTML = `
+      <div class="campo-grupo">
+        <label style="color:#ffd700;">QUEM ESTAVA COM O MATERIAL (POLICIAL):</label>
+        <input type="text" id="usuarioMaterial" list="listaPoliciais" oninput="verificarAutopreenchimento(this.value)" placeholder="GH, Nome de Guerra e RG..." style="border-color:#ffd700;">
+      </div>
+
+      <div class="campo-grupo" style="margin-top:15px; border-top: 1px dashed #555; padding-top:10px;">
+        <label>QUARTILHEIRO (NO MOMENTO):</label>
+        <input type="text" id="quartilheiroMomento" list="listaRumb" placeholder="Quem estava de serviço na reserva?">
+      </div>
+
+      <div class="campo-grupo">
+        <label>NOME DO RUMB (REGISTRO):</label>
+        <input type="text" id="respRumb" list="listaRumb" placeholder="Quem está fazendo este lançamento?">
+      </div>
+    `;
+
+    if (tipo === 'NAO_DEVOLUCAO') {
+        html = `
+        <div class="protocolo-titulo" style="color:#ff4444; border-bottom-color:#ff4444;">🚨 PROTOCOLO DE NÃO DEVOLUÇÃO DE ARMAMENTO</div>
+        <div class="instrucao" style="border-color: #ff4444; background: #3a0000;">
+          <strong>⚠️ O PORQUÊ DESTE REGISTRO (FUNDAMENTAÇÃO):</strong><br>
+          A não devolução de armamento ao término do serviço configura grave infração disciplinar.<br>
+          • <strong>Bol da PM nº 045/2005:</strong> Exige a restituição imediata do material bélico.<br>
+          • <strong>RDPMERJ (Anexo I):</strong> Enquadramento nos Itens <strong>40</strong> e <strong>45</strong>.
+        </div>
+        <div class="campo-grupo">
+          <label>ARMAMENTO RETIDO (TIPO E SÉRIE):</label>
+          <input type="text" id="serialItem" list="listaCameras" placeholder="Ex: Pistola Taurus PT100 Série XYZ123">
+        </div>
+        <div class="campo-grupo">
+          <label style="color:#ffd700;">POLICIAL INFRATOR (QUEM NÃO DEVOLVEU):</label>
+          <input type="text" id="usuarioMaterial" list="listaPoliciais" oninput="verificarAutopreenchimento(this.value)" placeholder="Posto/Graduação, Nome de Guerra e RG..." style="border-color:#ffd700;">
+        </div>
+        <div class="campo-grupo" style="display:flex; gap:10px;">
+           <div style="flex:1">
+             <label>ESCALA/TURNO DO POLICIAL:</label>
+             <input type="text" id="turnoPolicial" placeholder="Ex: GPP I - 08h às 20h">
+           </div>
+           <div style="flex:1">
+             <label>HORA DA CONSTATAÇÃO:</label>
+             <input type="time" id="horaConstatacao">
+           </div>
+        </div>
+        <div class="campo-grupo">
+          <label>TENTATIVAS DE CONTATO / RESULTADO:</label>
+          <input type="text" id="descDefeito" placeholder="Ex: Contato telefônico sem sucesso. Cmt da guarnição ciente.">
+        </div>
+        <div class="campo-grupo" style="margin-top:15px; border-top: 1px dashed #555; padding-top:10px;">
+          <label>OFICIAL DE DIA / SUPERVISOR COMUNICADO (OBRIGATÓRIO):</label>
+          <input type="text" id="oficialComunicado" placeholder="Posto, Nome de Guerra do Oficial cientificado">
+        </div>
+        <div class="campo-grupo">
+          <label>ARMEIRO / RUMB (QUEM ESTÁ REGISTRANDO):</label>
+          <input type="text" id="respRumb" list="listaRumb" placeholder="Seu Posto, Nome de Guerra e RG">
+          <input type="hidden" id="quartilheiroMomento" value="N/A">
+        </div>
+        <div class="btn-area">
+          <button type="button" class="btn-alerta" onclick="salvarRegistro('${tipo}', 'NÃO DEVOLUÇÃO')">🚨 GRAVAR REGISTRO (GERAR PENDÊNCIA)</button>
+        </div>
+      `;
+    }
+    else if (tipo === 'NAO_DEVOLUCAO_COP') {
+      html = `
+        <div class="protocolo-titulo" style="color:#d97706; border-bottom-color:#d97706;">⚠️ PROTOCOLO DE NÃO DEVOLUÇÃO DE CÂMERA (COP)</div>
+        <div class="instrucao" style="border-color: #d97706; background: #3a2a00;">
+          <strong>⚠️ ATENÇÃO:</strong><br>
+          A COP é material de controle rigoroso. O policial deve ser cobrado imediatamente para fins de rastreio e confecção do carregamento.
+        </div>
+        <div class="campo-grupo">
+          <label>SÉRIE / ID DA CÂMERA NÃO DEVOLVIDA:</label>
+          <input type="text" id="serialItem" list="listaCameras" placeholder="Ex: 123456">
+        </div>
+        <div class="campo-grupo">
+          <label style="color:#ffd700;">POLICIAL (QUEM NÃO DEVOLVEU):</label>
+          <input type="text" id="usuarioMaterial" list="listaPoliciais" oninput="verificarAutopreenchimento(this.value)" placeholder="Posto/Graduação, Nome de Guerra e RG..." style="border-color:#ffd700;">
+        </div>
+        <div class="campo-grupo" style="display:flex; gap:10px;">
+           <div style="flex:1">
+             <label>WHATSAPP DO POLICIAL (Apenas Números com DDD):</label>
+             <input type="number" id="zapPolicial" placeholder="Ex: 21999999999">
+           </div>
+           <div style="flex:1">
+             <label>ESCALA/TURNO DO POLICIAL:</label>
+             <input type="text" id="turnoPolicial" placeholder="Ex: GPP I - Dia 20">
+           </div>
+        </div>
+        <div class="campo-grupo">
+          <label>RELATO / RESPOSTA DO POLICIAL:</label>
+          <input type="text" id="descDefeito" placeholder="Ex: Cobrado via Zap, informou que deixou na base...">
+        </div>
+        <div class="campo-grupo" style="margin-top:15px; border-top: 1px dashed #555; padding-top:10px;">
+          <label>OFICIAL DE DIA / SUPERVISOR COMUNICADO (SE HOUVER):</label>
+          <input type="text" id="oficialComunicado" placeholder="Posto e Nome. Deixe em branco se ainda não comunicou.">
+        </div>
+        <div class="campo-grupo">
+          <label>ARMEIRO / RUMB (QUEM ESTÁ REGISTRANDO):</label>
+          <input type="text" id="respRumb" list="listaRumb" placeholder="Seu Posto, Nome de Guerra e RG">
+          <input type="hidden" id="quartilheiroMomento" value="N/A">
+        </div>
+        <div class="btn-area">
+          <button type="button" class="btn-whatsapp" onclick="cobrarCameraWhatsApp()">📱 COBRAR VIA WHATSAPP</button>
+          <button type="button" class="btn-alerta" style="background:#d97706;" onclick="salvarRegistro('${tipo}', 'FALTA DE CÂMERA')">⚠️ GRAVAR PENDÊNCIA</button>
+        </div>
+      `;
+    }
+    else if (tipo === 'DOCKSTATION') {
+      html = `
+        <div class="protocolo-titulo">PROTOCOLO DE SUPORTE TÉCNICO - ${tipo}</div>
+        <div class="instrucao">
+          <strong>⚠️ PROCEDIMENTO PADRÃO:</strong><br>
+          1. Identifique o local / porta da Dockstation.<br>
+          2. Informe o Quartilheiro.<br>
+          3. Preencha a descrição do problema (Ex: sem internet, rede rompida, armazenamento ausente).<br>
+          4. Abra o chamado via e-mail e depois salve no livro.
+        </div>
+        <div class="campo-grupo">
+          <label>IDENTIFICAÇÃO DA DOCKSTATION / PORTA:</label>
+          <input type="text" id="serialItem" placeholder="Ex: Armário 1, Porta 4 (ou digite N/A)">
+        </div>
+        <div class="campo-grupo">
+          <label>DESCRIÇÃO DO DEFEITO (Breve):</label>
+          <input type="text" id="descDefeito" list="listaDefeitosDock" placeholder="Ex: Sem internet, rede rompida, armazenamento ausente...">
+          <datalist id="listaDefeitosDock">
+            <option value="Sem internet">
+            <option value="Rede rompida">
+            <option value="Armazenamento ausente">
+          </datalist>
+        </div>
+        <input type="hidden" id="usuarioMaterial" value="N/A - Equipamento">
+        <div class="campo-grupo" style="margin-top:15px; border-top: 1px dashed #555; padding-top:10px;">
+          <label>QUARTILHEIRO (NO MOMENTO):</label>
+          <input type="text" id="quartilheiroMomento" list="listaRumb" placeholder="Quem estava de serviço na reserva?">
+        </div>
+        <div class="campo-grupo">
+          <label>NOME DO RUMB (REGISTRO):</label>
+          <input type="text" id="respRumb" list="listaRumb" placeholder="Quem está fazendo este lançamento?">
+        </div>
+        <div class="btn-area">
+          <button type="button" class="btn-email" onclick="abrirEmail('${tipo}')">📧 ABRIR CHAMADO (E-MAIL)</button>
+          <button type="button" class="btn-salvar" onclick="salvarRegistro('${tipo}', 'CHAMADO ABERTO')">💾 SALVAR NO LIVRO</button>
+        </div>
+      `;
+    }
+    else if (tipo === 'COP' || tipo === 'BATERIA') {
+      html = `
+        <div class="protocolo-titulo">PROTOCOLO DE SUPORTE TÉCNICO - ${tipo}</div>
+        <div class="instrucao">
+          <strong>⚠️ PROCEDIMENTO PADRÃO:</strong><br>
+          1. Identifique o número de série.<br>
+          2. Informe o Quartilheiro e o Usuário.<br>
+          3. Preencha a descrição do defeito de forma clara.<br>
+          4. Abra o chamado via e-mail e depois salve no livro.
+        </div>
+        <div class="campo-grupo">
+          <label>NÚMERO DE SÉRIE (${tipo}):</label>
+          <input type="text" id="serialItem" list="listaCameras" placeholder="Digite o serial...">
+        </div>
+        <div class="campo-grupo">
+          <label>DESCRIÇÃO DO DEFEITO (Breve):</label>
+          <input type="text" id="descDefeito" placeholder="Ex: Não carrega, Conector quebrado...">
+        </div>
+        ${camposPessoasHTML}
+        <div class="btn-area">
+          <button type="button" class="btn-email" onclick="abrirEmail('${tipo}')">📧 ABRIR CHAMADO (E-MAIL)</button>
+          <button type="button" class="btn-salvar" onclick="salvarRegistro('${tipo}', 'CHAMADO ABERTO')">💾 SALVAR NO LIVRO</button>
+        </div>
+      `;
+    } 
+    else if (tipo === 'GAS') {
+      html = `
+        <div class="protocolo-titulo">REGISTRO DE UTILIZAÇÃO DE ESPARGIDOR – RUMB</div>
+        <div class="campo-grupo" style="display:flex; gap:10px;">
+           <div style="flex:1">
+             <label>HORA DA DEVOLUÇÃO:</label>
+             <input type="time" id="horaDevolucao">
+           </div>
+           <div style="flex:2">
+             <label>NÚMERO DE PATRIMÔNIO / ID:</label>
+             <input type="text" id="serialItem" list="listaCameras" placeholder="Identificação do Espargidor">
+           </div>
+        </div>
+        <div class="campo-grupo">
+          <label>POLICIAL RESPONSÁVEL (QUEM UTILIZOU):</label>
+          <input type="text" id="usuarioMaterial" list="listaPoliciais" oninput="verificarAutopreenchimento(this.value)" placeholder="Posto/Graduação, Nome e RG">
+        </div>
+        <div class="campo-grupo">
+          <label>OCORRÊNCIA VINCULADA (RO / BOPM / PROCEDIMENTO):</label>
+          <input type="text" id="roOcorrencia" placeholder="Ex: RO 123/2024, BOPM...">
+        </div>
+        <div class="campo-grupo">
+          <label>RELATO SUCINTO DA UTILIZAÇÃO:</label>
+          <textarea id="descDefeito" placeholder="Descreva brevemente como foi utilizado..."></textarea>
+        </div>
+        <div class="sub-titulo">CONFERÊNCIA REALIZADA PELA RUMB</div>
+        <div class="checkbox-group">
+          <label><input type="radio" name="estadoGas" value="Frasco íntegro"> Frasco íntegro</label>
+          <label><input type="radio" name="estadoGas" value="Parcialmente utilizado"> Parcialmente utilizado</label>
+          <label><input type="radio" name="estadoGas" value="Totalmente utilizado"> Totalmente utilizado</label>
+          <label><input type="radio" name="estadoGas" value="Necessita substituição"> Necessita substituição</label>
+        </div>
+        <div class="campo-grupo">
+          <label>OBSERVAÇÕES (LACRE, VALIDADE, DANOS):</label>
+          <input type="text" id="obsGas" placeholder="Observações físicas...">
+        </div>
+        <div class="sub-titulo">PROVIDÊNCIAS ADOTADAS</div>
+        <div class="checkbox-group">
+          <label><input type="checkbox" id="provSubst"> Substituição realizada</label>
+          <label><input type="checkbox" id="provRepos"> Encaminhado p/ reposição</label>
+          <label><input type="checkbox" id="provComunic"> Comunicação ao superior</label>
+        </div>
+        <div class="campo-grupo">
+           <label>OUTRA PROVIDÊNCIA:</label>
+           <input type="text" id="provOutra" placeholder="Se houver...">
+        </div>
+        <div class="campo-grupo" style="border-top: 1px solid #555; margin-top:10px; padding-top:5px;">
+           <label>RESPONSÁVEL PELA CONFERÊNCIA (RUMB):</label>
+           <input type="text" id="respRumb" list="listaRumb" placeholder="Nome e Graduação do RUMB">
+           <input type="hidden" id="quartilheiroMomento" value="N/A"> 
+        </div>
+        <div class="btn-area">
+          <button type="button" class="btn-salvar" onclick="salvarRegistro('${tipo}', 'REGISTRO DE GÁS')">💾 ARQUIVAR PROTOCOLO</button>
+        </div>
+      `;
+    }
+    else {
+      html = `
+        <div class="protocolo-titulo">REGISTRO DE AVARIA / ALTERAÇÃO - ${tipo}</div>
+        <div class="instrucao" style="border-color: #c3073f; color: #ffcccc;">
+          <strong>⚠️ PROCEDIMENTO PADRÃO:</strong><br>
+          1. Recolher o material.<br>
+          2. Identificar a avaria.<br>
+          3. Separar para manutenção.
+        </div>
+        <div class="campo-grupo">
+          <label>NÚMERO DE SÉRIE / IDENTIFICAÇÃO:</label>
+          <input type="text" id="serialItem" list="listaCameras" placeholder="Série da arma, colete...">
+        </div>
+        <div class="campo-grupo">
+          <label>DESCRIÇÃO DETALHADA DA ALTERAÇÃO:</label>
+          <textarea id="descDefeito" placeholder="Descreva: Cano estufado, Tecla quebrada, Rasgo na capa..."></textarea>
+        </div>
+        ${camposPessoasHTML}
+        <div class="btn-area">
+          <button type="button" class="btn-salvar" onclick="salvarRegistro('${tipo}', 'MATERIAL COM AVARIA')">💾 REGISTRAR ALTERAÇÃO</button>
+        </div>
+      `;
+    }
+
+    container.innerHTML = html;
+  }
+
+  function cobrarCameraWhatsApp() {
+    const serial = document.getElementById('serialItem').value.trim();
+    const policial = document.getElementById('usuarioMaterial').value.trim();
+    let zap = document.getElementById('zapPolicial').value.replace(/\D/g, '');
+    const turno = document.getElementById('turnoPolicial').value.trim();
+
+    if(!serial || !policial || !zap) {
+      alert("Para cobrar via WhatsApp, preencha o Serial, o Nome do Policial e o número de WhatsApp.");
+      return;
+    }
+
+    if (!zap.startsWith('55')) {
+        zap = '55' + zap;
+    }
+
+    const textoMensagem = `*RUMB - ALERTA DE MATERIAL*\n\n` +
+                          `👮‍♂️ Policial: *${policial.toUpperCase()}*\n` +
+                          `⚠️ Verificamos que a Câmera Operacional (COP) ID: *${serial}*, cautelada para o seu turno (${turno}), ainda não consta como devolvida na Reserva de Armas.\n\n` +
+                          `Favor informar o paradeiro do equipamento ou providenciar a devolução imediatamente para evitarmos a confecção de Parte de Alteração.\n\n` +
+                          `_Mensagem do Sistema de Controle da RUMB._`;
+
+    const urlFormatada = `https://wa.me/${zap}?text=${encodeURIComponent(textoMensagem)}`;
+    window.open(urlFormatada, '_blank');
+  }
+
+  function abrirEmail(tipo) {
+    const serial = document.getElementById('serialItem').value;
+    const defeito = document.getElementById('descDefeito').value;
+    const usuario = document.getElementById('usuarioMaterial').value;
+    const quartilheiro = document.getElementById('quartilheiroMomento').value;
+    const resp = document.getElementById('respRumb').value;
+    
+    if(!serial || !defeito) { 
+        alert("Informe o Serial (ou Localização da Dockstation) e a Descrição do defeito para gerar o e-mail."); 
+        return; 
+    }
+
+    emailClicado = true; 
+
+    const assunto = `ABERTURA DE CHAMADO - ${tipo} - SERIAL/ID: ${serial}`;
+    
+    const corpo = `Solicito abertura de chamado técnico para o material abaixo:\n\n` +
+                  `TIPO: ${tipo}\n` +
+                  `SERIAL/ID: ${serial}\n` +
+                  `DEFEITO: ${defeito}\n` +
+                  (tipo === 'DOCKSTATION' ? `USUÁRIO: Equipamento Fixo (Sem autor)\n` : `USUÁRIO (QUEM ESTAVA): ${usuario}\n`) +
+                  `QUARTILHEIRO (NO MOMENTO): ${quartilheiro}\n` +
+                  `RESPONSÁVEL PELO REGISTRO: ${resp}\n\n` +
+                  `UNIDADE: 3ª UPP/19°BPM - CIA TABAJARAS\n` +
+                  `SETOR: RUMB\n` +
+                  `ENDEREÇO: ${ENDERECO_UNIDADE}`;
+
+    const href = `mailto:${EMAIL_DESTINO}?cc=${EMAIL_ORIGEM}&subject=${encodeURIComponent(assunto)}&body=${encodeURIComponent(corpo)}`;
+    window.location.href = href;
+  }
+
+  function salvarRegistro(tipo, status) {
+    const serial = document.getElementById('serialItem').value;
+    const defeito = document.getElementById('descDefeito') ? document.getElementById('descDefeito').value.trim() : '';
+    const usuario = document.getElementById('usuarioMaterial').value;
+    const resp = document.getElementById('respRumb').value;
+
+    if(!serial || !resp || !usuario || !defeito) { 
+        alert("Preencha todos os campos obrigatórios (Série/ID, Usuário, RUMB e a Descrição da Alteração/Relato)."); 
+        return; 
+    }
+
+    let detalheFinal = "";
+    let responsavelFinal = "";
+    let quartilheiroSalvamento = "N/A";
+
+    if (tipo === 'NAO_DEVOLUCAO') {
+        const turno = document.getElementById('turnoPolicial').value || "Não inf.";
+        const hora = document.getElementById('horaConstatacao').value || "Não inf.";
+        const oficial = document.getElementById('oficialComunicado').value || "Nenhum";
+
+        detalheFinal = `<span class="status-critico">🚨 PENDÊNCIA DE MATERIAL</span> [Turno: ${turno} | Constatado às: ${hora}]. Contato: ${defeito}. Oficial Cientificado: ${oficial}. Fundamento: RDPMERJ Itens 40 e 45.`;
+        responsavelFinal = `RUMB: ${resp.toUpperCase()}`;
+
+    } else if (tipo === 'NAO_DEVOLUCAO_COP') {
+        const turno = document.getElementById('turnoPolicial').value || "Não inf.";
+        const oficial = document.getElementById('oficialComunicado').value || "N/C";
+        
+        detalheFinal = `<span class="status-pendencia-cop">⚠️ PENDÊNCIA DE COP</span> [Turno: ${turno}]. Relato: ${defeito}. Oficial: ${oficial}.`;
+        responsavelFinal = `RUMB: ${resp.toUpperCase()}`;
+
+    } else if (tipo === 'GAS') {
+        const hora = document.getElementById('horaDevolucao').value || "N/Inf";
+        const ro = document.getElementById('roOcorrencia').value || "S/N";
+        
+        const radios = document.getElementsByName('estadoGas');
+        let estadoSel = "Não informado";
+        for (let r of radios) { if (r.checked) estadoSel = r.value; }
+
+        let providencias = [];
+        if(document.getElementById('provSubst').checked) providencias.push("Substituição");
+        if(document.getElementById('provRepos').checked) providencias.push("Reposição");
+        if(document.getElementById('provComunic').checked) providencias.push("Comunicação Sup.");
+        const provOutra = document.getElementById('provOutra').value;
+        if(provOutra) providencias.push(provOutra);
+
+        const obsFisica = document.getElementById('obsGas').value;
+
+        detalheFinal = `[RO: ${ro}] [Estado: ${estadoSel}] - Relato: ${defeito}. Obs: ${obsFisica}. Providências: ${providencias.join(', ')}. (Hora dev: ${hora})`;
+        responsavelFinal = `Conf. RUMB: ${resp.toUpperCase()}`;
+
+    } else {
+        quartilheiroSalvamento = document.getElementById('quartilheiroMomento').value || "N/A";
+        
+        let statusExibicao = status;
+        if (tipo === 'COP' || tipo === 'BATERIA' || tipo === 'DOCKSTATION') {
+            if (emailClicado) {
+                statusExibicao = "CHAMADO ABERTO (E-MAIL ENVIADO)";
+            } else {
+                statusExibicao = "<span class='status-alerta-email'>⚠️ SALVO SEM E-MAIL DE SUPORTE</span>";
+            }
+        }
+        
+        detalheFinal = `<strong>${statusExibicao}</strong>: ${defeito}`;
+        responsavelFinal = `${quartilheiroSalvamento.toUpperCase()} (Q) / ${resp.toUpperCase()} (R)`;
+    }
+
+    const registros = JSON.parse(localStorage.getItem('livroAlteracoesRumb')) || [];
+    const agora = new Date();
+
+    const novoReg = {
+      data: agora.toLocaleString('pt-BR'),
+      tipo: tipo === 'NAO_DEVOLUCAO' ? 'RETENÇÃO BÉLICA' : (tipo === 'NAO_DEVOLUCAO_COP' ? 'FALTA DE COP' : tipo),
+      serial: serial,
+      usuario: usuario.toUpperCase(),
+      detalhe: detalheFinal,
+      responsavel: responsavelFinal,
+      tipoOriginal: tipo,
+      defeitoOriginal: defeito,
+      quartilheiroOriginal: quartilheiroSalvamento,
+      rumbOriginal: resp
+    };
+
+    registros.push(novoReg);
+    localStorage.setItem('livroAlteracoesRumb', JSON.stringify(registros));
+    
+    renderizarTabela();
+    alert("Registro salvo com sucesso!");
+    
+    document.getElementById('selectMaterial').value = '';
+    carregarProtocolo();
+  }
+
+  function renderizarTabela() {
+    const registros = JSON.parse(localStorage.getItem('livroAlteracoesRumb')) || [];
+    const tbody = document.getElementById('tbodyHistorico');
+    tbody.innerHTML = '';
+
+    const registrosComIndex = registros.map((reg, index) => ({ ...reg, originalIndex: index })).reverse();
+
+    registrosComIndex.forEach(reg => {
+      let classeStatus = '';
+      if (reg.tipo === 'RETENÇÃO BÉLICA') classeStatus = 'status-avaria'; 
+      else if (reg.tipo === 'FALTA DE COP') classeStatus = 'status-gas'; 
+      else if (reg.detalhe.includes('CHAMADO')) classeStatus = 'status-email';
+      else if (reg.tipo === 'GAS') classeStatus = 'status-gas';
+      else classeStatus = 'status-avaria';
+
+      const usuarioExibido = reg.usuario ? reg.usuario : '<span style="color:#aaa;">-</span>';
+
+      let botoesAcao = `
+        <button class="btn-acao btn-acao-editar" onclick="editarRegistro(${reg.originalIndex})" title="Editar Registro">✏️</button>
+        <button class="btn-acao btn-acao-apagar" onclick="apagarRegistro(${reg.originalIndex})" title="Apagar Registro">🗑️</button>
+      `;
+
+      const tipoParaEmail = reg.tipoOriginal || reg.tipo;
+      if (['COP', 'BATERIA', 'DOCKSTATION'].includes(tipoParaEmail)) {
+        botoesAcao += `<button class="btn-acao btn-acao-email" onclick="reenviarEmail(${reg.originalIndex})" title="Abrir Chamado / Enviar E-mail">📧</button>`;
+      }
+
+      tbody.innerHTML += `
+        <tr>
+          <td>${reg.data}</td>
+          <td style="font-weight:bold;">${reg.tipo}</td>
+          <td>${reg.serial}</td>
+          <td style="font-weight:bold; color:#444;">${usuarioExibido}</td>
+          <td class="${classeStatus}">${reg.detalhe}</td>
+          <td style="font-size:10px;">${reg.responsavel}</td>
+          <td class="col-acoes">${botoesAcao}</td>
+        </tr>
+      `;
+    });
+  }
+  
+  function apagarRegistro(index) {
+    if (confirm("🚨 TEM CERTEZA QUE DESEJA APAGAR ESTE REGISTRO?\nEsta ação não poderá ser desfeita.")) {
+      const registros = JSON.parse(localStorage.getItem('livroAlteracoesRumb')) || [];
+      registros.splice(index, 1);
+      localStorage.setItem('livroAlteracoesRumb', JSON.stringify(registros));
+      renderizarTabela();
+    }
+  }
+
+  function editarRegistro(index) {
+    const registros = JSON.parse(localStorage.getItem('livroAlteracoesRumb')) || [];
+    const reg = registros[index];
+
+    const novaData = prompt("📝 Editar Data/Hora:", reg.data);
+    if (novaData !== null && novaData.trim() !== '') reg.data = novaData.trim();
+
+    const novoSerial = prompt("📝 Editar Serial / ID:", reg.serial);
+    if (novoSerial !== null && novoSerial.trim() !== '') reg.serial = novoSerial.trim();
+
+    const novoUsuario = prompt("📝 Editar Usuário (Policial):", reg.usuario);
+    if (novoUsuario !== null && novoUsuario.trim() !== '') reg.usuario = novoUsuario.trim().toUpperCase();
+
+    let defeitoAtual = reg.defeitoOriginal || reg.detalhe.replace(/(<([^>]+)>)/gi, "");
+    const novoDefeito = prompt("📝 Editar Relato / Descrição do Defeito:\n(Evite apagar tags de alerta HTML, apenas atualize o texto caso necessário)", defeitoAtual);
+    
+    if (novoDefeito !== null && novoDefeito.trim() !== '') {
+        reg.defeitoOriginal = novoDefeito.trim();
+        if (reg.detalhe.includes('</strong>:')) {
+            const partes = reg.detalhe.split('</strong>:');
+            reg.detalhe = partes[0] + '</strong>: ' + reg.defeitoOriginal;
+        } else if (reg.detalhe.includes('</span>')) {
+            const partes = reg.detalhe.split('</span>');
+            reg.detalhe = partes[0] + '</span> ' + reg.defeitoOriginal;
+        } else {
+            reg.detalhe = reg.defeitoOriginal;
+        }
+    }
+
+    registros[index] = reg;
+    localStorage.setItem('livroAlteracoesRumb', JSON.stringify(registros));
+    renderizarTabela();
+  }
+
+  function reenviarEmail(index) {
+    const registros = JSON.parse(localStorage.getItem('livroAlteracoesRumb')) || [];
+    const reg = registros[index];
+    
+    const tipo = reg.tipoOriginal || reg.tipo;
+    const serial = reg.serial;
+    const defeito = reg.defeitoOriginal || reg.detalhe.replace(/(<([^>]+)>)/gi, "");
+    const usuario = reg.usuario;
+    const quartilheiro = reg.quartilheiroOriginal || "N/I";
+    const resp = reg.rumbOriginal || reg.responsavel;
+
+    const assunto = `ABERTURA DE CHAMADO - ${tipo} - SERIAL/ID: ${serial}`;
+    const corpo = `Solicito abertura de chamado técnico para o material abaixo:\n\n` +
+                  `TIPO: ${tipo}\n` +
+                  `SERIAL/ID: ${serial}\n` +
+                  `DEFEITO: ${defeito}\n` +
+                  (tipo === 'DOCKSTATION' ? `USUÁRIO: Equipamento Fixo (Sem autor)\n` : `USUÁRIO (QUEM ESTAVA): ${usuario}\n`) +
+                  `QUARTILHEIRO (NO MOMENTO): ${quartilheiro}\n` +
+                  `RESPONSÁVEL PELO REGISTRO: ${resp}\n\n` +
+                  `UNIDADE: 3ª UPP/19°BPM - CIA TABAJARAS\n` +
+                  `SETOR: RUMB\n` +
+                  `ENDEREÇO: ${ENDERECO_UNIDADE}`;
+
+    const href = `mailto:${EMAIL_DESTINO}?cc=${EMAIL_ORIGEM}&subject=${encodeURIComponent(assunto)}&body=${encodeURIComponent(corpo)}`;
+    
+    if (reg.detalhe.includes('SEM E-MAIL DE SUPORTE')) {
+        reg.detalhe = reg.detalhe.replace("<span class='status-alerta-email'>⚠️ SALVO SEM E-MAIL DE SUPORTE</span>", "<strong>CHAMADO ABERTO (E-MAIL ENVIADO)</strong>");
+        registros[index] = reg;
+        localStorage.setItem('livroAlteracoesRumb', JSON.stringify(registros));
+        renderizarTabela();
+    }
+    
+    window.location.href = href;
+  }
+
+  function limparHistorico() {
+    if(confirm("Tem certeza que deseja apagar todo o histórico de alterações?")) {
+      localStorage.removeItem('livroAlteracoesRumb');
+      renderizarTabela();
+    }
+  }
+
+  function fazerBackup() {
+    const dados = localStorage.getItem('livroAlteracoesRumb');
+    if (!dados || dados === '[]') { alert("Nada para salvar!"); return; }
+    
+    const blob = new Blob([dados], {type: "application/json"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Livro_Alteracoes_RUMB_${new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
+
+  function restaurarBackup(input) {
+    const file = input.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        const conteudoLimpo = e.target.result.trim().replace(/^\uFEFF/, '');
+        const json = JSON.parse(conteudoLimpo);
+        
+        if (Array.isArray(json)) {
+          if(confirm("ATENÇÃO: Isso substituirá o histórico atual pelos dados do arquivo. Continuar?")) {
+            localStorage.setItem('livroAlteracoesRumb', JSON.stringify(json));
+            renderizarTabela();
+            alert("✅ Backup restaurado com sucesso!");
+          }
+        } else {
+          alert("❌ Arquivo inválido. O formato dos dados está incorreto.");
+        }
+      } catch (err) {
+        alert("❌ Erro ao ler arquivo. Certifique-se de que é um JSON válido.\nDetalhe: " + err.message);
+      } finally {
+        input.value = '';
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  // Inicialização
+  window.onload = function() {
+    criarDatalists();
+    renderizarTabela();
+  };
+
+</script>
+</body>
+</html>

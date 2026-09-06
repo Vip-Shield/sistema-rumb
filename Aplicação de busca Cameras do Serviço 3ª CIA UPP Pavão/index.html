@@ -1,0 +1,1362 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buscador de COP's - 3ª UPP</title>
+    <link rel="shortcut icon" type="image/x-icon" href="../IMAGENS/caveira.ico">
+
+    <style>
+        /* ESTILO GERAL */
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            padding-top: 240px; 
+        }
+
+        /* --- CABEÇALHO FIXO --- */
+        .fixed-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: #001f3f;
+            color: white;
+            z-index: 1000;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        .main-header {
+            position: relative;
+            height: 80px;       
+            background-color: #001f3f;
+            border-bottom: 1px solid #004080;
+        }
+
+        /* --- ÁREA CENTRAL (LOGO + TEXTO) --- */
+        .header-center {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            align-items: center;
+            white-space: nowrap; 
+        }
+
+        .logo {
+            width: 50px;
+            height: auto;
+            margin-right: 15px;
+            transition: transform 0.2s;
+        }
+
+        .logo:hover {
+            transform: scale(1.1);
+            filter: drop-shadow(0 0 5px #ffd700);
+        }
+
+        .header-text h1 {
+            margin: 0;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .header-text p {
+            margin: 2px 0 0 0;
+            font-size: 0.8rem;
+            color: #ffd700;
+            font-weight: bold;
+        }
+
+        /* --- MENU SUSPENSO (DIREITA) --- */
+        .user-menu {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%); 
+            z-index: 1002;
+        }
+
+        .menu-icon {
+            width: 45px;
+            height: auto;
+            transition: transform 0.2s;
+            cursor: pointer;
+        }
+
+        .menu-icon:hover {
+            transform: scale(1.1);
+            filter: drop-shadow(0 0 5px #ffd700);
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 55px;
+            background-color: #f9f9f9;
+            min-width: 200px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1001;
+            border-radius: 5px;
+            overflow: hidden;
+            border: 1px solid #ddd;
+        }
+
+        .dropdown-content a {
+            color: #333;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            font-size: 0.9rem;
+            transition: 0.2s;
+            border-bottom: 1px solid #eee;
+        }
+
+        .dropdown-content a:last-child { border-bottom: none; }
+        
+        .dropdown-content a:hover {
+            background-color: #001f3f;
+            color: #ffd700;
+        }
+
+        .show { display: block; }
+
+        /* --- BARRA DE BUSCA E CHECKLIST --- */
+        .search-box {
+            background-color: #001226;
+            padding: 15px;
+            text-align: center;
+            border-bottom: 3px solid #b8860b;
+        }
+
+        .search-wrapper {
+            position: relative;
+            display: inline-block;
+            width: 90%;
+            max-width: 500px;
+            margin-bottom: 10px;
+        }
+
+        .search-wrapper input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 10px 35px 10px 10px;
+            border-radius: 5px;
+            border: 1px solid #004080;
+            font-size: 16px;
+            text-align: center;
+            outline: none;
+        }
+
+        .search-wrapper input:focus {
+            border-color: #ffd700;
+            box-shadow: 0 0 5px #ffd700;
+        }
+
+        .btn-clear-search {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: #aaa;
+            cursor: pointer;
+            display: none;
+        }
+
+        .btn-clear-search:hover { color: #ef4444; }
+
+        /* --- BARRA DE RESUMO DO CHECKLIST --- */
+        .checklist-summary {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            background-color: rgba(255, 255, 255, 0.05);
+            padding: 10px;
+            border-radius: 8px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .summary-text {
+            font-size: 0.95rem;
+            color: #fff;
+            margin-right: 10px;
+        }
+
+        .summary-text .faltam { color: #ef4444; font-weight: bold; font-size: 1.1rem; }
+        .summary-text .conferidas { color: #10b981; font-weight: bold; }
+        .summary-text .pagas { color: #3b82f6; font-weight: bold; }
+        .summary-text .anteriores { color: #8b5cf6; font-weight: bold; }
+        .summary-text .retidas { color: #9ca3af; font-weight: bold; } 
+
+        .summary-text span:hover { filter: brightness(1.2); }
+
+        .btn-panel {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.85rem;
+            transition: 0.2s;
+        }
+
+        .btn-filter { background-color: #ffd700; color: #001f3f; }
+        .btn-filter:hover { background-color: #e6c200; }
+        
+        .btn-reset { background-color: #ef4444; color: white; }
+        .btn-reset:hover { background-color: #dc2626; }
+
+        .btn-report-faltas { background-color: #f97316; color: white; }
+        .btn-report-faltas:hover { background-color: #ea580c; }
+
+        /* --- CHECKBOX E BOTÃO DO WHATSAPP MÚLTIPLO --- */
+        .checkbox-zap {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #25D366;
+        }
+
+        .btn-zap-multiplo {
+            background-color: #25D366;
+            color: white;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.85rem;
+            transition: 0.2s;
+        }
+
+        .btn-zap-multiplo:hover { background-color: #1ebe5d; }
+
+        /* --- LISTA DE CARDS --- */
+        .container {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .grid-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 15px;
+        }
+
+        .grid-list li {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border: 1px solid #ddd;
+            transition: transform 0.2s, border-color 0.2s;
+            position: relative;
+        }
+
+        .grid-list li:hover {
+            transform: translateY(-3px);
+            border-color: #001f3f;
+        }
+
+        /* Modificadores de Cards */
+        .card-checked { background-color: #ecfdf5 !important; border: 2px solid #10b981 !important; opacity: 0.85; }
+        .card-pago { background-color: #eff6ff !important; border: 2px solid #3b82f6 !important; opacity: 0.90; }
+        .card-anterior { background-color: #f3e8ff !important; border: 2px solid #8b5cf6 !important; opacity: 0.90; }
+        
+        .card-retained {
+            background-color: #1a1a1a !important;
+            border: 2px solid #000 !important;
+            color: #d1d5db !important;
+        }
+        .card-retained strong { color: #fff !important; }
+        .card-retained span { color: #d1d5db !important; }
+        .card-retained small { background: #374151 !important; color: #9ca3af !important; }
+        .card-retained .profile-pic { filter: grayscale(100%) opacity(0.4); }
+
+        .profile-pic {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            margin-bottom: 10px;
+            transition: 0.3s;
+        }
+
+        .grid-list span { display: block; font-size: 0.9rem; color: #333; }
+        .grid-list strong { font-size: 1.1rem; color: #001f3f; display: block; margin: 5px 0; }
+        .grid-list small { color: #666; font-weight: bold; background: #eee; padding: 2px 6px; border-radius: 4px; }
+
+        /* --- BOTÕES DO CARD --- */
+        .btn-status {
+            width: 100%;
+            padding: 6px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        .status-ok { background-color: #e2e8f0; color: #475569; border: 1px solid #cbd5e1; margin-top: 8px;}
+        .status-ok:hover { background-color: #cbd5e1; }
+        .status-alert { background-color: #b91c1c; color: white; animation: pulse 2s infinite; margin-top: 8px;}
+        .status-alert:hover { background-color: #991b1b; }
+
+        .btn-whatsapp { background-color: #25D366; color: white; border: 1px solid #1da851; margin-top: 5px; }
+        .btn-whatsapp:hover { background-color: #1ebe5d; }
+
+        /* GRID PARA OS BOTÕES DE AÇÃO 2x2 */
+        .btn-group { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 5px; 
+            margin-top: 5px; 
+        }
+        
+        /* Botões de Ação do Card */
+        .chk-uncheck { background-color: #f8fafc; color: #64748b; border: 1px dashed #94a3b8; }
+        .chk-uncheck:hover { background-color: #e2e8f0; }
+        .chk-checked { background-color: #10b981; color: white; border: 1px solid #059669; }
+        .chk-checked:hover { background-color: #059669; }
+
+        .pag-uncheck { background-color: #f0f9ff; color: #0284c7; border: 1px dashed #7dd3fc; }
+        .pag-uncheck:hover { background-color: #e0f2fe; }
+        .pag-checked { background-color: #3b82f6; color: white; border: 1px solid #2563eb; }
+        .pag-checked:hover { background-color: #2563eb; }
+
+        .ant-uncheck { background-color: #faf5ff; color: #7e22ce; border: 1px dashed #d8b4fe; }
+        .ant-uncheck:hover { background-color: #f3e8ff; }
+        .ant-checked { background-color: #8b5cf6; color: white; border: 1px solid #7c3aed; }
+        .ant-checked:hover { background-color: #7c3aed; }
+
+        .ret-uncheck { background-color: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1; }
+        .ret-uncheck:hover { background-color: #e2e8f0; }
+        .ret-checked { background-color: #000; color: #ffd700; border: 1px solid #ffd700; }
+        .ret-checked:hover { background-color: #333; }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(185, 28, 28, 0.4); }
+            70% { box-shadow: 0 0 0 6px rgba(185, 28, 28, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(185, 28, 28, 0); }
+        }
+
+        .hidden { display: none; }
+        
+        #no-results {
+            text-align: center;
+            color: #b91c1c;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+
+        /* --- MODAIS --- */
+        .modal {
+            display: none; position: fixed; z-index: 2000; left: 0; top: 0;
+            width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6); backdrop-filter: blur(3px);
+        }
+        .modal-content {
+            background-color: #fefefe; margin: 10% auto; padding: 25px; border: 1px solid #888;
+            width: 90%; max-width: 500px; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            position: relative; animation: fadeIn 0.3s;
+        }
+        @keyframes fadeIn { from {opacity: 0; transform: translateY(-20px);} to {opacity: 1; transform: translateY(0);} }
+        .close-btn { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
+        .close-btn:hover { color: black; }
+        .modal-header h2 { margin-top: 0; color: #001f3f; border-bottom: 2px solid #ffd700; padding-bottom: 10px; display: inline-block; font-size: 1.2rem;}
+
+        textarea, .input-form { width: 100%; padding: 10px; box-sizing: border-box; border: 2px solid #ccc; border-radius: 4px; font-family: inherit; margin-bottom: 15px; }
+        textarea { height: 120px; resize: vertical; }
+        textarea:focus, .input-form:focus { border-color: #001f3f; outline: none; }
+        .modal-footer { text-align: right; }
+
+        .btn-save { background-color: #001f3f; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 1rem; }
+        .btn-save:hover { background-color: #003366; }
+        .btn-clear { background-color: #ef4444; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 1rem; margin-right: 10px; }
+        .main-footer { text-align: center; padding: 20px; margin-top: 20px; font-size: 0.8rem; color: #666; border-top: 1px solid #ccc; }
+    </style>
+</head>
+<body>
+
+    <div class="fixed-header">
+        <header class="main-header">
+            <div class="header-center">
+                <a href="../dashboard.html"><img src="caveira-armada.png" alt="Logo" class="logo" title="Voltar ao Painel"></a>
+                <div class="header-text">
+                    <h1>3ª UPP / 19º BPM</h1>
+                    <p>CIA UPP TABAJARAS - SISTEMA DE BUSCA</p>
+                </div>
+            </div>
+
+            <div class="user-menu">
+                <img src="escudo.png" alt="Menu" class="menu-icon" onclick="toggleMenu()" title="Opções">
+                <div id="dropdownMenu" class="dropdown-content">
+                    <a href="#" onclick="abrirModalRegistro()">+ Registrar Nova COP</a>
+                    <a href="#" onclick="exportarDados()">💾 Salvar Backup</a>
+                    <a href="#" onclick="triggerImport()">📂 Importar Backup</a>
+                </div>
+            </div>
+        </header>
+
+        <div class="search-box">
+            <div class="search-wrapper">
+                <input type="text" id="search-input" placeholder="🔍 Digite o Serial ou Número da COP...">
+                <button id="clear-search-btn" class="btn-clear-search" onclick="limparBusca()" title="Limpar Busca">&times;</button>
+            </div>
+            
+            <div class="checklist-summary">
+                <span class="summary-text" id="summary-text">Carregando dados...</span>
+                <button class="btn-panel btn-filter" id="btn-filter" onclick="toggleFaltantes()">Filtrar Faltantes</button>
+                <button class="btn-panel btn-reset" onclick="zerarConferencia()">Zerar Turno</button>
+                <button class="btn-panel btn-report-faltas" onclick="finalizarConferencia()">🚨 Relatar Faltas (WhatsApp)</button>
+                <button id="btn-zap-multiplo" class="btn-zap-multiplo" onclick="enviarZapMultiplos()" title="Enviar todas as câmeras selecionadas">📲 Enviar Selecionadas (0)</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- DATALISTS PARA AUTOCOMPLETAR POLICIAIS -->
+    <datalist id="listaPoliciais"></datalist>
+    <datalist id="listaPoliciaisNomes"></datalist>
+
+    <input type="file" id="fileInput" style="display: none;" onchange="importarDados(this)" accept=".json">
+
+    <main class="container">
+        <p id="no-results" class="hidden">Nenhuma câmera visível ou encontrada.</p>
+        <ul id="name-list" class="grid-list"></ul>
+    </main>
+
+    <!-- MODAL OBSERVAÇÃO -->
+    <div id="obsModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="fecharModal('obsModal')">&times;</span>
+            <div class="modal-header">
+                <h2 id="modalTitle">Observação</h2>
+            </div>
+            <div class="modal-body">
+                <p style="font-size: 0.9rem; color: #666;">Descreva abaixo a avaria ou motivo da baixa/retenção:</p>
+                <textarea id="obsInput" placeholder="Ex: Baixa por tela quebrada, Extraviada no APF 123... (Deixe em branco se estiver OK)"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-clear" onclick="limparObs()">Limpar / OK</button>
+                <button class="btn-save" onclick="salvarObs()">Salvar Observação</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL PAGAR COP -->
+    <div id="pagarModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="fecharModal('pagarModal')">&times;</span>
+            <div class="modal-header">
+                <h2 id="pagarModalTitle">Pagar Câmera (COP)</h2>
+            </div>
+            <div class="modal-body">
+                <p style="font-size: 0.9rem; color: #666;">Preencha os dados do policial que está retirando a câmera:</p>
+                
+                <label style="font-weight:bold; color:#001f3f;">RG (Digite p/ buscar):</label>
+                <input type="text" id="pagarRG" list="listaPoliciais" oninput="preencherPolicialPagar()" class="input-form" placeholder="Ex: 99.999">
+                
+                <label style="font-weight:bold; color:#001f3f;">Nome do Policial (Digite p/ buscar):</label>
+                <input type="text" id="pagarNome" list="listaPoliciaisNomes" oninput="preencherRgPorNomePagar()" class="input-form" placeholder="Ex: SD Silva">
+
+                <label style="font-weight:bold; color:#001f3f;">Data de Saída:</label>
+                <input type="date" id="pagarData" class="input-form">
+            </div>
+            <div class="modal-footer">
+                <button class="btn-clear" style="background-color: #aaa;" onclick="fecharModal('pagarModal')">Cancelar</button>
+                <button class="btn-save" onclick="confirmarPagar()">Confirmar Pagamento</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DIA ANTERIOR -->
+    <div id="anteriorModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="fecharModal('anteriorModal')">&times;</span>
+            <div class="modal-header">
+                <h2 id="anteriorModalTitle">Dia Anterior (COP)</h2>
+            </div>
+            <div class="modal-body">
+                <p style="font-size: 0.9rem; color: #666;">Preencha os dados do policial que retirou a câmera no dia anterior:</p>
+                
+                <label style="font-weight:bold; color:#001f3f;">RG (Digite p/ buscar):</label>
+                <input type="text" id="anteriorRG" list="listaPoliciais" oninput="preencherPolicialAnterior()" class="input-form" placeholder="Ex: 99.999">
+                
+                <label style="font-weight:bold; color:#001f3f;">Nome do Policial (Digite p/ buscar):</label>
+                <input type="text" id="anteriorNome" list="listaPoliciaisNomes" oninput="preencherRgPorNomeAnterior()" class="input-form" placeholder="Ex: SD Silva">
+
+                <label style="font-weight:bold; color:#001f3f;">Data de Saída:</label>
+                <input type="date" id="anteriorData" class="input-form">
+            </div>
+            <div class="modal-footer">
+                <button class="btn-clear" style="background-color: #aaa;" onclick="fecharModal('anteriorModal')">Cancelar</button>
+                <button class="btn-save" onclick="confirmarAnterior()">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL NOVO REGISTRO -->
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="fecharModal('registerModal')">&times;</span>
+            <div class="modal-header">
+                <h2>Registrar Nova Câmera</h2>
+            </div>
+            <div class="modal-body">
+                <label style="font-weight:bold; color:#001f3f;">Serial:</label>
+                <input type="text" id="newSerial" class="input-form" placeholder="Ex: J12345678">
+                
+                <label style="font-weight:bold; color:#001f3f;">Número:</label>
+                <input type="text" id="newNum" class="input-form" placeholder="Ex: 99">
+            </div>
+            <div class="modal-footer">
+                <button class="btn-clear" style="background-color: #aaa;" onclick="fecharModal('registerModal')">Cancelar</button>
+                <button class="btn-save" onclick="salvarNovoRegistro()">Cadastrar</button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="main-footer">
+        <p>&copy; 2026 - Desenvolvido por BitBlaze Webdesign</p>
+    </footer>
+
+    <script>
+        const defaultCameras = [
+            { serial: "J32840821", num: "01" }, { serial: "J33583945", num: "02" }, { serial: "J30911918", num: "03" }, { serial: "J25656078", num: "04" },
+            { serial: "J33583817", num: "05" }, { serial: "J25656201", num: "06" }, { serial: "J25656140", num: "07" }, { serial: "J16688176", num: "08" },
+            { serial: "J16688329", num: "09" }, { serial: "J24884419", num: "10" }, { serial: "J16688112", num: "11" }, { serial: "J16688217", num: "12" },
+            { serial: "J17292213", num: "13" }, { serial: "J16688139", num: "14" }, { serial: "J33583852", num: "15" }, { serial: "J16688219", num: "16" },
+            { serial: "J24884620", num: "17" }, { serial: "J16688102", num: "18" }, { serial: "J25656198", num: "19" }, { serial: "J17292241", num: "20" },
+            { serial: "J24884338", num: "21" }, { serial: "J33583725", num: "22" }, { serial: "J33583812", num: "23" }, { serial: "J33583750", num: "24" },
+            { serial: "J33583975", num: "25" }, { serial: "J30313691", num: "26" }, { serial: "J24884393", num: "27" }, { serial: "J16046060", num: "28" },
+            { serial: "J16688120", num: "29" }, { serial: "J33583781", num: "30" }, { serial: "J33583938", num: "31" }, { serial: "J24884060", num: "32" },
+            { serial: "J16688138", num: "33" }, { serial: "J32841250", num: "34" }, { serial: "J24884617", num: "35" }, { serial: "J17292280", num: "36" },
+            { serial: "J16046199", num: "37" }, { serial: "J17292235", num: "38" }, { serial: "J17292275", num: "39" }, { serial: "J16688201", num: "40" },
+            { serial: "J24884061", num: "41" }, { serial: "J33583742", num: "42" }, { serial: "J15634783", num: "43" }, { serial: "J16046173", num: "44" },
+            { serial: "J16344240", num: "45" }, { serial: "J16344577", num: "46" }, { serial: "J32345866", num: "47" }, { serial: "J16688351", num: "48" },
+            { serial: "J30913118", num: "49" }, { serial: "J16046234", num: "50" }, { serial: "J16654122", num: "51" }, { serial: "J33583803", num: "52" },
+            { serial: "J32612221", num: "53" }, { serial: "J30911909", num: "54" }, { serial: "J24884369", num: "55" }, { serial: "J30912289", num: "56" },
+            { serial: "J33583794", num: "57" }, { serial: "J30914427", num: "58" }, { serial: "J32923637", num: "59" }, { serial: "J32970633", num: "60" },
+            { serial: "J24884222", num: "61" }, { serial: "J32841027", num: "62" }, { serial: "J17292254", num: "63" }, { serial: "j12957374", num: "64" }
+        ];
+
+        // --- BANCO DE DADOS DOS POLICIAIS IMPORTADO DO INDEX ---
+        const basePoliciais = [
+            { rg: '110134', nome: 'SD PM LIMA', tel: '5521970336379' },
+            { rg: '103097', nome: '3º SGT PM ALBUQUERQUE', tel: '5521970375724' },
+            { rg: '105324', nome: 'CB PM EUZÉBIO', tel: '5521982006815' },
+            { rg: '100235', nome: '3º SGT PM BRUNO', tel: '5521982566832' },
+            { rg: '103776', nome: '3º SGT PM CARNEIRO', tel: '5521970174485' },
+            { rg: '103800', nome: '3º SGT PM MELLO', tel: '5532998419962' },
+            { rg: '90521', nome: '3º SGT PM LOURO', tel: '5521964716337' },
+            { rg: '103190', nome: '3º SGT PM CASTRO', tel: '5521964544472' },
+            { rg: '101235', nome: '3º SGT PM XIMENES', tel: '5521983232636' },
+            { rg: '93330', nome: '3º SGT PM DA LUZ', tel: '5521964265794' },
+            { rg: '93977', nome: '3º SGT PM S. OLIVEIRA', tel: '5521993803418' },
+            { rg: '101492', nome: '3º SGT PM LEANDRO BAPTISTA', tel: '5521991122289' },
+            { rg: '98826', nome: '3º SGT PM BARROCO', tel: '5521996607799' },
+            { rg: '109091', nome: 'CB PM DAMASCENO', tel: '' },
+            { rg: '112380', nome: 'SD PM DYLLAN', tel: '5522998279364' },
+            { rg: '106071', nome: 'CB PM ANDERSON', tel: '5521964914757' },
+            { rg: '112377', nome: 'SD PM MATOS', tel: '5522997390919' },
+            { rg: '99934', nome: '3º SGT PM BAIA', tel: '5521964025323' },
+            { rg: '112350', nome: 'SD PM GILVAN FLOR', tel: '5522999678068' },
+            { rg: '108663', nome: 'CB PM ANTONIO ANDRE D', tel: '5521965997857' },
+            { rg: '96097', nome: '3º SGT PM GATTO', tel: '5521964941521' },
+            { rg: '98382', nome: '3º SGT PM NETO', tel: '5521983796752' },
+            { rg: '104072', nome: '3º SGT PM FLAVIO LUIZ', tel: '5521982893878' },
+            { rg: '96253', nome: '3º SGT PM SILVA GOMES', tel: '5521964011713' },
+            { rg: '104788', nome: 'CB PM MORGADO', tel: '' },
+            { rg: '97864', nome: '3º SGT PM BARRETO', tel: '5521971961216' },
+            { rg: '91951', nome: '3º SGT PM CARLA', tel: '5521975220505' },
+            { rg: '85446', nome: '2º SGT PM SEKIGUCHI', tel: '5521982554242' },
+            { rg: '85538', nome: '2º SGT PM GEORGE', tel: '5521964215356' },
+            { rg: '94010', nome: '3º SGT PM R. SIMÕES', tel: '5521982539175' },
+            { rg: '85523', nome: '2º SGT PM BRUNO LIMA', tel: '5521970059743' },
+            { rg: '94429', nome: '3º SGT PM MOURA', tel: '5521964211720' },
+            { rg: '103265', nome: '3º SGT PM ORTIZ', tel: '5522992868403' },
+            { rg: '102571', nome: '3º SGT PM L. MACHADO', tel: '5521964747153' },
+            { rg: '108023', nome: 'CB PM ALESSANDRO', tel: '5521975051238' },
+            { rg: '95976', nome: '3º SGT PM PATRICK', tel: '5521964310826' },
+            { rg: '101187', nome: '3º SGT PM ROBERTO', tel: '5521964196915' },
+            { rg: '102430', nome: '3º SGT PM INOCENCIO', tel: '5521971002524' },
+            { rg: '103780', nome: '3º SGT PM W. MARINHO', tel: '5521993769598' },
+            { rg: '92907', nome: '3º SGT PM VARJÃO', tel: '5521983630383' },
+            { rg: '106304', nome: 'CB PM DE OLIVEIRA', tel: '5521969069838' },
+            { rg: '98071', nome: '3º SGT PM LUIZ', tel: '5521996001871' },
+            { rg: '107521', nome: 'CB PM PANTOJA', tel: '5521980815284' },
+            { rg: '105475', nome: 'CB PM LUCIANO', tel: '5521965494587' },
+            { rg: '98631', nome: '3º SGT PM BARTHOLO', tel: '5521979955405' },
+            { rg: '94319', nome: '3º SGT PM CLESCIO', tel: '5521964417050' },
+            { rg: '105711', nome: 'CB PM SOUZA LIMA', tel: '5521968323211' },
+            { rg: '90431', nome: '3º SGT PM GELSON', tel: '5521971775779' },
+            { rg: '105219', nome: 'CB PM LUCAS (C)', tel: '5521998145601' },
+            { rg: '92931', nome: '3º SGT PM DE ANDRADE', tel: '5521964490314' },
+            { rg: '100941', nome: '3º SGT PM REIS', tel: '5521964362726' },
+            { rg: '105709', nome: 'CB PM LUIZ SILVA', tel: '5521991695707' },
+            { rg: '92156', nome: '3º SGT PM GRANJA', tel: '5521975935737' },
+            { rg: '103807', nome: '3º SGT PM PITZER', tel: '' },
+            { rg: '106876', nome: 'CB PM CRISTIANO', tel: '5521976672870' },
+            { rg: '102727', nome: '3º SGT PM AMAURI', tel: '' },
+            { rg: '106708', nome: 'CB PM COUTO', tel: '5521968388608' },
+            { rg: '98741', nome: '3º SGT PM EUGENIO', tel: '5521970393233' },
+            { rg: '86268', nome: '2º SGT PM SERGIO', tel: '5521964403044' },
+            { rg: '95872', nome: '3º SGT PM J. CARLOS', tel: '5521987123133' },
+            { rg: '101882', nome: '3º SGT PM CHAVES', tel: '' },
+            { rg: '105544', nome: 'CB PM GOMES', tel: '' },
+            { rg: '95865', nome: '3º SGT PM PEDROSO', tel: '5521969719181' },
+            { rg: '98598', nome: '3º SGT PM SATLES', tel: '' },
+            { rg: '100142', nome: '3º SGT PM HASSAN', tel: '5521975318805' },
+            { rg: '93431', nome: '3º SGT PM QUITETE', tel: '' },
+            { rg: '92616', nome: '3º SGT PM R PEGAS', tel: '5521976126928' },
+            { rg: '103353', nome: '3º SGT PM CHELQUE', tel: '5521964121798' },
+            { rg: '98697', nome: '3º SGT PM NARCISO', tel: '5521995795374' },
+            { rg: '96396', nome: '3º SGT PM ANA CAROLINA', tel: '5521970243046' },
+            { rg: '105154', nome: 'CB PM IMBUZEIRO', tel: '21969299623' },
+            { rg: '87913', nome: 'CAP PM CERQUEIRA', tel: '21970388663' },
+            { rg: '96773', nome: '3º SGT PM DE ALMEIDA', tel: '' },
+            { rg: '102154', nome: '3º SGT PM BONIFACIO', tel: '' },
+            { rg: '95999', nome: '3º SGT PM ESCOBAR', tel: '' },
+            { rg: '109234', nome: 'CB PM SOLEDADE', tel: '' },
+            { rg: '77200', nome: '1º SGT PM PRADO', tel: '21964648351' },
+            { rg: '83685', nome: '3º SGT PM Ausente', tel: '21xxxxxxxxx' },
+            { rg: '99044', nome: '3º SGT PM Ausente', tel: '21xxxxxxxxx' },
+            { rg: '88511', nome: '3º SGT PM Ausente', tel: '21xxxxxxxxx' },
+            { rg: '112047', nome: 'SD PM Ausente', tel: '21xxxxxxxxx' },
+            { rg: '70428', nome: 'SUBTEN PM SIRLEY', tel: '21964776159' },
+            { rg: '99647', nome: '3º SGT PM Ausente', tel: '21xxxxxxxxx' },
+            { rg: '107480', nome: 'CB PM DO CARMO', tel: '21979727305' },
+            { rg: '69814', nome: 'SUBTEN PM JANDELSON', tel: '21970139016' },
+            { rg: '91901', nome: '3º SGT PM LIMA', tel: '21964382136' },
+            { rg: '91164', nome: '3º SGT PM D MARTINS', tel: 'xxxxxxxxxx' },
+            { rg: '94031', nome: '3º SGT PM REGATTIERI', tel: 'xxxxxxxxxx' },
+            { rg: '89822', nome: '3º SGT PM BENJAMIM', tel: 'xxxxxxxxxx' },
+            { rg: '106186', nome: 'CB PM R. SILVA', tel: 'xxxxxxxxxx' }
+
+
+
+        ];
+
+        let cameras = JSON.parse(localStorage.getItem('myCameras')) || defaultCameras;
+        const listElement = document.getElementById('name-list');
+        let currentSerial = null;
+        let currentPagarSerial = null;
+        let currentAnteriorSerial = null;
+        let currentFilter = 'all';
+
+        const URL_GOOGLE_SCRIPT = "https://script.google.com/macros/s/AKfycbyaHjk3sjAOFvu3wsoC70pULSmhx5JS5Hy6Wr7dFCT9qCeLr5kQ8i67aHc5RJrLoxYt6g/exec";
+
+        function carregarListaPoliciais() {
+            const datalist = document.getElementById('listaPoliciais');
+            const datalistNomes = document.getElementById('listaPoliciaisNomes');
+            datalist.innerHTML = '';
+            datalistNomes.innerHTML = '';
+            basePoliciais.forEach(policial => {
+                const option = document.createElement('option');
+                option.value = policial.rg;
+                option.text = policial.nome;
+                datalist.appendChild(option);
+                
+                const optionNome = document.createElement('option');
+                optionNome.value = policial.nome;
+                datalistNomes.appendChild(optionNome);
+            });
+        }
+
+        function preencherPolicialPagar() {
+            const rgDigitado = document.getElementById('pagarRG').value.trim();
+            const policial = basePoliciais.find(p => p.rg === rgDigitado);
+            if (policial) document.getElementById('pagarNome').value = policial.nome;
+        }
+
+        function preencherRgPorNomePagar() {
+            const nomeDigitado = document.getElementById('pagarNome').value.trim();
+            const policial = basePoliciais.find(p => p.nome === nomeDigitado);
+            if (policial) document.getElementById('pagarRG').value = policial.rg;
+        }
+
+        function preencherPolicialAnterior() {
+            const rgDigitado = document.getElementById('anteriorRG').value.trim();
+            const policial = basePoliciais.find(p => p.rg === rgDigitado);
+            if (policial) document.getElementById('anteriorNome').value = policial.nome;
+        }
+
+        function preencherRgPorNomeAnterior() {
+            const nomeDigitado = document.getElementById('anteriorNome').value.trim();
+            const policial = basePoliciais.find(p => p.nome === nomeDigitado);
+            if (policial) document.getElementById('anteriorRG').value = policial.rg;
+        }
+
+        function getNumBySerial(serial) {
+            const cam = cameras.find(c => c.serial === serial);
+            return cam ? cam.num : "-";
+        }
+
+        function registrarNaPlanilha(acao, serial, num, detalhes) {
+            if (!URL_GOOGLE_SCRIPT) return;
+
+            fetch(URL_GOOGLE_SCRIPT, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({
+                    acao: acao,
+                    serial: serial,
+                    numero: num,
+                    detalhes: detalhes
+                })
+            }).catch(err => console.error("Erro ao enviar para planilha:", err));
+        }
+
+        function atualizarContadorZap() {
+            const qtd = document.querySelectorAll('.checkbox-zap:checked').length;
+            const btn = document.getElementById('btn-zap-multiplo');
+            if (btn) btn.innerText = `📲 Enviar Selecionadas (${qtd})`;
+        }
+
+        function enviarZap(serial, num) {
+            const mensagem = encodeURIComponent(`*Câmera Nº ${num}*\nSerial: ${serial}`);
+            const url = `https://wa.me/?text=${mensagem}`;
+            window.open(url, '_blank');
+        }
+
+        function cobrarPago(serial, num) {
+            let pagName = localStorage.getItem('pag_nome_' + serial) || "Policial";
+            let pagRG = localStorage.getItem('pag_rg_' + serial) || "";
+            let pagDataRaw = localStorage.getItem('pag_data_' + serial);
+            let dataTexto = pagDataRaw ? ` no dia *${pagDataRaw.split('-').reverse().join('/')}*` : "";
+
+            let prefixoAlerta = "*COBRANÇA DE CÂMERA (COP) - RUMB / 3ª UPP*";
+
+            if (pagDataRaw) {
+                let now = new Date();
+                now.setHours(now.getHours() - 5);
+                now.setHours(0, 0, 0, 0);
+                let dtPag = new Date(pagDataRaw + 'T00:00:00');
+                let diffDays = Math.floor((now.getTime() - dtPag.getTime()) / (1000 * 3600 * 24));
+
+                if (diffDays === 1) {
+                    prefixoAlerta = "*🚨 ALERTA: CÂMERA DO SERVIÇO ANTERIOR (+24H) - RUMB / 3ª UPP*";
+                } else if (diffDays >= 2) {
+                    prefixoAlerta = "*🚨 URGENTE: CÂMERA RETIDA HÁ MAIS DE 48H - RUMB / 3ª UPP*";
+                }
+            }
+
+            let msg = `${prefixoAlerta}\n\nSaudações, *${pagName}*${pagRG ? ' (RG: ' + pagRG + ')' : ''}!\n\nConsta em nosso sistema que a *COP Nº ${num}* (Serial: ${serial}) foi acautelada/paga para você${dataTexto}.\n\nPor favor, informe o *destino atual* desta câmera ou realize a sua devolução à Reserva de Armamento (RUMB).`;
+
+            const policial = basePoliciais.find(p => p.rg === pagRG);
+            let tel = policial && policial.tel ? policial.tel : '';
+
+            if (tel) {
+                window.open(`https://wa.me/${tel}?text=${encodeURIComponent(msg)}`, '_blank');
+            } else {
+                window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+            }
+        }
+
+        function cobrarAnterior(serial, num) {
+            let antName = localStorage.getItem('ant_nome_' + serial) || "Policial";
+            let antRG = localStorage.getItem('ant_rg_' + serial) || "";
+            let antDataRaw = localStorage.getItem('ant_data_' + serial);
+            let dataTexto = antDataRaw ? ` no dia *${antDataRaw.split('-').reverse().join('/')}*` : " no *dia anterior*";
+
+            let msg = `*🚨 ALERTA: CÂMERA DO SERVIÇO ANTERIOR - RUMB / 3ª UPP*\n\nSaudações, *${antName}*${antRG ? ' (RG: ' + antRG + ')' : ''}!\n\nConsta em nosso sistema que a *COP Nº ${num}* (Serial: ${serial}) foi acautelada para você${dataTexto}.\n\nPor favor, informe o *destino atual* desta câmera ou realize a sua devolução à Reserva de Armamento (RUMB).`;
+
+            const policial = basePoliciais.find(p => p.rg === antRG);
+            let tel = policial && policial.tel ? policial.tel : '';
+
+            if (tel) {
+                window.open(`https://wa.me/${tel}?text=${encodeURIComponent(msg)}`, '_blank');
+            } else {
+                window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+            }
+        }
+
+        function enviarZapMultiplos() {
+            const checkboxesMarcadas = document.querySelectorAll('.checkbox-zap:checked');
+            
+            if (checkboxesMarcadas.length === 0) {
+                alert("Selecione pelo menos uma câmera para enviar.");
+                return;
+            }
+
+            let textoMensagem = "*INFORME - RUMB / 3ª UPP*\n\n";
+            textoMensagem += "Cumprimentando-o cordialmente, encaminho a relação das Câmeras Operacionais Portáteis (COPs) selecionadas para ciência e devidos fins:\n\n";
+            
+            checkboxesMarcadas.forEach(chk => {
+                const serial = chk.getAttribute('data-serial');
+                const num = chk.getAttribute('data-num');
+                textoMensagem += `🔹 *COP Nº ${num}* - Serial: ${serial}\n`;
+            });
+
+            textoMensagem += `\n*Total:* ${checkboxesMarcadas.length} equipamento(s).`;
+            const url = `https://wa.me/?text=${encodeURIComponent(textoMensagem)}`;
+            window.open(url, '_blank');
+            
+            checkboxesMarcadas.forEach(chk => chk.checked = false);
+            atualizarContadorZap();
+        }
+
+        function finalizarConferencia() {
+            let faltantes = [];
+            
+            cameras.forEach(cam => {
+                let isChecked = localStorage.getItem('chk_' + cam.serial) === 'true';
+                let isPaid = localStorage.getItem('pag_' + cam.serial) === 'true';
+                let isAnterior = localStorage.getItem('ant_' + cam.serial) === 'true';
+                let isRetained = localStorage.getItem('ret_' + cam.serial) === 'true';
+                
+                if (!isChecked && !isPaid && !isAnterior && !isRetained) {
+                    faltantes.push(cam);
+                }
+            });
+
+            if (faltantes.length > 0) {
+                if(confirm(`⚠️ ATENÇÃO: Faltam contabilizar ${faltantes.length} câmera(s) neste turno!\n\nDeseja enviar o relatório de câmeras faltantes no WhatsApp?`)) {
+                    let textoMensagem = "*🚨 ALERTA DE FALTAS - RUMB / 3ª UPP*\n\n";
+                    textoMensagem += "Informo que, após a conferência de turno, os seguintes equipamentos encontram-se *PENDENTES* (não localizados na RUMB, não pagos hoje ou em dias anteriores e não retidos):\n\n";
+                    
+                    faltantes.forEach(cam => {
+                        textoMensagem += `❌ *COP Nº ${cam.num}* - Serial: ${cam.serial}\n`;
+                    });
+
+                    textoMensagem += `\n*Total de faltas:* ${faltantes.length} equipamento(s).`;
+                    const url = `https://wa.me/?text=${encodeURIComponent(textoMensagem)}`;
+                    window.open(url, '_blank');
+                }
+            } else {
+                alert("✅ Conferência concluída com sucesso! Nenhuma câmera faltando no turno atual.");
+            }
+        }
+
+        function renderList() {
+            listElement.innerHTML = ""; 
+            let qtdConferidas = 0;
+            let qtdPagas = 0;
+            let qtdAnterior = 0;
+            let qtdRetidas = 0;
+            
+            cameras.forEach(cam => {
+                const savedObs = localStorage.getItem('obs_' + cam.serial);
+                let isChecked = localStorage.getItem('chk_' + cam.serial) === 'true';
+                let isPaid = localStorage.getItem('pag_' + cam.serial) === 'true';
+                let isAnterior = localStorage.getItem('ant_' + cam.serial) === 'true';
+                let isRetained = localStorage.getItem('ret_' + cam.serial) === 'true';
+                
+                // Contabilidade
+                if (isRetained) {
+                    qtdRetidas++;
+                } else if (isAnterior) {
+                    qtdAnterior++;
+                } else if (isPaid) {
+                    qtdPagas++;
+                } else if (isChecked) {
+                    qtdConferidas++;
+                }
+
+                // Filtragem
+                if (currentFilter === 'rumb' && !isChecked) return;
+                if (currentFilter === 'pagas' && !isPaid) return;
+                if (currentFilter === 'anteriores' && !isAnterior) return;
+                if (currentFilter === 'retidas' && !isRetained) return;
+                if (currentFilter === 'faltam' && (isChecked || isPaid || isAnterior || isRetained)) return;
+
+                let btnObsClass = "status-ok";
+                let btnObsText = "Verificar / Relatar";
+                if (savedObs && savedObs.trim() !== "") {
+                    btnObsClass = "status-alert";
+                    btnObsText = "⚠️ VER OBS/AVARIA";
+                }
+
+                let cardClass = "";
+                if (isRetained) cardClass = "card-retained";
+                else if (isAnterior) cardClass = "card-anterior";
+                else if (isPaid) cardClass = "card-pago";
+                else if (isChecked) cardClass = "card-checked";
+
+                let btnChkClass = isChecked ? "chk-checked" : "chk-uncheck";
+                let btnChkText = isChecked ? "✅ Conferida" : "⚪ RUMB";
+
+                let btnPagClass = isPaid ? "pag-checked" : "pag-uncheck";
+                let btnPagText = isPaid ? "🔵 Paga" : "Pagar";
+
+                let btnAntClass = isAnterior ? "ant-checked" : "ant-uncheck";
+                let btnAntText = isAnterior ? "🟣 Anterior" : "Dia Anterior";
+
+                let btnRetClass = isRetained ? "ret-checked" : "ret-uncheck";
+                let btnRetText = isRetained ? "⚫ Retida" : "Reter";
+
+                let infoTextHTML = "";
+                let btnZapText = "📲 Enviar p/ WhatsApp";
+                let btnZapAction = `enviarZap('${cam.serial}', '${cam.num}')`;
+                let btnZapClass = "btn-whatsapp";
+
+                // Informações e Cobrança de Destino quando Paga ou Anterior
+                if (isPaid) {
+                    let pagName = localStorage.getItem('pag_nome_' + cam.serial) || "Não Informado";
+                    let pagRG = localStorage.getItem('pag_rg_' + cam.serial) || "---";
+                    let pagDataRaw = localStorage.getItem('pag_data_' + cam.serial);
+                    let pagDataStr = pagDataRaw ? pagDataRaw.split('-').reverse().join('/') : "";
+
+                    let corBordaPago = "#3b82f6";
+                    let corTextoPago = "#3b82f6";
+                    let iconePago = "🔵";
+                    let txtAlerta = "";
+                    let animacao = "";
+
+                    if (pagDataRaw) {
+                        let now = new Date();
+                        now.setHours(now.getHours() - 5);
+                        now.setHours(0, 0, 0, 0);
+                        
+                        let dtPag = new Date(pagDataRaw + 'T00:00:00');
+                        let diffTime = now.getTime() - dtPag.getTime();
+                        let diffDays = Math.floor(diffTime / (1000 * 3600 * 24));
+
+                        if (diffDays === 1) {
+                            corBordaPago = "#f97316";
+                            corTextoPago = "#ea580c";
+                            iconePago = "🟠";
+                            txtAlerta = "<br><span style='color:#ea580c; font-weight:bold;'>⚠️ Serviço Anterior (+24h)</span>";
+                            btnZapClass = "btn-whatsapp status-alert";
+                        } else if (diffDays >= 2) {
+                            corBordaPago = "#b91c1c";
+                            corTextoPago = "#b91c1c";
+                            iconePago = "🔴";
+                            txtAlerta = "<br><span style='color:#b91c1c; font-weight:bold;'>🚨 ALERTA (+48h)</span>";
+                            animacao = "animation: pulse 2s infinite;";
+                            btnZapClass = "btn-whatsapp status-alert";
+                        } else {
+                            btnZapClass = "btn-whatsapp status-alert";
+                        }
+                    } else {
+                        btnZapClass = "btn-whatsapp status-alert";
+                    }
+
+                    infoTextHTML = `
+                        <div style="color: ${corTextoPago}; font-weight: bold; margin-top: 5px; font-size: 0.8rem; border: 1px dashed ${corBordaPago}; padding: 4px; border-radius: 4px; ${animacao}">
+                            ${iconePago} PAGA PARA:<br>${pagName} (RG: ${pagRG})<br>${pagDataStr ? '📅 ' + pagDataStr : ''}${txtAlerta}
+                        </div>
+                    `;
+                    btnZapText = "🚨 Cobrar Destino";
+                    btnZapAction = `cobrarPago('${cam.serial}', '${cam.num}')`;
+                } else if (isAnterior) {
+                    let antName = localStorage.getItem('ant_nome_' + cam.serial) || "Não Informado";
+                    let antRG = localStorage.getItem('ant_rg_' + cam.serial) || "---";
+                    let antDataRaw = localStorage.getItem('ant_data_' + cam.serial);
+                    let antDataStr = antDataRaw ? antDataRaw.split('-').reverse().join('/') : "";
+
+                    infoTextHTML = `
+                        <div style="color: #7e22ce; font-weight: bold; margin-top: 5px; font-size: 0.8rem; border: 1px dashed #7e22ce; padding: 4px; border-radius: 4px;">
+                            🟣 DIA ANTERIOR:<br>${antName} (RG: ${antRG})<br>${antDataStr ? '📅 ' + antDataStr : ''}
+                        </div>
+                    `;
+                    btnZapText = "🚨 Cobrar Destino";
+                    btnZapAction = `cobrarAnterior('${cam.serial}', '${cam.num}')`;
+                    btnZapClass = "btn-whatsapp status-alert"; 
+                }
+
+                const li = document.createElement('li');
+                li.className = cardClass;
+                li.innerHTML = `
+                    <input type="checkbox" class="checkbox-zap" data-serial="${cam.serial}" data-num="${cam.num}" title="Selecionar para envio múltiplo" onclick="atualizarContadorZap()">
+                    <img src="cop.png" class="profile-pic"> 
+                    <span>SERIAL: <strong>${cam.serial}</strong><small>NÚMERO ${cam.num}</small></span>
+                    
+                    ${infoTextHTML}
+
+                    <button class="btn-status ${btnObsClass}" onclick="abrirObs('${cam.serial}', '${cam.num}')">
+                        ${btnObsText}
+                    </button>
+                    
+                    <button class="btn-status ${btnZapClass}" onclick="${btnZapAction}" title="Ação WhatsApp">
+                        ${btnZapText}
+                    </button>
+
+                    <div class="btn-group">
+                        <button class="btn-status ${btnChkClass}" onclick="toggleCheck('${cam.serial}')" title="Marcar como presente na RUMB hoje">
+                            ${btnChkText}
+                        </button>
+                        <button class="btn-status ${btnPagClass}" onclick="togglePago('${cam.serial}')" title="Pago para o efetivo atual">
+                            ${btnPagText}
+                        </button>
+                        <button class="btn-status ${btnAntClass}" onclick="toggleAnterior('${cam.serial}')" title="Câmera paga no dia anterior">
+                            ${btnAntText}
+                        </button>
+                        <button class="btn-status ${btnRetClass}" onclick="toggleReter('${cam.serial}')" title="Baixa, Extravio ou Acautelada">
+                            ${btnRetText}
+                        </button>
+                    </div>
+                `;
+                listElement.appendChild(li);
+            });
+
+            atualizarPainelResumo(qtdConferidas, qtdPagas, qtdAnterior, qtdRetidas, cameras.length);
+            atualizarContadorZap();
+        }
+
+        function setFilter(type) {
+            currentFilter = (currentFilter === type) ? 'all' : type;
+            const btn = document.getElementById('btn-filter');
+            if (currentFilter === 'faltam') {
+                btn.innerText = "Mostrar Todas";
+                btn.style.backgroundColor = "#e2e8f0";
+            } else {
+                btn.innerText = "Filtrar Faltantes";
+                btn.style.backgroundColor = "#ffd700";
+            }
+            renderList();
+            executarBusca();
+        }
+
+        function toggleCheck(serial) {
+            const isChecked = localStorage.getItem('chk_' + serial) === 'true';
+            if (isChecked) {
+                localStorage.removeItem('chk_' + serial);
+            } else {
+                localStorage.setItem('chk_' + serial, 'true');
+                localStorage.removeItem('pag_' + serial);
+                localStorage.removeItem('pag_nome_' + serial);
+                localStorage.removeItem('pag_rg_' + serial);
+                localStorage.removeItem('pag_data_' + serial);
+                localStorage.removeItem('ant_' + serial);
+                localStorage.removeItem('ant_nome_' + serial);
+                localStorage.removeItem('ant_rg_' + serial);
+                localStorage.removeItem('ant_data_' + serial);
+                localStorage.removeItem('ret_' + serial); 
+            }
+            renderList();
+            executarBusca(); 
+        }
+
+        function togglePago(serial) {
+            const isPaid = localStorage.getItem('pag_' + serial) === 'true';
+            if (isPaid) {
+                localStorage.removeItem('pag_' + serial);
+                localStorage.removeItem('pag_nome_' + serial);
+                localStorage.removeItem('pag_rg_' + serial);
+                localStorage.removeItem('pag_data_' + serial);
+                renderList();
+                executarBusca();
+            } else {
+                currentPagarSerial = serial;
+                const num = getNumBySerial(serial);
+                document.getElementById('pagarModalTitle').innerText = `Pagar Câmera Nº ${num} (${serial})`;
+                document.getElementById('pagarNome').value = "";
+                document.getElementById('pagarRG').value = "";
+                document.getElementById('pagarData').value = new Date().toISOString().slice(0, 10);
+                document.getElementById('pagarModal').style.display = "block";
+                document.getElementById('pagarRG').focus();
+            }
+        }
+
+        function confirmarPagar() {
+            const nome = document.getElementById('pagarNome').value.trim();
+            const rg = document.getElementById('pagarRG').value.trim();
+            const dataPagamento = document.getElementById('pagarData').value;
+            
+            if (!nome || !rg) {
+                alert("Preencha o Nome e o RG do policial para pagar a câmera.");
+                return;
+            }
+
+            localStorage.setItem('pag_' + currentPagarSerial, 'true');
+            localStorage.setItem('pag_nome_' + currentPagarSerial, nome);
+            localStorage.setItem('pag_rg_' + currentPagarSerial, rg);
+            localStorage.setItem('pag_data_' + currentPagarSerial, dataPagamento);
+
+            localStorage.removeItem('chk_' + currentPagarSerial);
+            localStorage.removeItem('ant_' + currentPagarSerial);
+            localStorage.removeItem('ant_nome_' + currentPagarSerial);
+            localStorage.removeItem('ant_rg_' + currentPagarSerial);
+            localStorage.removeItem('ant_data_' + currentPagarSerial);
+            localStorage.removeItem('ret_' + currentPagarSerial);
+            
+            const num = getNumBySerial(currentPagarSerial);
+            registrarNaPlanilha("Pagamento", currentPagarSerial, num, `Paga para: ${nome} (RG: ${rg}) em ${dataPagamento}`);
+
+            fecharModal('pagarModal');
+            renderList(); 
+            executarBusca();
+        }
+
+        function toggleAnterior(serial) {
+            const isAnterior = localStorage.getItem('ant_' + serial) === 'true';
+            if (isAnterior) {
+                localStorage.removeItem('ant_' + serial);
+                localStorage.removeItem('ant_nome_' + serial);
+                localStorage.removeItem('ant_rg_' + serial);
+                localStorage.removeItem('ant_data_' + serial);
+                renderList();
+                executarBusca();
+            } else {
+                currentAnteriorSerial = serial;
+                const num = getNumBySerial(serial);
+                document.getElementById('anteriorModalTitle').innerText = `Dia Anterior - Câmera Nº ${num} (${serial})`;
+                document.getElementById('anteriorNome').value = "";
+                document.getElementById('anteriorRG').value = "";
+                let onteDate = new Date();
+                onteDate.setDate(onteDate.getDate() - 1); // Preenche automático o dia de ontem
+                document.getElementById('anteriorData').value = onteDate.toISOString().slice(0, 10);
+                document.getElementById('anteriorModal').style.display = "block";
+                document.getElementById('anteriorRG').focus();
+            }
+        }
+
+        function confirmarAnterior() {
+            const nome = document.getElementById('anteriorNome').value.trim();
+            const rg = document.getElementById('anteriorRG').value.trim();
+            const dataAnterior = document.getElementById('anteriorData').value;
+
+            if (!nome || !rg) {
+                alert("Preencha o Nome e o RG do policial para registrar a câmera no Dia Anterior.");
+                return;
+            }
+
+            localStorage.setItem('ant_' + currentAnteriorSerial, 'true');
+            localStorage.setItem('ant_nome_' + currentAnteriorSerial, nome);
+            localStorage.setItem('ant_rg_' + currentAnteriorSerial, rg);
+            localStorage.setItem('ant_data_' + currentAnteriorSerial, dataAnterior);
+
+            localStorage.removeItem('chk_' + currentAnteriorSerial);
+            localStorage.removeItem('pag_' + currentAnteriorSerial);
+            localStorage.removeItem('pag_nome_' + currentAnteriorSerial);
+            localStorage.removeItem('pag_rg_' + currentAnteriorSerial);
+            localStorage.removeItem('pag_data_' + currentAnteriorSerial);
+            localStorage.removeItem('ret_' + currentAnteriorSerial);
+
+            const num = getNumBySerial(currentAnteriorSerial);
+            registrarNaPlanilha("Dia Anterior", currentAnteriorSerial, num, `Acautelada dia anterior para: ${nome} (RG: ${rg}) em ${dataAnterior}`);
+
+            fecharModal('anteriorModal');
+            renderList();
+            executarBusca();
+        }
+
+
+        function toggleReter(serial) {
+            const isRetained = localStorage.getItem('ret_' + serial) === 'true';
+            if (isRetained) {
+                localStorage.removeItem('ret_' + serial);
+            } else {
+                localStorage.setItem('ret_' + serial, 'true');
+                localStorage.removeItem('chk_' + serial); 
+                localStorage.removeItem('pag_' + serial);
+                localStorage.removeItem('pag_nome_' + serial);
+                localStorage.removeItem('pag_rg_' + serial);
+                localStorage.removeItem('pag_data_' + serial);
+                localStorage.removeItem('ant_' + serial);
+                localStorage.removeItem('ant_nome_' + serial);
+                localStorage.removeItem('ant_rg_' + serial);
+                localStorage.removeItem('ant_data_' + serial);
+            }
+            renderList();
+            executarBusca();
+        }
+
+        function atualizarPainelResumo(conferidas, pagas, anteriores, retidas, total) {
+            const faltam = total - conferidas - pagas - anteriores - retidas;
+            const st = (type) => currentFilter === type ? "text-decoration: underline; cursor: pointer;" : "cursor: pointer;";
+            
+            document.getElementById('summary-text').innerHTML = 
+                `<span style="${st('all')}" onclick="setFilter('all')" title="Mostrar Todas">Total: <strong>${total}</strong></span> | 
+                 <span class="conferidas" style="${st('rumb')}" onclick="setFilter('rumb')" title="Filtrar RUMB">✅ RUMB: ${conferidas}</span> | 
+                 <span class="pagas" style="${st('pagas')}" onclick="setFilter('pagas')" title="Filtrar Pagas">🔵 Pagas: ${pagas}</span> | 
+                 <span class="anteriores" style="${st('anteriores')}" onclick="setFilter('anteriores')" title="Filtrar Dia Anterior">🟣 Ant.: ${anteriores}</span> | 
+                 <span class="retidas" style="${st('retidas')}" onclick="setFilter('retidas')" title="Filtrar Retidas">⚫ Retidas: ${retidas}</span> | 
+                 <span class="faltam" style="${st('faltam')}" onclick="setFilter('faltam')" title="Filtrar Faltantes">❌ Faltam: ${faltam}</span>`;
+        }
+
+        function toggleFaltantes() {
+            setFilter(currentFilter === 'faltam' ? 'all' : 'faltam');
+        }
+
+        // ZERAR TURNO JUNTO COM O DIA ANTERIOR E DADOS DE QUEM PEGOU
+        function zerarConferencia() {
+            if(confirm("ATENÇÃO: Deseja iniciar uma nova conferência de turno? Isso vai zerar as câmeras 'Conferidas', 'Pagas' e do 'Dia Anterior'. As 'Retidas' continuarão intocadas.")) {
+                cameras.forEach(cam => {
+                    localStorage.removeItem('chk_' + cam.serial);
+                    localStorage.removeItem('pag_' + cam.serial);
+                    localStorage.removeItem('pag_nome_' + cam.serial);
+                    localStorage.removeItem('pag_rg_' + cam.serial);
+                    localStorage.removeItem('pag_data_' + cam.serial);
+                    localStorage.removeItem('ant_' + cam.serial);
+                    localStorage.removeItem('ant_nome_' + cam.serial);
+                    localStorage.removeItem('ant_rg_' + cam.serial);
+                    localStorage.removeItem('ant_data_' + cam.serial);
+                });
+                renderList();
+                executarBusca();
+            }
+        }
+
+        function executarBusca() {
+            const searchInput = document.getElementById('search-input');
+            const clearBtn = document.getElementById('clear-search-btn');
+            const termo = searchInput.value.toUpperCase();
+            const itens = listElement.getElementsByTagName('li');
+            let encontrou = false;
+
+            clearBtn.style.display = termo.length > 0 ? "block" : "none";
+
+            for (let i = 0; i < itens.length; i++) {
+                const texto = itens[i].innerText;
+                if (texto.toUpperCase().indexOf(termo) > -1) {
+                    itens[i].style.display = "";
+                    encontrou = true;
+                } else {
+                    itens[i].style.display = "none";
+                }
+            }
+            document.getElementById('no-results').style.display = (encontrou || itens.length === 0) ? "none" : "block";
+        }
+        
+        function limparBusca() {
+            const searchInput = document.getElementById('search-input');
+            searchInput.value = '';
+            executarBusca();
+            searchInput.focus(); 
+        }
+
+        document.getElementById('search-input').addEventListener('keyup', executarBusca);
+
+        function toggleMenu() { document.getElementById("dropdownMenu").classList.toggle("show"); }
+
+        window.onclick = function(event) {
+            if (!event.target.matches('.menu-icon')) {
+                var dropdowns = document.getElementsByClassName("dropdown-content");
+                for (var i = 0; i < dropdowns.length; i++) {
+                    if (dropdowns[i].classList.contains('show')) dropdowns[i].classList.remove('show');
+                }
+            }
+            if (event.target == document.getElementById("obsModal")) fecharModal('obsModal');
+            if (event.target == document.getElementById("registerModal")) fecharModal('registerModal');
+            if (event.target == document.getElementById("pagarModal")) fecharModal('pagarModal');
+            if (event.target == document.getElementById("anteriorModal")) fecharModal('anteriorModal');
+        }
+
+        function exportarDados() {
+            const cams = JSON.parse(localStorage.getItem('myCameras')) || defaultCameras;
+            const dadosExtra = {};
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key.startsWith('obs_') || key.startsWith('chk_') || key.startsWith('pag_') || key.startsWith('ant_') || key.startsWith('ret_')) {
+                    dadosExtra[key] = localStorage.getItem(key);
+                }
+            }
+            const backupData = { cameras: cams, extras: dadosExtra };
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", "backup_cops_" + new Date().toISOString().slice(0,10) + ".json");
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+        }
+
+        function triggerImport() { document.getElementById('fileInput').click(); }
+
+        function importarDados(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    if (importedData.cameras) {
+                        localStorage.setItem('myCameras', JSON.stringify(importedData.cameras));
+                    }
+                    if (importedData.extras) { 
+                        for (const [key, value] of Object.entries(importedData.extras)) {
+                            localStorage.setItem(key, value);
+                        }
+                    }
+                    alert("Backup restaurado com sucesso!");
+                    location.reload(); 
+                } catch (err) {
+                    alert("Erro ao ler o arquivo. Certifique-se que é um arquivo .json válido.");
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function abrirModalRegistro() {
+            document.getElementById("registerModal").style.display = "block";
+            document.getElementById("newSerial").value = "";
+            document.getElementById("newNum").value = "";
+        }
+
+        function salvarNovoRegistro() {
+            const s = document.getElementById("newSerial").value.trim().toUpperCase();
+            const n = document.getElementById("newNum").value.trim();
+            if (s === "" || n === "") return alert("Preencha Serial e Número.");
+            cameras.push({ serial: s, num: n });
+            localStorage.setItem('myCameras', JSON.stringify(cameras));
+            
+            renderList();
+            fecharModal('registerModal');
+            alert("Câmera " + n + " registrada com sucesso!");
+        }
+
+        function abrirObs(serial, num) {
+            currentSerial = serial;
+            document.getElementById("modalTitle").innerText = `Câmera Nº ${num} (Serial: ${serial})`;
+            document.getElementById("obsInput").value = localStorage.getItem('obs_' + serial) || "";
+            document.getElementById("obsModal").style.display = "block";
+            document.getElementById("obsInput").focus();
+        }
+
+        function salvarObs() {
+            if(!currentSerial) return;
+            
+            const textoInput = document.getElementById("obsInput").value.trim();
+            const textoSalvo = localStorage.getItem('obs_' + currentSerial) || "";
+            const num = getNumBySerial(currentSerial);
+
+            if (textoInput !== textoSalvo) {
+                if(textoInput) {
+                    localStorage.setItem('obs_' + currentSerial, textoInput);
+                    registrarNaPlanilha("Observação", currentSerial, num, "Nova Avaria/Obs relatada: " + textoInput);
+                } else {
+                    localStorage.removeItem('obs_' + currentSerial);
+                    registrarNaPlanilha("Observação", currentSerial, num, "Avaria/Obs foi limpa/resolvida.");
+                }
+            }
+            
+            fecharModal('obsModal');
+            renderList(); 
+        }
+
+        function limparObs() {
+            document.getElementById("obsInput").value = "";
+            salvarObs();
+        }
+
+        function fecharModal(modalId) { document.getElementById(modalId).style.display = "none"; }
+
+        // Inicialização
+        window.addEventListener('load', function() {
+            carregarListaPoliciais();
+            renderList();
+        });
+    </script>
+</body>
+</html>

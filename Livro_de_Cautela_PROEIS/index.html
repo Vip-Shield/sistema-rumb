@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Livro de Cautela PROEIS - RUMB</title>
+    <link rel="shortcut icon" type="imagex/png" href="../IMAGENS/caveira.ico">
+
+<style>
+  /* ESTILO GERAL */
+  body { 
+    font-family: 'Segoe UI', Arial, sans-serif; 
+    background: #001f3f; 
+    color: #fff; 
+    padding: 20px; 
+    padding-top: 130px; 
+    font-size: 11px; 
+  }
+  
+  /* CABEÇALHO FIXO */
+  .header { 
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    background: #001f3f; 
+    z-index: 1000; 
+    box-sizing: border-box; 
+    padding: 10px 20px;
+    display: grid; 
+    grid-template-columns: 70px 1fr 70px; 
+    align-items: center; 
+    border-bottom: 3px solid #0074D9; 
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+  }
+
+  .titulo h1 { text-align: center; font-size: 20px; margin: 0; color: #f0f0f0; text-transform: uppercase; letter-spacing: 1px; }
+  .titulo p { text-align: center; margin: 5px 0; color: #39CCCC; font-weight: bold; }
+
+  /* FORMULÁRIO */
+  .form-container { background: #001226; padding: 20px; border-radius: 8px; border: 1px solid #0074D9; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+  
+  .bloco-titulo { 
+    background: linear-gradient(90deg, #003366, #001f3f); 
+    color: #fff; 
+    padding: 6px; 
+    font-weight: bold; 
+    text-align: center; 
+    margin: 15px 0 10px 0; 
+    border-left: 5px solid #39CCCC;
+    text-transform: uppercase; 
+    font-size: 12px;
+  }
+
+  .grid-campos { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; }
+  .campo-grupo { display: flex; flex-direction: column; }
+  
+  label { font-size: 10px; margin-bottom: 4px; color: #7FDBFF; font-weight: bold; }
+  input, select { padding: 8px; border-radius: 4px; border: 1px solid #004080; background: #001830; color: #fff; font-size: 12px; }
+  input:focus { border-color: #39CCCC; outline: none; }
+  
+  input[readonly], input.auto-filled { background: #002a50; color: #7FDBFF; }
+
+  /* BOTÕES */
+  .btn-area { margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap; }
+  button { padding: 10px 20px; cursor: pointer; font-weight: bold; border-radius: 4px; border: none; text-transform: uppercase; font-size: 11px; color: white;}
+  .btn-salvar { background: #0074D9; color: #fff; } .btn-salvar:hover { background: #0056a3; }
+  .btn-print { background: #415a77; } .btn-print:hover { background: #2c3e50; }
+  .btn-backup { background: #059669; } .btn-restore { background: #dc2626; }
+  .btn-filter { background: #b8860b; color: black; }
+  
+  /* NOVAS CLASSES PARA O ALERTA DE 60H */
+  .btn-alert { background: #b91c1c; color: white; border: 1px solid #ffcccc;} 
+  .btn-alert:hover { background: #991b1b; }
+  .linha-atrasada td { background-color: #ffebee !important; color: #c62828 !important; font-weight: bold; }
+
+  /* BARRA DE PESQUISA E CONTADOR */
+  .search-container { margin-top: 20px; margin-bottom: 10px; display: flex; flex-direction: column; gap: 8px; }
+  
+  /* BUSCA COM TIPO SEARCH (ADICIONA O X PARA APAGAR RÁPIDO) */
+  #inputBusca { width: 100%; padding: 10px; background: #001226; border: 1px solid #39CCCC; color: white; border-radius: 5px; font-weight: bold; box-sizing: border-box;}
+  #inputBusca::placeholder { color: #7FDBFF; }
+  /* ESTILO PARA O "X" NO WEBKIT (CHROME, EDGE, SAFARI) */
+  #inputBusca::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; height: 12px; width: 12px; background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%2339CCCC"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>') no-repeat center center; background-size: contain; cursor: pointer;}
+
+  
+  .contador-box { align-self: flex-start; background: #b8860b; color: #000; padding: 6px 12px; border-radius: 4px; font-weight: bold; font-size: 12px; box-shadow: 0 0 8px rgba(184, 134, 11, 0.5); }
+
+  /* TABELA */
+  table { width: 100%; border-collapse: collapse; margin-top: 5px; background: white; color: black; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+  th, td { border: 1px solid #ccc; padding: 6px; text-align: center; font-size: 10px; }
+  th { background: #001f3f; color: white; text-transform: uppercase; letter-spacing: 0.5px; }
+  .col-rumb { background-color: #e0f7fa; font-weight: bold; color: #006064; }
+  .col-pag { color: #d35400; font-weight: bold; }
+  tr:nth-child(even) { background: #f0f8ff; }
+  
+  .btn-baixa { background: #15803d; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 10px; margin-bottom:4px;}
+  .btn-baixa:hover { background: #166534; }
+  
+  .btn-renovar { background: #3b82f6; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 10px; font-weight: bold; margin-bottom: 4px;}
+  .btn-renovar:hover { background: #2563eb; }
+
+  .btn-aviso { background: #eab308; color: black; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 10px; font-weight:bold; margin-bottom: 4px;}
+  
+  .btn-whats { background: #25D366; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 10px; margin-left: 2px; font-weight: bold; margin-bottom: 4px;}
+  .btn-whats:hover { background: #128C7E; }
+
+  .btn-editar { background: #f59e0b; color: white; border: none; padding: 4px 6px; border-radius: 3px; cursor: pointer; font-size: 10px; margin-left: 2px; font-weight: bold;}
+  .btn-excluir { background: #ef4444; color: white; border: none; padding: 4px 6px; border-radius: 3px; cursor: pointer; font-size: 10px; margin-left: 2px; font-weight: bold;}
+  
+  @media print {
+    .form-container, .btn-area, .search-container, .no-print, .btn-whats, .btn-baixa, .btn-editar, .btn-excluir, .btn-aviso, .btn-renovar { display: none; }
+    body { background: white; color: black; padding: 0; }
+    .header { position: relative; border-bottom: 1px solid #000; }
+    th { background: #ddd !important; color: black; border: 1px solid #000; }
+    td { border: 1px solid #000; }
+    table { font-size: 9px; } th, td { padding: 2px; }
+  }
+
+  /* MODAL DE NOTIFICAÇÃO */
+  #modalNotificacao {
+    display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    background: #001226; padding: 20px; border: 2px solid #39CCCC; border-radius: 8px;
+    z-index: 2000; width: 450px; box-shadow: 0 0 15px rgba(0,0,0,0.8);
+  }
+  #modalOverlay {
+    display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.7); z-index: 1999;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <a href="../dashboard.html"><img src="caveira.png" width="60" alt="RUMB" onerror="this.style.display='none'" title="Voltar ao Painel"></a> 
+  <div class="titulo">
+    <h1>Polícia Militar do Estado do Rio de Janeiro</h1>
+    <p>LIVRO DE CAUTELA PROEIS – RUMB (UPP TABAJARAS)</p>
+  </div>
+  <img src="pmerj.png" width="60" alt="PMERJ" onerror="this.style.display='none'">
+</div>
+
+<div class="form-container no-print">
+  <form id="formCautela">
+    <div class="bloco-titulo">1. IDENTIFICAÇÃO DO POLICIAL (PROEIS)</div>
+    <div class="grid-campos">
+      <div class="campo-grupo">
+        <label>RG (Digite para buscar)</label>
+        <input type="text" id="rg" list="lista-rgs" required placeholder="00.000" autocomplete="off">
+        <datalist id="lista-rgs"></datalist>
+      </div>
+
+      <div class="campo-grupo" style="flex-grow: 2;">
+        <label>NOME DE GUERRA</label>
+        <input type="text" id="nome" list="lista-nomes" required placeholder="Nome do Policial" autocomplete="off">
+        <datalist id="lista-nomes"></datalist>
+      </div>
+
+      <div class="campo-grupo">
+        <label>GH</label>
+        <input type="text" id="gh" required placeholder="Ex: SD" class="auto-filled">
+      </div>
+    </div>
+
+    <div class="bloco-titulo">2. ARMAMENTO E EQUIPAMENTO</div>
+    <div class="grid-campos">
+      
+      <div class="campo-grupo">
+        <label>Nº DA ARMA OU COLETE</label>
+        <input type="text" id="arma" list="lista-armas" required autocomplete="off" placeholder="Digite o Nº">
+        <datalist id="lista-armas"></datalist>
+      </div>
+      
+      <div class="campo-grupo"><label>MODELO</label><input type="text" id="modelo" required></div>
+      <div class="campo-grupo"><label>QTD. MUNIÇÕES</label><input type="number" id="mun" required style="width:80px"></div>
+      <div class="campo-grupo"><label>QTD. CARREGADORES</label><input type="number" id="car" required style="width:80px"></div>
+    </div>
+
+    <div class="bloco-titulo">3. CONTROLE DE CAUTELA (RUMB)</div>
+    <div class="grid-campos">
+      <div class="campo-grupo"><label>DATA DA ATIVIDADE</label><input type="date" id="dataAt" required></div>
+      <div class="campo-grupo"><label>DATA DA CAUTELA</label><input type="date" id="dataC" required></div>
+      <div class="campo-grupo"><label>HORA DA CAUTELA</label><input type="time" id="horaC" required></div>
+      <div class="campo-grupo"><label>OBS...</label><input type="text" id="paginaLivro" placeholder="Observações..."></div>
+      <div class="campo-grupo" style="flex-grow: 2;"><label style="color: #39CCCC;">RUMB (QUARTILHEIRO)</label><input type="text" id="rumb" required placeholder="Quem está entregando a arma..."></div>
+    </div>
+
+    <div class="btn-area">
+      <button type="submit" class="btn-salvar" id="btnSalvar">📝 REGISTRAR CAUTELA</button>
+      <button type="button" class="btn-filter" onclick="mostrarAbertas()">🔴 VER APENAS ABERTAS</button>
+      <button type="button" class="btn-filter" onclick="render()">📘 VER TODAS</button>
+      <button type="button" class="btn-alert" onclick="alertaAtrasos(true)">🚨 VERIFICAR ATRASOS (60H)</button>
+      <button type="button" class="btn-print" onclick="window.print()">🖨️ IMPRIMIR</button>
+      <button type="button" class="btn-backup" onclick="exportarBackup()">💾 SALVAR BACKUP</button>
+      <input type="file" id="fileBackup" style="display:none" onchange="importarBackup(this)">
+      <button type="button" class="btn-restore" onclick="document.getElementById('fileBackup').click()">📂 IMPORTAR</button>
+    </div>
+  </form>
+</div>
+
+<div class="search-container no-print">
+  <div class="contador-box" id="contadorAbertas">🚨 CAUTELAS EM ABERTO: 0</div>
+  <input type="search" id="inputBusca" placeholder="🔍 BUSCAR REGISTRO (Digite RG, Nome, Arma, Obs..., Data ou RUMB...)" onkeyup="filtrarTabela()">
+</div>
+
+<table id="tabela">
+  <thead>
+    <tr>
+      <th colspan="3" style="background:#001f3f">IDENTIFICAÇÃO</th>
+      <th colspan="4">ARMAMENTO</th>
+      <th colspan="5" style="background:#0074D9">CAUTELA (SAÍDA)</th> <th colspan="4" style="background:#15803d; color:white">DEVOLUÇÃO (BAIXA)</th>
+    </tr>
+    <tr>
+      <th>GH</th><th>RG</th><th>NOME</th>
+      <th>ARMA/COLETE</th><th>MODELO</th><th>MUN.</th><th>CAR.</th>
+      <th>DATA ATIV.</th><th>DATA CAUT.</th><th>HORA</th><th>OBS...</th><th>RUMB</th> <th>DT. ENT.</th><th>HR. ENT.</th><th>RUMB ENTREGA</th><th>AÇÃO</th>
+    </tr>
+  </thead>
+  <tbody id="tabelaCorpo"></tbody>
+</table>
+
+<div id="modalOverlay" onclick="fecharModal()"></div>
+
+<div id="modalNotificacao">
+  <h3 style="color:#39CCCC; margin-top:0; border-bottom:1px solid #004080; padding-bottom:5px; text-transform:uppercase;">⚠️ Gerar Aviso de Pendência</h3>
+  
+  <label style="color:#7FDBFF; font-weight:bold; font-size:11px;">MENSAGEM GERADA:</label>
+  <textarea id="textoAviso" rows="9" style="width:100%; box-sizing:border-box; background:#001830; color:#fff; border:1px solid #004080; border-radius:4px; padding:10px; font-size:12px; margin-top:5px; margin-bottom:15px; resize:none;"></textarea>
+  
+  <div style="display:flex; gap:10px; justify-content:flex-end;">
+    <button onclick="fecharModal()" style="background:#dc2626; padding:8px 15px; color:white; border:none; border-radius:3px; cursor:pointer; font-weight:bold;">CANCELAR</button>
+    <button onclick="copiarAviso()" style="background:#415a77; padding:8px 15px; color:white; border:none; border-radius:3px; cursor:pointer; font-weight:bold;">📋 COPIAR</button>
+    <button onclick="enviarAvisoZap()" style="background:#25D366; padding:8px 15px; color:white; border:none; border-radius:3px; cursor:pointer; font-weight:bold;">📱 ENVIAR PRO ZAP</button>
+  </div>
+</div>
+
+<script>
+// --- BANCO DE DADOS DO EFETIVO COM TELEFONES ---
+const databaseEfetivo = [
+  { gh: "SUB PM", rg: "68831", nome: "GOMES" },
+  { gh: "CB PM", rg: "101823", nome: "S. LEMOS", telefone: "21969408254" },
+  { gh: "SD PM", rg: "110297", nome: "L. BARBOSA", telefone: "21991869919" },
+  { gh: "CB PM", rg: "106260", nome: "BAPTISTA", telefone: "21987347572" },
+  { gh: "3º SGT PM", rg: "91071", nome: "DIAS", telefone: "21970085762" },
+  { gh: "CB PM", rg: "108786", nome: "TORRES", telefone: "21982572969" },
+  { gh: "3º SGT PM", rg: "99488", nome: "DE PAULA", telefone: "24998426337" },
+  { gh: "3º SGT PM", rg: "91665", nome: "R. ALCANTARA", telefone: "21965040543" },
+  { gh: "3º SGT PM", rg: "100032", nome: "R. LACERDA", telefone: "21970297523" },
+  { gh: "1º SGT PM", rg: "77614", nome: "ALZIR", telefone: "21972711724" },
+  { gh: "SUBTEN PM", rg: "66381", nome: "J. MARCELO", telefone: "21964518575" },
+  { gh: "3º SGT PM", rg: "94010", nome: "R. SIMÕES", telefone: "21982539175" },
+  { gh: "3º SGT PM", rg: "97196", nome: "DAN", telefone: "21964827877" },
+  { gh: "CB PM", rg: "106561", nome: "MARCOS", telefone: "21999954971" },
+  { gh: "3º SGT PM", rg: "99242", nome: "ADRIEL", telefone: "21974085368" },
+  { gh: "CB PM", rg: "105249", nome: "R. FILHO", telefone: "21970072545" },
+  { gh: "CB PM", rg: "102712", nome: "JOAQUIM", telefone: "21964721739" },
+  { gh: "3º SGT PM", rg: "100360", nome: "ULISSES", telefone: "21987387179" },
+  { gh: "CB PM", rg: "105375", nome: "RANGEL", telefone: "21990454574" },
+  { gh: "CB PM", rg: "104282", nome: "SILVA" }, 
+  { gh: "CB PM", rg: "102181", nome: "JUNIOR", telefone: "21965845525" },
+  { gh: "CB PM", rg: "106533", nome: "CORTEZ", telefone: "21997773565" },
+  { gh: "3º SGT PM", rg: "98121", nome: "JOHNATHAN", telefone: "21964675646" },
+  { gh: "3º SGT PM", rg: "96990", nome: "CLEISON", telefone: "24998599248" },
+  { gh: "CB PM", rg: "104197", nome: "DA SILVA", telefone: "21979454227" },
+  { gh: "3º SGT PM", rg: "98408", nome: "NASCIMENTO", telefone: "21975524819" },
+  { gh: "3º SGT PM", rg: "93752", nome: "CARDOSO", telefone: "21960173981" },
+  { gh: "2º SGT PM", rg: "85458", nome: "SANTOS", telefone: "21969555411" },
+  { gh: "CB PM", rg: "107510", nome: "DA SILVA", telefone: "21973797765" },
+  { gh: "SD PM", rg: "110796", nome: "ERICA", telefone: "21976699905" },
+  { gh: "2º SGT PM", rg: "83708", nome: "A. MENDES", telefone: "21970777378" },
+  { gh: "3º SGT PM", rg: "98607", nome: "SOUZA", telefone: "21987222220" },
+  { gh: "CB PM", rg: "102704", nome: "J. ANDRÉ", telefone: "21973708392" },
+  { gh: "CB PM", rg: "106351", nome: "M. ARAUJO", telefone: "21982766602" },
+  { gh: "CB PM", rg: "103727", nome: "BIZONI", telefone: "21967098524" },
+  { gh: "3º SGT PM", rg: "93998", nome: "F. PERES", telefone: "21964544296" },
+  { gh: "3º SGT PM", rg: "95837", nome: "LACERDA" }, 
+  { gh: "CB PM", rg: "107520", nome: "T. RODRIGUES", telefone: "21984798140" },
+  { gh: "CB PM", rg: "107561", nome: "COUTINHO", telefone: "21975708723" },
+  { gh: "CB PM", rg: "108292", nome: "JULIANO", telefone: "21983673231" },
+  { gh: "SD PM", rg: "110387", nome: "JOSUÉ", telefone: "22998867687" },
+  { gh: "CB PM", rg: "108824", nome: "CARMO", telefone: "21996901647" },
+  { gh: "CB PM", rg: "107805", nome: "M. PAULO", telefone: "21976058456" },
+  { gh: "3º SGT PM", rg: "98339", nome: "SOUZA", telefone: "21996380102" },
+  { gh: "3º SGT PM", rg: "95629", nome: "FULLY", telefone: "21972738628" },
+  { gh: "CB PM", rg: "104953", nome: "PINHEIRO", telefone: "21993471036" },
+  { gh: "CB PM", rg: "103051", nome: "TIRADENTES", telefone: "22997162034" },
+  { gh: "CB PM", rg: "104291", nome: "FELIX", telefone: "21964649977" },
+  { gh: "2º SGT PM", rg: "86615", nome: "ISAIAS", telefone: "21966095717" },
+  { gh: "1º SGT PM", rg: "73888", nome: "COIMBRA", telefone: "21964106784" },
+  { gh: "3º SGT PM", rg: "93331", nome: "FERREIRA", telefone: "21964317876" },
+  { gh: "3º SGT PM", rg: "98596", nome: "VIDAL", telefone: "21995201781" },
+  { gh: "CB PM", rg: "108190", nome: "UERBERT", telefone: "24998521847" },
+  { gh: "CB PM", rg: "102190", nome: "D. SILVA", telefone: "32988415933" },
+  { gh: "SD PM", rg: "110594", nome: "JULIANA FERREIRA", telefone: "21970082257" },
+  { gh: "SUBTEN PM", rg: "65727", nome: "SANTANA", telefone: "21964523812" },
+  { gh: "CB PM", rg: "105341", nome: "AZEVEDO", telefone: "21987051213" },
+  { gh: "3º SGT PM", rg: "100228", nome: "MIRANDA", telefone: "21970129054" },
+  { gh: "3º SGT PM", rg: "99791", nome: "ALMEIDA", telefone: "21964023724" },
+  { gh: "CB PM", rg: "105284", nome: "LEONARDO", telefone: "24993289247" },
+  { gh: "CB PM", rg: "109067", nome: "CAMILO", telefone: "24988150463" },
+  { gh: "CB PM", rg: "106467", nome: "L. SILVA", telefone: "24992337100" },
+  { gh: "SD PM", rg: "109738", nome: "MARIANO", telefone: "21976083720" },
+  { gh: "CB PM", rg: "105248", nome: "DE SOUZA", telefone: "21987958625" },
+  { gh: "3º SGT PM", rg: "93168", nome: "F. ABREU", telefone: "21981867018" },
+  { gh: "CB PM", rg: "109109", nome: "RODRIGUES", telefone: "21983634551" },
+  { gh: "SD PM", rg: "110470", nome: "TELES", telefone: "21977287457" },
+  { gh: "CB PM", rg: "108677", nome: "ÉDVAN", telefone: "21974753248" },
+  { gh: "3º SGT PM", rg: "91049", nome: "JHONATHAN" },
+  { gh: "2º SGT PM", rg: "86367", nome: "REGALDINO" },
+  { gh: "2º SGT PM", rg: "85426", nome: "BRITO" },
+  { gh: "3º SGT PM", rg: "93606", nome: "A. ALCANTARA" },
+  { gh: "CB PM", rg: "109510", nome: "MAGANO" },
+  { gh: "CB PM", rg: "109414", nome: "BIANCHI", telefone: "21988766548" },
+  { gh: "SD PM", rg: "109754", nome: "CAMELO" },
+  { gh: "SUBTEN PM", rg: "70372", nome: "MENDES" },
+  { gh: "SD PM", rg: "110433", nome: "D. SANTOS" },
+  { gh: "3º SGT PM", rg: "95714", nome: "MALAQUIAS" },
+  { gh: "SUBTEN PM", rg: "76452", nome: "WAGNER" },
+  { gh: "3º SGT PM", rg: "93081", nome: "GUEDES" },
+  { gh: "3º SGT PM", rg: "92119", nome: "CAIO" },
+  { gh: "3º SGT PM", rg: "100000", nome: "ALACRINO" },
+  { gh: "3º SGT PM", rg: "99164", nome: "R. MACHADO" },
+  { gh: "3º SGT PM", rg: "91783", nome: "CHARLES" },
+  { gh: "CB PM", rg: "106348", nome: "SOARES" },
+  { gh: "3º SGT PM", rg: "92732", nome: "MARCIO ESTEVÃO" },
+  { gh: "CB PM", rg: "105377", nome: "F. RIBEIRO" },
+  { gh: "SD PM", rg: "108664", nome: "SOUSA SILVA" },
+  { gh: "CB PM", rg: "105374", nome: "LAIA" },
+  { gh: "3º SGT PM", rg: "92490", nome: "VALIM" },
+  { gh: "CB PM", rg: "106650", nome: "MATHEUS" },
+  { gh: "3º SGT PM", rg: "96287", nome: "RODRIGUES" },
+  { gh: "2º SGT PM", rg: "85664", nome: "DENILSON" },
+  { gh: "3º SGT PM", rg: "92258", nome: "DOMINGOS" },
+  { gh: "3º SGT PM", rg: "93341", nome: "L. FRANCISCO", telefone: "21965216019" },
+  { gh: "SD PM", rg: "109908", nome: "TRIUMPHO" },
+  { gh: "3º SGT PM", rg: "91131", nome: "CONDE" },
+  { gh: "CB PM", rg: "101752", nome: "TRINDADE" },
+  { gh: "3º SGT PM", rg: "91115", nome: "ITALO" },
+  { gh: "3º SGT PM", rg: "96003", nome: "JONATHA" },
+  { gh: "CB PM", rg: "105391", nome: "HENRIQUE" },
+  { gh: "CB PM", rg: "106037", nome: "CAIQUE" },
+  { gh: "3º SGT PM", rg: "98202", nome: "CRISTIANO" },
+  { gh: "3º SGT PM", rg: "99226", nome: "M. JUNIOR" },
+  { gh: "3º SGT PM", rg: "96541", nome: "SILVEIRA" },
+  { gh: "2º SGT PM", rg: "85995", nome: "VINICIUS" },
+  { gh: "SUBTEN PM", rg: "68832", nome: "PAULO CÉSAR" },
+  { gh: "3º SGT PM", rg: "99199", nome: "CARDOSO", telefone: "21968072899" },
+  { gh: "2º SGT PM", rg: "84891", nome: "LISBOA", telefone: "21970135467" },
+  { gh: "3º SGT PM", rg: "101235", nome: "XIMENES", telefone: "21983232636" },
+  { gh: "SD PM", rg: "110134", nome: "LIMA", telefone: "21970336379" },
+  { gh: "SUBTEN PM", rg: "70428", nome: "SIRLEY", telefone: "21964776159" },
+  { gh: "3º SGT PM", rg: "92156", nome: "GRANJA", telefone: "21975935737" },
+  { gh: "3º SGT PM", rg: "96396", nome: "ANA CAROLINA", telefone: "21970243046" },
+  { gh: "3º SGT PM", rg: "90431", nome: "GELSON", telefone: "21971775779" },
+  { gh: "3º SGT PM", rg: "103353", nome: "CHELQUE", telefone: "21964121798" }
+];
+
+function initAutocomplete() {
+  const dlRg = document.getElementById('lista-rgs');
+  const dlNome = document.getElementById('lista-nomes');
+  databaseEfetivo.forEach(p => {
+    const optR = document.createElement('option');
+    optR.value = p.rg;
+    optR.label = `${p.nome} (${p.gh})`;
+    dlRg.appendChild(optR);
+
+    const optN = document.createElement('option');
+    optN.value = p.nome;
+    optN.label = `${p.gh} - RG: ${p.rg}`;
+    dlNome.appendChild(optN);
+  });
+}
+
+const inputRg = document.getElementById('rg');
+const inputNome = document.getElementById('nome');
+const inputGh = document.getElementById('gh');
+
+inputRg.addEventListener('input', function() {
+  const val = this.value;
+  const found = databaseEfetivo.find(p => p.rg === val);
+  if (found) { inputNome.value = found.nome; inputGh.value = found.gh; }
+});
+
+inputNome.addEventListener('input', function() {
+  const val = this.value;
+  const found = databaseEfetivo.find(p => p.nome === val);
+  if (found) { inputRg.value = found.rg; inputGh.value = found.gh; }
+});
+
+initAutocomplete();
+
+// --- BANCO DE DADOS DE ARMAS E COLETES ---
+const baseArmasEColetes = {
+  // Pistolas PT.100
+  "40740": "Pistola PT.100", "40949": "Pistola PT.100", "41872": "Pistola PT.100", "40743": "Pistola PT.100", "40745": "Pistola PT.100", "41869": "Pistola PT.100", "41876": "Pistola PT.100", "40744": "Pistola PT.100", "40956": "Pistola PT.100", "40748": "Pistola PT.100", "40747": "Pistola PT.100", "40952": "Pistola PT.100", "40594": "Pistola PT.100", "40598": "Pistola PT.100", "40746": "Pistola PT.100", "40742": "Pistola PT.100", "40741": "Pistola PT.100", "40739": "Pistola PT.100", "40957": "Pistola PT.100", "41878": "Pistola PT.100", "40954": "Pistola PT.100",
+  
+  // Pistolas IMBEL
+  "28715": "Pistola IMBEL", "28739": "Pistola IMBEL", "28732": "Pistola IMBEL", "28734": "Pistola IMBEL", "28723": "Pistola IMBEL", "28706": "Pistola IMBEL", "16717": "Pistola IMBEL", "28747": "Pistola IMBEL", "28729": "Pistola IMBEL", "28722": "Pistola IMBEL",
+  
+  // Coletes Balístico (Tamanho M)
+  "351364": "Colete Balístico (M)", "351365": "Colete Balístico (M)", "351033": "Colete Balístico (M)", "351032": "Colete Balístico (M)", "351362": "Colete Balístico (M)", "351363": "Colete Balístico (M)", "351044": "Colete Balístico (M)", "351045": "Colete Balístico (M)", "351354": "Colete Balístico (M)", "351355": "Colete Balístico (M)", "351462": "Colete Balístico (M)", "351463": "Colete Balístico (M)", "351492": "Colete Balístico (M)", "351493": "Colete Balístico (M)", "350926": "Colete Balístico (M)", "350927": "Colete Balístico (M)", "351460": "Colete Balístico (M)", "351461": "Colete Balístico (M)", "351458": "Colete Balístico (M)", "351459": "Colete Balístico (M)",
+  
+  // Coletes Balístico (Tamanho G)
+  "2763625": "Colete Balístico (G)", "2763626": "Colete Balístico (G)", "2763605": "Colete Balístico (G)", "2763606": "Colete Balístico (G)", "2763663": "Colete Balístico (G)", "2763664": "Colete Balístico (G)", "2763641": "Colete Balístico (G)", "276342": "Colete Balístico (G)", "2763235": "Colete Balístico (G)", "2763236": "Colete Balístico (G)", "2763379": "Colete Balístico (G)", "2763308": "Colete Balístico (G)", "2763631": "Colete Balístico (G)", "2763632": "Colete Balístico (G)", "2763309": "Colete Balístico (G)", "2764285": "Colete Balístico (G)", "2764286": "Colete Balístico (G)", "2764414": "Colete Balístico (G)", "2764415": "Colete Balístico (G)", "2764416": "Colete Balístico (G)",
+  
+  // Coletes Balístico (Tamanho GG)
+  "2765915": "Colete Balístico (GG)", "2765916": "Colete Balístico (GG)", "2765941": "Colete Balístico (GG)", "2765942": "Colete Balístico (GG)", "2765897": "Colete Balístico (GG)", "2765898": "Colete Balístico (GG)", "2765895": "Colete Balístico (GG)", "2765985": "Colete Balístico (GG)", "2765896": "Colete Balístico (GG)", "2765986": "Colete Balístico (GG)", "2766031": "Colete Balístico (GG)", "2766032": "Colete Balístico (GG)", "2765919": "Colete Balístico (GG)", "2765920": "Colete Balístico (GG)", "2765929": "Colete Balístico (GG)", "2765930": "Colete Balístico (GG)", "2765955": "Colete Balístico (GG)", "2765956": "Colete Balístico (GG)", "2767312": "Colete Balístico (GG)", "2767313": "Colete Balístico (GG)", "2767320": "Colete Balístico (GG)", "2767321": "Colete Balístico (GG)", "2766990": "Colete Balístico (GG)", "2766991": "Colete Balístico (GG)", "2767262": "Colete Balístico (GG)", "2767263": "Colete Balístico (GG)", "2767258": "Colete Balístico (GG)", "2767259": "Colete Balístico (GG)", "2767272": "Colete Balístico (GG)", "2767273": "Colete Balístico (GG)", "2766693": "Colete Balístico (GG)", "2766694": "Colete Balístico (GG)", "2767930": "Colete Balístico (GG)", "2767931": "Colete Balístico (GG)", "2768102": "Colete Balístico (GG)", "2768103": "Colete Balístico (GG)", "2768316": "Colete Balístico (GG)"
+};
+
+// Função para iniciar o autocomplete de armas
+function initAutocompleteArmas() {
+  const inputArma = document.getElementById('arma');
+  const inputModelo = document.getElementById('modelo');
+  const dlArmas = document.getElementById('lista-armas');
+
+  // Preenche a datalist com os números
+  Object.keys(baseArmasEColetes).forEach(num => {
+    const opt = document.createElement('option');
+    opt.value = num;
+    opt.label = baseArmasEColetes[num];
+    dlArmas.appendChild(opt);
+  });
+
+  // Listener para preencher automaticamente o campo "MODELO" e permitir escrita manual
+  inputArma.addEventListener('input', function() {
+    const numeroDigitado = this.value.trim();
+    if (baseArmasEColetes[numeroDigitado]) {
+      inputModelo.value = baseArmasEColetes[numeroDigitado];
+    }
+  });
+}
+
+// Chamar a função de inicialização
+initAutocompleteArmas();
+
+// --- ESCALA RUMB (24x72 horas) ---
+const escalaRumb24x72 = [
+    { posto: "2º SGT PM", rg: "85446", nome: "SEKIGUCHI" },  // Dia 0: 18/07/2026
+    { posto: "2º SGT PM", rg: "85538", nome: "GEORGE" },     // Dia 1: 19/07/2026
+    { posto: "3º SGT PM", rg: "94010", nome: "R. SIMÕES" },  // Dia 2: 20/07/2026
+    { posto: "2º SGT PM", rg: "", nome: "BRUNO LIMA" }       // Dia 3: 21/07/2026
+];
+
+// Data Âncora (Início do Ciclo): 18 de Julho de 2026 às 05:00 da manhã
+const dataAncoraRumb = new Date(2026, 6, 18, 5, 0, 0, 0); 
+
+// --- LÓGICA DE ATUALIZAÇÃO AUTOMÁTICA DO RUMB ---
+function atualizarRumbAutomatico() {
+    const inputData = document.getElementById('dataC').value;
+    const inputHora = document.getElementById('horaC').value;
+    if (!inputData) return;
+
+    const partesData = inputData.split('-');
+    const dataSelecionada = new Date(partesData[0], partesData[1] - 1, partesData[2]);
+    
+    // Captura a hora preenchida ou assume 00:00 se estiver vazio
+    if (inputHora) {
+        const partesHora = inputHora.split(':');
+        dataSelecionada.setHours(partesHora[0], partesHora[1], 0, 0);
+    } else {
+        dataSelecionada.setHours(0,0,0,0);
+    }
+
+    const diffTempo = dataSelecionada.getTime() - dataAncoraRumb.getTime();
+    
+    // Calcula a diferença em dias considerando o horário (24h)
+    const diffDias = Math.floor(diffTempo / (1000 * 3600 * 24));
+
+    let indiceTurno = diffDias % 4;
+    if (indiceTurno < 0) indiceTurno += 4;
+
+    document.getElementById('rumb').value = escalaRumb24x72[indiceTurno].nome;
+}
+
+const form = document.getElementById("formCautela");
+const tabela = document.querySelector("#tabelaCorpo");
+let dados = JSON.parse(localStorage.getItem("livroCautela_PROEIS")) || [];
+let indexEmEdicao = -1;
+
+form.onsubmit = e => {
+  e.preventDefault();
+  const novo = {
+    gh: document.getElementById('gh').value.toUpperCase(),
+    rg: document.getElementById('rg').value,
+    nome: document.getElementById('nome').value.toUpperCase(),
+    arma: document.getElementById('arma').value.toUpperCase(),
+    modelo: document.getElementById('modelo').value.toUpperCase(),
+    mun: document.getElementById('mun').value,
+    car: document.getElementById('car').value,
+    dataAt: document.getElementById('dataAt').value, 
+    dataC: document.getElementById('dataC').value,
+    horaC: document.getElementById('horaC').value,
+    paginaLivro: document.getElementById('paginaLivro').value,
+    rumb: document.getElementById('rumb').value.toUpperCase(),
+    status: "Cautelado"
+  };
+
+  if (indexEmEdicao >= 0) {
+      const registroAntigo = dados[indexEmEdicao];
+      
+      novo.status = registroAntigo.status;
+      novo.dataE = registroAntigo.dataE;
+      novo.horaE = registroAntigo.horaE;
+      novo.rumbEntrega = registroAntigo.rumbEntrega;
+      
+      // LOGÍCA DE PRORROGAÇÃO: Se a data ou hora da cautela for alterada na edição, salva o registro antigo na OBS
+      if(registroAntigo.dataC !== novo.dataC || registroAntigo.horaC !== novo.horaC) {
+          const dataFormatada = (registroAntigo.dataC && registroAntigo.dataC.includes('-')) 
+              ? registroAntigo.dataC.split('-').reverse().join('/') 
+              : registroAntigo.dataC;
+              
+          const historico = `[Orig: ${dataFormatada} às ${registroAntigo.horaC}] `;
+          if (!novo.paginaLivro.includes("Orig:")) {
+              novo.paginaLivro = historico + novo.paginaLivro;
+          }
+      }
+      
+      dados[indexEmEdicao] = novo;
+      indexEmEdicao = -1;
+      
+      const btnSubmit = document.getElementById('btnSalvar');
+      btnSubmit.innerHTML = '📝 REGISTRAR CAUTELA';
+      btnSubmit.style.background = '#0074D9';
+  } else {
+      const existeAberta = dados.some(d => d.rg === novo.rg && d.status === "Cautelado");
+      if (existeAberta) { 
+          // PERMITE MÚLTIPLOS REGISTROS SE O USUÁRIO CONFIRMAR
+          const desejaRegistrar = confirm(`ATENÇÃO: O(a) ${novo.gh} ${novo.nome} já possui uma cautela em aberto.\n\nDeseja registrar um novo horário/equipamento para este policial? (Múltiplas cautelas)`);
+          if (!desejaRegistrar) return; 
+      }
+      dados.push(novo);
+  }
+  
+  salvar();
+  render();
+  form.reset();
+
+  // Reseta Data, Hora e RUMB para "Agora" após salvar
+  document.getElementById('dataAt').valueAsDate = new Date();
+  document.getElementById('dataC').valueAsDate = new Date();
+  document.getElementById('horaC').value = new Date().toLocaleTimeString('pt-BR').slice(0,5);
+  atualizarRumbAutomatico();
+
+  document.getElementById('rg').focus();
+};
+
+function excluirRegistro(index) {
+    if(confirm("⚠️ Tem certeza que deseja EXCLUIR definitivamente este registro do livro?")) {
+      dados.splice(index, 1);
+      salvar();
+      render();
+    }
+}
+
+function editarRegistro(index) {
+    const r = dados[index];
+    
+    document.getElementById('gh').value = r.gh || '';
+    document.getElementById('rg').value = r.rg || '';
+    document.getElementById('nome').value = r.nome || '';
+    document.getElementById('arma').value = r.arma || '';
+    document.getElementById('modelo').value = r.modelo || '';
+    document.getElementById('mun').value = r.mun || '';
+    document.getElementById('car').value = r.car || '';
+    document.getElementById('dataAt').value = r.dataAt || '';
+    document.getElementById('dataC').value = r.dataC || '';
+    document.getElementById('horaC').value = r.horaC || '';
+    document.getElementById('paginaLivro').value = r.paginaLivro || '';
+    document.getElementById('rumb').value = r.rumb || '';
+
+    indexEmEdicao = index;
+    
+    const btnSubmit = document.getElementById('btnSalvar');
+    btnSubmit.innerHTML = '🔄 ATUALIZAR REGISTRO';
+    btnSubmit.style.background = '#f59e0b';
+    
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function entregar(index) {
+  let agora = new Date();
+
+  // 1. Solicita a Data
+  const dataCInput = prompt("Informe a data da baixa (DD/MM/AAAA) ou deixe em branco para assumir a data atual:");
+  if (dataCInput) {
+      const regexDataC = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+      if(regexDataC.test(dataCInput)){
+         const partes = dataCInput.split('/');
+         agora = new Date(partes[2], partes[1] - 1, partes[0], agora.getHours(), agora.getMinutes(), agora.getSeconds());
+      } else {
+          alert('Formato de data inválido. Assumindo a data atual.');
+      }
+  }
+
+  // 2. Solicita a Hora - O sistema já automatiza a hora da baixa aqui
+  const horaAtual = agora.toLocaleTimeString('pt-BR').slice(0,5);
+  const horaCInput = prompt("Horário da baixa (Deixe o horário abaixo para confirmar a hora atual ou digite outro no formato HH:MM):", horaAtual);
+  
+  if (horaCInput) {
+      const regexHora = /^(\d{2}):(\d{2})$/;
+      if(regexHora.test(horaCInput)){
+         const partesHora = horaCInput.split(':');
+         agora.setHours(partesHora[0], partesHora[1], 0);
+      } else {
+          alert('Formato de hora inválido. Assumindo a hora atual.');
+      }
+  }
+
+  // Lógica para achar quem está de serviço no momento do recebimento na escala 24x72
+  // Pega o momento exato da baixa (agora) já com a hora escolhida pelo usuário
+  const diffMs = agora.getTime() - dataAncoraRumb.getTime();
+  const diffDias = Math.floor(diffMs / (1000 * 3600 * 24));
+  let indiceTurnoBaixa = diffDias % 4;
+  if (indiceTurnoBaixa < 0) indiceTurnoBaixa += 4; 
+  
+  const sugestao = escalaRumb24x72[indiceTurnoBaixa].nome;
+
+  const nomeRumb = prompt(`Baixando em ${agora.toLocaleDateString('pt-BR')} às ${agora.toLocaleTimeString('pt-BR').slice(0,5)}.\n\nInforme o RUMB que está recebendo o material:`, sugestao);
+
+  if (nomeRumb === null || nomeRumb.trim() === "") {
+      alert("Baixa cancelada: É necessário informar quem recebeu o material.");
+      return;
+  }
+
+  dados[index].dataE = agora.toLocaleDateString('pt-BR');
+  dados[index].horaE = agora.toLocaleTimeString('pt-BR').slice(0,5);
+  dados[index].rumbEntrega = nomeRumb.toUpperCase();
+  dados[index].status = "Entregue";
+  
+  salvar();
+  render();
+}
+
+function renovarCautela(index) {
+  if(confirm("Tem certeza que deseja RENOVAR esta cautela e atualizar para a data e hora atuais?")) {
+      let agora = new Date();
+      let dataRenovacao = agora.toISOString().split('T')[0];
+      let horaRenovacao = agora.toLocaleTimeString('pt-BR').slice(0,5);
+      
+      const historico = `[Renovado em: ${agora.toLocaleDateString('pt-BR')} às ${horaRenovacao}] `;
+      let obsAnterior = dados[index].paginaLivro || "";
+      
+      if (!obsAnterior.includes(historico.trim())) {
+          dados[index].paginaLivro = historico + obsAnterior;
+      }
+      
+      dados[index].dataC = dataRenovacao;
+      dados[index].horaC = horaRenovacao;
+      
+      salvar();
+      render();
+      alert("Cautela renovada com sucesso! O prazo de 60 horas foi reiniciado.");
+  }
+}
+
+function salvar() { localStorage.setItem("livroCautela_PROEIS", JSON.stringify(dados)); }
+
+function filtrarTabela() {
+  const termo = document.getElementById('inputBusca').value.toUpperCase();
+  const linhas = document.querySelectorAll('#tabelaCorpo tr');
+  linhas.forEach(linha => {
+      const textoLinha = linha.innerText.toUpperCase();
+      if(textoLinha.includes(termo)) { linha.style.display = ''; } else { linha.style.display = 'none'; }
+  });
+}
+
+// --- SISTEMA DE ALERTA DE 60 HORAS ---
+function verificaAtraso60h(dataC, horaC) {
+  if (!dataC || !horaC) return false;
+  const dataCautela = new Date(`${dataC}T${horaC}`);
+  const agora = new Date();
+  const diferencaMs = agora - dataCautela;
+  const diferencaHoras = diferencaMs / (1000 * 60 * 60);
+  return diferencaHoras >= 60;
+}
+
+function alertaAtrasos(cliqueManual = false) {
+  const atrasados = dados.filter(d => d.status === "Cautelado" && verificaAtraso60h(d.dataC, d.horaC));
+  
+  if (atrasados.length > 0) {
+    alert(`🚨 ALERTA DO ARMAMENTO:\n\nExistem ${atrasados.length} cautela(s) com MAIS DE 60 HORAS em aberto!\nAs linhas correspondentes estão destacadas em vermelho na tabela.`);
+  } else if (cliqueManual) {
+    alert("✅ Tudo em ordem. Nenhuma cautela com mais de 60 horas em aberto.");
+  }
+}
+
+// --- LÓGICA DO MODAL DE AVISO (COBRANÇA) ---
+let registroAtualParaAviso = null;
+
+function abrirModalAviso(index) {
+  registroAtualParaAviso = dados[index];
+  document.getElementById('modalNotificacao').style.display = 'block';
+  document.getElementById('modalOverlay').style.display = 'block';
+  gerarMensagem();
+}
+
+function fecharModal() {
+  document.getElementById('modalNotificacao').style.display = 'none';
+  document.getElementById('modalOverlay').style.display = 'none';
+  registroAtualParaAviso = null;
+}
+
+function gerarMensagem() {
+  if(!registroAtualParaAviso) return;
+  const r = registroAtualParaAviso;
+  
+  const armaInfo = r.arma ? `${r.arma} (${r.modelo})` : "(NÃO ESPECIFICADA)";
+  const mensagem = `À atenção do(a) ${r.gh} ${r.nome}, RG ${r.rg}.\n\nInformo que, conforme verificação no sistema da Reserva Única de Material Bélico (RUMB) no serviço PROEIS, consta em aberto a devolução do armamento/equipamento ${armaInfo}. \n\nO prazo de devolução expirou conforme o previsto no BOL PM nº 004, de 07 JAN 2021. Solicito a gentileza de comparecer à RUMB, com a maior brevidade possível, a fim de proceder à devolução do referido armamento e regularização da cautela. \n\nCaso haja algum impedimento, favor informar.\n\nMensagem gerada automaticamente por sistema de controle digital.\nAtenciosamente.`;
+
+  document.getElementById('textoAviso').value = mensagem;
+}
+
+function copiarAviso() {
+  const textarea = document.getElementById('textoAviso');
+  textarea.select();
+  document.execCommand('copy');
+  alert("Aviso copiado com sucesso! Agora é só colar no WhatsApp.");
+  fecharModal();
+}
+
+function enviarAvisoZap() {
+  if (!registroAtualParaAviso) return;
+  const r = registroAtualParaAviso;
+  const texto = document.getElementById('textoAviso').value;
+  
+  const militar = databaseEfetivo.find(p => p.rg === r.rg);
+  let telefone = militar && militar.telefone ? militar.telefone : "";
+
+  let url = `https://api.whatsapp.com/send?text=${encodeURIComponent(texto)}`;
+  
+  if (telefone) {
+    telefone = telefone.replace(/\D/g, '');
+    if (!telefone.startsWith('55')) {
+      telefone = '55' + telefone;
+    }
+    url = `https://api.whatsapp.com/send?phone=${telefone}&text=${encodeURIComponent(texto)}`;
+  } else {
+    alert(`⚠️ O telefone do ${r.gh} ${r.nome} não está no banco de dados. O WhatsApp abrirá para você selecionar o contato manualmente.`);
+  }
+  
+  window.open(url, '_blank');
+  fecharModal();
+}
+
+function render(filtroAbertas = false) {
+  tabela.innerHTML = "";
+  const listaExibicao = filtroAbertas ? dados.filter(d => d.status === "Cautelado") : dados;
+  
+  const abertasCount = dados.filter(d => d.status === "Cautelado").length;
+  document.getElementById("contadorAbertas").innerText = `🚨 CAUTELAS EM ABERTO: ${abertasCount}`;
+  
+  listaExibicao.slice().reverse().forEach((d) => {
+    const indexReal = dados.indexOf(d);
+    
+    const dataAtFormatada = (d.dataAt && d.dataAt.includes('-')) ? d.dataAt.split('-').reverse().join('/') : (d.dataAt || "-");
+    const dataCFormatada = (d.dataC && d.dataC.includes('-')) ? d.dataC.split('-').reverse().join('/') : (d.dataC || "-");
+    
+    const tr = document.createElement("tr");
+    
+    let acoesHtml = "";
+    let isAtrasada = false;
+
+    if(d.status === "Cautelado") {
+      isAtrasada = verificaAtraso60h(d.dataC, d.horaC);
+      
+      acoesHtml = `
+          <div style="display:flex; flex-direction:column; gap:4px; align-items:center;">
+            <button class="btn-baixa" onclick="entregar(${indexReal})">BAIXAR</button>
+            <button class="btn-renovar" onclick="renovarCautela(${indexReal})">🔄 RENOVAR</button>
+            <button class="btn-aviso" onclick="abrirModalAviso(${indexReal})">⚠️ AVISO</button>
+          </div>
+      `;
+      
+      if (isAtrasada) {
+        tr.className = "linha-atrasada";
+      }
+    } else if (d.status === "Entregue") {
+      tr.style.opacity = "0.6"; 
+      tr.style.background = "#e0ffe0"; 
+    }
+
+    tr.innerHTML = `
+      <td>${d.gh || "-"}</td> <td>${d.rg || "-"}</td> <td style="text-align:left; font-weight:bold">${d.nome || "-"}</td>
+      <td>${d.arma || "-"}</td> <td>${d.modelo || "-"}</td> <td>${d.mun || "-"}</td> <td>${d.car || "-"}</td>
+      <td>${dataAtFormatada}</td> <td>${dataCFormatada}</td> <td>${d.horaC || "-"}</td>
+      <td class="col-pag">${d.paginaLivro || "-"}</td> 
+      <td class="col-rumb">${d.rumb || "-"}</td>
+      <td>${d.dataE || ""}</td> <td>${d.horaE || ""}</td> <td class="col-rumb">${d.rumbEntrega || ""}</td>
+      <td style="display: flex; gap: 4px; justify-content: center; align-items: center; flex-wrap: wrap; padding: 4px;">
+        ${acoesHtml}
+        <button class="btn-editar" onclick="editarRegistro(${indexReal})" title="Editar Informações">✏️</button>
+        <button class="btn-excluir" onclick="excluirRegistro(${indexReal})" title="Apagar Registro">🗑️</button>
+      </td>`;
+    tabela.appendChild(tr);
+  });
+  filtrarTabela();
+}
+
+function mostrarAbertas() { render(true); }
+
+function exportarBackup() {
+  const blob = new Blob([JSON.stringify(dados, null, 2)], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `Livro_Cautela_PROEIS_rumb-${new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')}.json`;
+  a.click();
+}
+
+function importarBackup(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+        const json = JSON.parse(e.target.result);
+        if(confirm("Deseja substituir a tabela atual pelos dados do backup?")) {
+            dados = json; 
+            salvar(); 
+            render(); 
+            alert("Backup importado com sucesso.");
+        }
+    } catch(err) { 
+        alert("Erro ao importar. O arquivo pode estar corrompido."); 
+    } finally {
+        input.value = ""; 
+    }
+  };
+  reader.readAsText(file);
+}
+
+// Inicializa a tabela
+render();
+setTimeout(() => alertaAtrasos(false), 500); 
+
+// INICIALIZA CAMPOS DE DATA, HORA E RUMB AUTOMÁTICO
+document.getElementById('dataAt').valueAsDate = new Date();
+document.getElementById('dataC').valueAsDate = new Date();
+document.getElementById('horaC').value = new Date().toLocaleTimeString('pt-BR').slice(0,5);
+atualizarRumbAutomatico();
+
+// Monitora mudanças para atualizar em tempo real
+document.getElementById('dataC').addEventListener('change', atualizarRumbAutomatico);
+document.getElementById('horaC').addEventListener('change', atualizarRumbAutomatico);
+
+</script>
+</body>
+</html>

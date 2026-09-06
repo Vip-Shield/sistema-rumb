@@ -1,0 +1,3111 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buscador de MATERIAIS da RUMB</title>
+    <link rel="shortcut icon" type="imagex/png" href="../IMAGENS/caveira.ico">
+
+    <style>
+        /* ESTILO GERAL */
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+            padding-top: 400px; 
+        }
+
+        /* --- CABEÇALHO FIXO --- */
+        .fixed-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: #0d1b2a; 
+            color: white;
+            z-index: 1000;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            padding-bottom: 15px;
+            padding-top: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header-content {
+            width: 100%;
+            position: relative; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+
+        /* --- TÍTULOS E CAVEIRA (CENTRALIZADOS) --- */
+        h1 {
+            font-size: 1.4rem;
+            margin: 0;
+            text-transform: uppercase;
+            color: #f0f0f0;
+            text-align: center;
+            line-height: 1.4;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toggle-acoes-btn {
+            background: none;
+            border: none;
+            color: #ffd700;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0;
+            transition: transform 0.2s;
+        }
+        .toggle-acoes-btn:hover {
+            transform: scale(1.2);
+        }
+
+        .unit-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 5px;
+        }
+
+        .unit-name {
+            font-size: 1rem; 
+            color: #ffd700; 
+            font-weight: bold;
+        }
+
+        .logo-caveira {
+            width: 35px;
+            height: auto;
+            vertical-align: middle;
+        }
+
+        /* --- MENU ESCUDO (CANTO DIREITO) --- */
+        .menu-container {
+            position: absolute; 
+            top: 0;
+            right: 20px;
+            cursor: pointer;
+            z-index: 1002;
+        }
+
+        .logo-escudo {
+            width: 70px;
+            height: auto;
+            transition: transform 0.3s ease;
+            filter: drop-shadow(0 0 5px rgba(255,255,255,0.2));
+        }
+
+        .menu-container:hover .logo-escudo {
+            transform: scale(1.05);
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%; 
+            right: 0; 
+            background-color: #ffffff;
+            min-width: 180px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1003;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 2px solid #ffd700;
+        }
+
+        .dropdown-content button {
+            color: #0d1b2a;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            width: 100%;
+            text-align: left;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.9rem;
+            transition: background 0.2s;
+        }
+
+        .dropdown-content button:hover {
+            background-color: #f1f1f1;
+            color: #b45309;
+        }
+
+        .menu-container:hover .dropdown-content {
+            display: block;
+        }
+
+        /* --- BARRA DE BUSCA --- */
+        .search-container {
+            width: 90%;
+            max-width: 600px;
+            text-align: center;
+            position: relative; 
+            margin-bottom: 15px;
+        }
+
+        #search-input {
+            width: 100%;
+            padding: 12px;
+            padding-right: 40px; 
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            outline: none;
+            text-align: center;
+            box-sizing: border-box; 
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        #clear-search {
+            position: absolute;
+            right: 15px;
+            top: 25px; 
+            transform: translateY(-50%);
+            font-size: 20px;
+            font-weight: bold;
+            color: #888;
+            cursor: pointer;
+            display: none; 
+        }
+
+        #clear-search:hover {
+            color: #dc2626; 
+        }
+
+        /* --- NOVO DROPDOWN FILTRO DE MATERIAL --- */
+        #material-filter {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            font-size: 15px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            outline: none;
+            text-align: center;
+            font-weight: bold;
+            color: #0d1b2a;
+            box-sizing: border-box; 
+            background-color: #fff;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+            cursor: pointer;
+        }
+
+        /* --- BARRA DE RESUMO DO CHECKLIST --- */
+        .checklist-summary {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            background-color: rgba(255, 255, 255, 0.05);
+            padding: 10px;
+            border-radius: 8px;
+            max-width: 950px;
+            margin: 0 auto;
+        }
+
+        /* Painel de ações ocultável */
+        #painel-acoes {
+            display: none; 
+        }
+
+        .summary-text {
+            font-size: 0.95rem;
+            color: #fff;
+        }
+
+        /* Efeitos interativos para os status do resumo */
+        .summary-text span {
+            cursor: pointer;
+            transition: 0.2s;
+            padding: 2px 4px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+        
+        .summary-text span:hover {
+            opacity: 0.7;
+            text-decoration: underline;
+        }
+
+        /* Classe quando um status específico é clicado/filtrado */
+        .filtro-ativo {
+            background-color: rgba(255, 255, 255, 0.15);
+            border: 1px dashed #fff;
+        }
+
+        .summary-text .faltam { color: #ef4444; font-weight: bold; font-size: 1.1rem; }
+        .summary-text .conferidas { color: #10b981; font-weight: bold; }
+        .summary-text .retidas { color: #9ca3af; font-weight: bold; } 
+
+        .btn-panel {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.85rem;
+            transition: 0.2s;
+        }
+
+        .btn-filter { background-color: #ffd700; color: #001f3f; }
+        .btn-filter:hover { background-color: #e6c200; }
+        
+        .btn-reset { background-color: #ef4444; color: white; }
+        .btn-reset:hover { background-color: #dc2626; }
+
+        .btn-report-faltas { background-color: #f97316; color: white; }
+        .btn-report-faltas:hover { background-color: #ea580c; }
+
+        #file-input { display: none; }
+
+        /* --- CHECKBOX E BOTÃO DO WHATSAPP MÚLTIPLO --- */
+        .checkbox-zap {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #25D366;
+        }
+
+        .btn-zap-multiplo {
+            background-color: #25D366;
+            color: white;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.85rem;
+            transition: 0.2s;
+            margin-left: 10px;
+        }
+
+        .btn-zap-multiplo:hover {
+            background-color: #1ebe5d;
+        }
+
+        .select-msg-tipo {
+            padding: 6px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            font-size: 0.85rem;
+            background-color: #fff;
+            color: #333;
+            margin-left: 10px;
+            outline: none;
+        }
+
+        /* --- LISTA DE MATERIAIS --- */
+        #name-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        #name-list li {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border: 1px solid #ddd;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            transition: transform 0.2s, border-color 0.2s;
+            position: relative; 
+        }
+
+        #name-list li:hover {
+            transform: translateY(-3px);
+            border-color: #0d1b2a;
+        }
+
+        /* --- ESTILOS DE ESTADO DOS CARDS --- */
+        .card-checked {
+            background-color: #ecfdf5 !important;
+            border: 2px solid #10b981 !important;
+            opacity: 0.90;
+        }
+        
+        .card-pago {
+            background-color: #eff6ff !important;
+            border: 2px solid #3b82f6 !important;
+            opacity: 0.90;
+        }
+
+        .card-anterior {
+            background-color: #e0e7ff !important;
+            border: 2px solid #4f46e5 !important;
+            opacity: 0.90;
+        }
+
+        .card-fixo {
+            background-color: #f0fdfa !important;
+            border: 2px solid #0d9488 !important;
+            opacity: 0.90;
+        }
+
+        .card-proeis {
+            background-color: #fff7ed !important;
+            border: 2px solid #f97316 !important;
+            opacity: 0.90;
+        }
+        
+        .card-partial {
+            background-color: #fffbeb !important;
+            border: 2px solid #f59e0b !important;
+        }
+
+        .card-guardado {
+            background-color: #f3e8ff !important;
+            border: 2px solid #a855f7 !important;
+            opacity: 0.90;
+        }
+
+        .card-retained {
+            background-color: #1a1a1a !important;
+            border: 2px solid #000 !important;
+            color: #d1d5db !important;
+        }
+        .card-retained strong { color: #fff !important; }
+        .card-retained span.material-text { color: #d1d5db !important; }
+        .card-retained .profile-pic { filter: grayscale(100%) opacity(0.4); }
+
+        .card-repasse-active {
+            background-color: #e0f2fe !important;
+            border: 2px solid #0ea5e9 !important;
+            opacity: 0.90;
+        }
+
+        .profile-pic {
+            width: 100px;
+            height: 100px;
+            object-fit: contain;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            padding: 5px;
+            background: #fff;
+            transition: 0.3s;
+        }
+
+        .material-text {
+            font-weight: bold;
+            color: #001f3f;
+            margin-bottom: 10px;
+            font-size: 0.85rem;
+            display: block;
+            margin-top: 20px; 
+        }
+
+        /* --- BOTÕES DO CARD --- */
+        .action-buttons {
+            width: 100%;
+            margin-top: auto;
+        }
+
+        .btn-status {
+            width: 100%;
+            padding: 8px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        .status-ok { background-color: #e2e8f0; color: #475569; border: 1px solid #cbd5e1; margin-top: 8px;}
+        .status-ok:hover { background-color: #cbd5e1; }
+        .status-alert { background-color: #b91c1c; color: white; animation: pulse 2s infinite; margin-top: 8px;}
+        .status-alert:hover { background-color: #991b1b; }
+
+        .btn-whatsapp { background-color: #25D366; color: white; border: 1px solid #1da851; margin-top: 5px; }
+        .btn-whatsapp:hover { background-color: #1ebe5d; }
+
+        .btn-group { display: flex; gap: 5px; margin-top: 5px; flex-wrap: wrap; justify-content: center; }
+        
+        .chk-uncheck { background-color: #f8fafc; color: #64748b; border: 1px dashed #94a3b8; flex: 1 1 30%; margin: 2px; }
+        .chk-uncheck:hover { background-color: #e2e8f0; }
+        .chk-checked { background-color: #10b981; color: white; flex: 1 1 30%; border: 1px solid #059669; margin: 2px; }
+        .chk-checked:hover { background-color: #059669; }
+
+        .pag-uncheck { background-color: #f0f9ff; color: #0284c7; border: 1px dashed #7dd3fc; flex: 1 1 30%; margin: 2px; }
+        .pag-uncheck:hover { background-color: #e0f2fe; }
+        .pag-checked { background-color: #3b82f6; color: white; flex: 1 1 30%; border: 1px solid #2563eb; margin: 2px; }
+        .pag-checked:hover { background-color: #2563eb; }
+
+        .ant-uncheck { background-color: #eef2ff; color: #4338ca; border: 1px dashed #818cf8; flex: 1 1 30%; margin: 2px; }
+        .ant-uncheck:hover { background-color: #e0e7ff; }
+        .ant-checked { background-color: #4f46e5; color: white; flex: 1 1 30%; border: 1px solid #3730a3; margin: 2px; }
+        .ant-checked:hover { background-color: #3730a3; }
+
+        .fixo-uncheck { background-color: #f0fdfa; color: #0f766e; border: 1px dashed #5eead4; flex: 1 1 30%; margin: 2px; }
+        .fixo-uncheck:hover { background-color: #ccfbf1; }
+        .fixo-checked { background-color: #0d9488; color: white; flex: 1 1 30%; border: 1px solid #0f766e; margin: 2px; }
+        .fixo-checked:hover { background-color: #0f766e; }
+
+        .proeis-uncheck { background-color: #fff7ed; color: #c2410c; border: 1px dashed #fdba74; flex: 1 1 30%; margin: 2px; }
+        .proeis-uncheck:hover { background-color: #ffedd5; }
+        .proeis-checked { background-color: #f97316; color: white; flex: 1 1 30%; border: 1px solid #ea580c; margin: 2px; }
+        .proeis-checked:hover { background-color: #ea580c; }
+
+        .ret-uncheck { background-color: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1; flex: 1 1 30%; margin: 2px; }
+        .ret-uncheck:hover { background-color: #e2e8f0; }
+        .ret-checked { background-color: #000; color: #ffd700; flex: 1 1 30%; border: 1px solid #ffd700; margin: 2px; }
+        .ret-checked:hover { background-color: #333; }
+
+        .gua-uncheck { background-color: #faf5ff; color: #9333ea; border: 1px dashed #d8b4fe; flex: 1 1 30%; margin: 2px; }
+        .gua-uncheck:hover { background-color: #f3e8ff; }
+        .gua-checked { background-color: #a855f7; color: white; flex: 1 1 30%; border: 1px solid #9333ea; margin: 2px; }
+        .gua-checked:hover { background-color: #9333ea; }
+        
+        .btn-repasse-card { background-color: #f0f9ff; color: #0284c7; border: 1px dashed #7dd3fc; flex: 1 1 30%; margin: 2px; }
+        .btn-repasse-card:hover { background-color: #e0f2fe; }
+        .rep-checked { background-color: #0ea5e9; color: white; flex: 1 1 30%; border: 1px solid #0284c7; margin: 2px; }
+        .rep-checked:hover { background-color: #0284c7; }
+
+        /* --- ESTILOS DO CONTADOR --- */
+        .contador-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            margin-top: 8px;
+            padding: 5px;
+        }
+        .btn-count {
+            background: #0d1b2a;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            width: 32px;
+            height: 32px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: 0.2s;
+        }
+        .btn-count:hover { background: #1a365d; }
+        .btn-count.minus { background: #ef4444; }
+        .btn-count.minus:hover { background: #dc2626; }
+        .btn-count.plus { background: #10b981; }
+        .btn-count.plus:hover { background: #059669; }
+        .count-display {
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: #0d1b2a;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(185, 28, 28, 0.4); }
+            70% { box-shadow: 0 0 0 6px rgba(185, 28, 28, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(185, 28, 28, 0); }
+        }
+
+        #no-results {
+            text-align: center;
+            font-size: 1.2rem;
+            color: #b91c1c;
+            margin-top: 20px;
+            display: none;
+            font-weight: bold;
+        }
+
+        /* --- MODAIS --- */
+        .modal {
+            display: none; position: fixed; z-index: 2000; left: 0; top: 0;
+            width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6); backdrop-filter: blur(3px);
+        }
+
+        .modal-content {
+            background-color: #fefefe; margin: 10% auto; padding: 25px; border: 1px solid #888;
+            width: 90%; max-width: 500px; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            position: relative; animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn { from {opacity: 0; transform: translateY(-20px);} to {opacity: 1; transform: translateY(0);} }
+
+        .close-btn { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
+        .close-btn:hover { color: black; }
+        .modal-header h2 { margin-top: 0; color: #0d1b2a; border-bottom: 2px solid #ffd700; padding-bottom: 10px; display: inline-block; font-size: 1.2rem;}
+
+        .input-form { width: 100%; padding: 10px; box-sizing: border-box; border: 2px solid #ccc; border-radius: 4px; font-family: inherit; margin-bottom: 15px; font-size: 1rem; }
+        textarea.input-form { height: 120px; resize: vertical; }
+        .input-form:focus { border-color: #0d1b2a; outline: none; }
+        
+        .modal-footer { text-align: right; }
+
+        .btn-save { background-color: #0d1b2a; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 1rem; }
+        .btn-save:hover { background-color: #1a365d; }
+        .btn-clear { background-color: #ef4444; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 1rem; margin-right: 10px; }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            color: #666;
+            font-size: 12px;
+            padding-bottom: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .menu-container {
+                position: relative;
+                right: auto;
+                top: auto;
+                margin-bottom: 10px;
+            }
+            .fixed-header {
+                position: relative; 
+            }
+            body {
+                padding-top: 20px;
+            }
+            .header-content {
+                margin-bottom: 5px;
+            }
+            .checklist-summary {
+                flex-direction: column;
+            }
+            .btn-zap-multiplo, .select-msg-tipo {
+                margin-left: 0;
+                margin-top: 5px;
+                width: 100%;
+                box-sizing: border-box;
+            }
+        }
+    </style>
+</head>
+<body>
+    
+    <div class="fixed-header">
+        <div class="header-content">
+            
+            <h1>
+                Lista dos Materiais da RUMB
+                <button class="toggle-acoes-btn" onclick="togglePainelAcoes()" title="Mostrar/Ocultar Ações">⚙️</button>
+            </h1>
+            
+            <div class="unit-container">
+                <span class="unit-name">3ª UPP/19ºBPM - CIA UPP TABAJARAS</span>
+                <a href="../dashboard.html"><img src="caveira-armada.png" alt="Caveira" class="logo-caveira" title="Voltar ao Painel"></a>
+            </div>
+
+            <div class="menu-container">
+                <img src="escudo.png" alt="Menu Backup" class="logo-escudo" title="Menu de Opções">
+                <div class="dropdown-content">
+                    <button onclick="exportarBackup()">💾 Salvar Backup</button>
+                    <button onclick="document.getElementById('file-input').click()">📂 Importar Backup</button>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="search-container">
+            <input type="text" id="search-input" placeholder="Digite o número de série ou modelo do material...">
+            <span id="clear-search" title="Limpar pesquisa">&times;</span> 
+            <select id="material-filter" onchange="executarBusca()" title="Filtrar por tipo de material">
+                <option value="">TODOS OS MATERIAIS</option>
+                <option value="FUZIL 5.56">FUZIL 5.56 (IMBEL / IA2)</option>
+                <option value="FUZIL 7.62">FUZIL 7.62</option>
+                <option value="COLETE">COLETES BALÍSTICOS</option>
+                <option value="PT100">PISTOLA PT100</option>
+                <option value="PISTOLA IMBEL">PISTOLA IMBEL</option>
+                <option value="12">ESPINGARDA CAL. 12</option>
+                <option value="LANÇADOR">LANÇADOR 37/40mm</option>
+                <option value="RÁDIO">RÁDIOS PORTÁTEIS</option>
+                <option value="SPARK">SPARK</option>
+                <option value="CONTÁVEIS">MATERIAIS CONTÁVEIS / DIVERSOS</option>
+            </select>
+        </div>
+
+        <div class="checklist-summary" id="summary-text">
+            <!-- Preenchido via JavaScript -->
+        </div>
+
+        <div class="checklist-summary" id="painel-acoes" style="margin-top: 5px;">
+            <button class="btn-panel btn-filter" id="btn-filter" onclick="toggleFaltantes()">Filtrar Faltantes</button>
+            <button class="btn-panel btn-reset" onclick="zerarConferencia()">Zerar Turno</button>
+            <button class="btn-panel btn-report-faltas" onclick="finalizarConferencia()">🚨 Relatar Faltas (WhatsApp)</button>
+            <button class="btn-panel" style="background-color: #3b82f6; color: white;" onclick="abrirModalRepasse()">🔄 Histórico Repasse</button>
+            
+            <select id="select-tipo-msg" class="select-msg-tipo">
+                <option value="padrao">Relatório Padrão (Conferência)</option>
+                <option value="nao_devolvido">Cobrança: Material Não Devolvido</option>
+                <option value="avaria">Relatório de Avaria / Manutenção</option>
+            </select>
+            <button id="btn-zap-multiplo" class="btn-zap-multiplo" onclick="enviarZapMultiplos()" title="Enviar todos os materiais selecionados">📲 Enviar Selecionados (0)</button>
+        </div>
+    </div>
+
+    <input type="file" id="file-input" accept=".json" onchange="importarBackup(this)">
+
+    <p id="no-results">Nenhum material encontrado.</p>
+
+    <!-- LISTA DE POLICIAIS AUTOCOMPLETAR (Oculto) -->
+    <datalist id="listaPoliciais">
+        <!-- Preenchido via JavaScript -->
+    </datalist>
+    <datalist id="listaPoliciaisNomes">
+        <!-- Preenchido via JavaScript -->
+    </datalist>
+
+    <ul id="name-list">
+        <!-- =================== COLETES P =================== -->
+        <li data-id="colete-358359">
+            <input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()" title="Selecionar para envio múltiplo">
+            <img src="colete2.jpg" alt="COLETE" class="profile-pic">
+            <span class="material-text">COLETE SERIAL: 358359 - NÚMERO PEQUENO P - MODELO:GB52/09 - FABRICAÇÃO:02/2019 - VALIDADE:02/2024 - LOTE:396 - Nº01</span>
+            <div class="anotacoes"></div>
+        </li>
+
+        <!-- NOVOS COLETES M -->
+        <li data-id="colete-351364"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 351364 - NÚMERO MÉDIO M - Nº01</span><div class="anotacoes"></div></li>
+        <li data-id="colete-351365"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 351365 - NÚMERO MÉDIO M - Nº02</span><div class="anotacoes"></div></li>
+        <li data-id="colete-351033"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 351033 - NÚMERO MÉDIO M - Nº03</span><div class="anotacoes"></div></li>
+        <li data-id="colete-351032"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 351032 - NÚMERO MÉDIO M - Nº04</span><div class="anotacoes"></div></li>
+        <li data-id="colete-351362"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 351362 - NÚMERO MÉDIO M - Nº05</span><div class="anotacoes"></div></li>
+        <li data-id="colete-351363"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 351363 - NÚMERO MÉDIO M - Nº06</span><div class="anotacoes"></div></li>
+        <li data-id="colete-351044"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 351044 - NÚMERO MÉDIO M - Nº07</span><div class="anotacoes"></div></li>
+        <li data-id="colete-351045"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 351045 - NÚMERO MÉDIO M - Nº08</span><div class="anotacoes"></div></li>
+        <li data-id="colete-351354"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 351354 - NÚMERO MÉDIO M - Nº09</span><div class="anotacoes"></div></li>
+        <li data-id="colete-351355"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 351355 - NÚMERO MÉDIO M - Nº10</span><div class="anotacoes"></div></li>
+        <li data-id="colete-351462"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 351462 - NÚMERO MÉDIO M - Nº11</span><div class="anotacoes"></div></li>
+        <li data-id="colete-351463"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 351463 - NÚMERO MÉDIO M - Nº12</span><div class="anotacoes"></div></li>
+        <li data-id="colete-351492"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 351492 - NÚMERO MÉDIO M - Nº13</span><div class="anotacoes"></div></li>
+        <li data-id="colete-350926"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 350926 - NÚMERO MÉDIO M - Nº14</span><div class="anotacoes"></div></li>
+        <li data-id="colete-351460"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 351460 - NÚMERO MÉDIO M - Nº15</span><div class="anotacoes"></div></li>
+        <li data-id="colete-351461"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 351461 - NÚMERO MÉDIO M - Nº16</span><div class="anotacoes"></div></li>
+        <li data-id="colete-351458"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 351458 - NÚMERO MÉDIO M - Nº17</span><div class="anotacoes"></div></li>
+        <li data-id="colete-351459"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 351459 - NÚMERO MÉDIO M - Nº18</span><div class="anotacoes"></div></li>
+        <li data-id="colete-351699"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 351699 - NÚMERO MÉDIO M - Nº19</span><div class="anotacoes"></div></li>
+        <li data-id="colete-350927"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 350927 - NÚMERO MÉDIO M - Nº20</span><div class="anotacoes"></div></li>
+        <li data-id="colete-3775504"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 3775504 - NÚMERO MÉDIO M - Nº21</span><div class="anotacoes"></div></li>
+
+
+        <!-- NOVOS COLETES G -->
+        <li data-id="colete-2763625"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete3.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 2763625 - NÚMERO GRANDE G - Nº01</span><div class="anotacoes"></div></li>
+        <li data-id="colete-2763626"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete3.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 2763626 - NÚMERO GRANDE G - Nº02</span><div class="anotacoes"></div></li>
+        <li data-id="colete-2763605"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete3.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 2763605 - NÚMERO GRANDE G - Nº03</span><div class="anotacoes"></div></li>
+        <li data-id="colete-2763606"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete3.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 2763606 - NÚMERO GRANDE G - Nº04</span><div class="anotacoes"></div></li>
+        <li data-id="colete-2763663"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete3.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 2763663 - NÚMERO GRANDE G - Nº05</span><div class="anotacoes"></div></li>
+        <li data-id="colete-2763664"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete3.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 2763664 - NÚMERO GRANDE G - Nº06</span><div class="anotacoes"></div></li>
+        <li data-id="colete-2763641"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete3.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 2763641 - NÚMERO GRANDE G - Nº07</span><div class="anotacoes"></div></li>
+        <li data-id="colete-2763380"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete3.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 2763380 - NÚMERO GRANDE G - Nº08</span><div class="anotacoes"></div></li>
+        <li data-id="colete-2763235"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete3.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 2763235 - NÚMERO GRANDE G - Nº09</span><div class="anotacoes"></div></li>
+        <li data-id="colete-2763236"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete3.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 2763236 - NÚMERO GRANDE G - Nº10</span><div class="anotacoes"></div></li>
+        <li data-id="colete-2763379"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete3.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 2763379 - NÚMERO GRANDE G - Nº11</span><div class="anotacoes"></div></li>
+        <li data-id="colete-2763605"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete3.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 2763605 - NÚMERO GRANDE G - Nº12</span><div class="anotacoes"></div></li>
+        <li data-id="colete-2763631"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete3.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 2763631 - NÚMERO GRANDE G - Nº13</span><div class="anotacoes"></div></li>
+        <li data-id="colete-2763632"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete3.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 2763632 - NÚMERO GRANDE G - Nº14</span><div class="anotacoes"></div></li>
+        <li data-id="colete-2763309"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete3.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 2763309 - NÚMERO GRANDE G - Nº15</span><div class="anotacoes"></div></li>
+        <li data-id="colete-2764285"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete3.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 2764285 - NÚMERO GRANDE G - Nº16</span><div class="anotacoes"></div></li>
+        <li data-id="colete-2764286"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete3.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 2764286 - NÚMERO GRANDE G - Nº17</span><div class="anotacoes"></div></li>
+        <li data-id="colete-2764414"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete3.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 2764414 - NÚMERO GRANDE G - Nº18</span><div class="anotacoes"></div></li>
+        <li data-id="colete-2764415"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete3.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 2764415 - NÚMERO GRANDE G - Nº19</span><div class="anotacoes"></div></li>
+        <li data-id="colete-2764416"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete3.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 2764416 - NÚMERO GRANDE G - Nº20</span><div class="anotacoes"></div></li>
+        <li data-id="colete-2763642"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete3.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 2763642 - NÚMERO GRANDE G - Nº21</span><div class="anotacoes"></div></li>
+
+
+        <!-- =================== NOVOS COLETES GG =================== -->
+        <li data-id="colete-2765915"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete3.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 2765915 - NÚMERO GG - Nº01</span><div class="anotacoes"></div></li>
+        <li data-id="colete-2765916"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete3.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 2765916 - NÚMERO GG - Nº02</span><div class="anotacoes"></div></li>
+        <li data-id="colete-2765941"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete3.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 2765941 - NÚMERO GG - Nº03</span><div class="anotacoes"></div></li>
+        <li data-id="colete-2765942"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete3.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 2765942 - NÚMERO GG - Nº04</span><div class="anotacoes"></div></li>
+        <li data-id="colete-2765897"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete3.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 2765897 - NÚMERO GG - Nº05</span><div class="anotacoes"></div></li>
+        <li data-id="colete-2765898"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete3.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 2765898 - NÚMERO GG - Nº06</span><div class="anotacoes"></div></li>
+        <li data-id="colete-2765985"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete3.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 2765985 - NÚMERO GG - Nº07</span><div class="anotacoes"></div></li>
+        <li data-id="colete-2765986"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete3.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 2765986 - NÚMERO GG - Nº08</span><div class="anotacoes"></div></li>
+        <li data-id="colete-2766031"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete3.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 2766031 - NÚMERO GG - Nº09</span><div class="anotacoes"></div></li>
+        <li data-id="colete-2766032"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete3.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 2766032 - NÚMERO GG - Nº10</span><div class="anotacoes"></div></li>
+        <li data-id="colete-2765919"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete3.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 2765919 - NÚMERO GG - Nº11</span><div class="anotacoes"></div></li>
+        <li data-id="colete-2765920"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete3.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 2765920 - NÚMERO GG - Nº12</span><div class="anotacoes"></div></li>
+        <li data-id="colete-2765929"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete3.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 2765929 - NÚMERO GG - Nº13</span><div class="anotacoes"></div></li>
+        <li data-id="colete-2765930"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete3.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 2765930 - NÚMERO GG - Nº14</span><div class="anotacoes"></div></li>
+        <li data-id="colete-2765955"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete3.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 2765955 - NÚMERO GG - Nº15</span><div class="anotacoes"></div></li>
+        <li data-id="colete-2765956"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete3.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 2765956 - NÚMERO GG - Nº16</span><div class="anotacoes"></div></li>
+        <li data-id="colete-2767312"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete3.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 2767312 - NÚMERO GG - Nº17</span><div class="anotacoes"></div></li>
+        <li data-id="colete-2767313"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete3.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 2767313 - NÚMERO GG - Nº18</span><div class="anotacoes"></div></li>
+        <li data-id="colete-2767320"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete3.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 2767320 - NÚMERO GG - Nº19</span><div class="anotacoes"></div></li>
+        <li data-id="colete-2767321"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete3.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 2767321 - NÚMERO GG - Nº20</span><div class="anotacoes"></div></li>
+        <li data-id="colete-2766990"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete3.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 2766990 - NÚMERO GG - Nº21</span><div class="anotacoes"></div></li>
+        <li data-id="colete-2766991"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete3.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 2766991 - NÚMERO GG - Nº22</span><div class="anotacoes"></div></li>
+        <li data-id="colete-2767262"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete3.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 2767262 - NÚMERO GG - Nº23</span><div class="anotacoes"></div></li>
+        <li data-id="colete-2767263"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete3.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 2767263 - NÚMERO GG - Nº24</span><div class="anotacoes"></div></li>
+        <li data-id="colete-2767258"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete3.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 2767258 - NÚMERO GG - Nº25</span><div class="anotacoes"></div></li>
+        <li data-id="colete-2767259"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete3.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 2767259 - NÚMERO GG - Nº26</span><div class="anotacoes"></div></li>
+        <li data-id="colete-2767272"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete3.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 2767272 - NÚMERO GG - Nº27</span><div class="anotacoes"></div></li>
+        <li data-id="colete-2767273"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete3.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 2767273 - NÚMERO GG - Nº28</span><div class="anotacoes"></div></li>
+        <li data-id="colete-2766693"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete3.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 2766693 - NÚMERO GG - Nº29</span><div class="anotacoes"></div></li>
+        <li data-id="colete-2766694"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete3.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 2766694 - NÚMERO GG - Nº30</span><div class="anotacoes"></div></li>
+        <li data-id="colete-2767930"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete3.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 2767930 - NÚMERO GG - Nº31</span><div class="anotacoes"></div></li>
+        <li data-id="colete-2767931"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete3.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 2767931 - NÚMERO GG - Nº32</span><div class="anotacoes"></div></li>
+        <li data-id="colete-2768102"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete3.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 2768102 - NÚMERO GG - Nº33</span><div class="anotacoes"></div></li>
+        <li data-id="colete-2768103"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete3.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 2768103 - NÚMERO GG - Nº34</span><div class="anotacoes"></div></li>
+        <li data-id="colete-2768316"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="colete3.jpg" alt="COLETE" class="profile-pic"><span class="material-text">COLETE SERIAL: 2768316 - NÚMERO GG - Nº35</span><div class="anotacoes"></div></li>
+
+
+        <!-- =================== FUZIS IA2 IMBEL 5.56 =================== -->
+        <li data-id="IA2-BRA08080"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="ia2_fuzil_556.jpg" alt="IA2" class="profile-pic"><span class="material-text">FUZIL IA2 IMBEL 5.56 SERIAL: BRA08080 - BR - Nº01</span><div class="anotacoes"></div></li>  
+        <li data-id="IA2-BRA07916"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="ia2_fuzil_556.jpg" alt="IA2" class="profile-pic"><span class="material-text">FUZIL IA2 IMBEL 5.56 SERIAL: BRA07916 - BR - Nº02</span><div class="anotacoes"></div></li>
+        <li data-id="IA2-BRA07916-2"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="ia2_fuzil_556.jpg" alt="IA2" class="profile-pic"><span class="material-text">FUZIL IA2 IMBEL 5.56 SERIAL: BRA11759 - BR - Nº03</span><div class="anotacoes"></div></li>    
+        <li data-id="IA2-BRA11759"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="ia2_fuzil_556.jpg" alt="IA2" class="profile-pic"><span class="material-text">FUZIL IA2 IMBEL 5.56 SERIAL: JFA07926 - BR - Nº04</span><div class="anotacoes"></div></li>  
+        <li data-id="IA2-JFA07925"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="ia2_fuzil_556.jpg" alt="IA2" class="profile-pic"><span class="material-text">FUZIL IA2 IMBEL 5.56 SERIAL: JFA07925 - BR - Nº05</span><div class="anotacoes"></div></li>  
+
+
+        <!-- =================== FUZIS IMBEL 5.56 =================== -->
+        <li data-id="FUZIL-556-JCA00599"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="fuzil-556.jpg" alt="FUZIL-556" class="profile-pic"><span class="material-text">FUZIL IMBEL 5.56 SERIAL: JCA00599 - BR - Nº01</span><div class="anotacoes"></div></li>  
+        <li data-id="FUZIL-556-JAA00378"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="fuzil-556.jpg" alt="FUZIL-556" class="profile-pic"><span class="material-text">FUZIL IMBEL 5.56 SERIAL: JAA00378 - BR - Nº02</span><div class="anotacoes"></div></li>  
+        <li data-id="FUZIL-556-JAA01715"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="fuzil-556.jpg" alt="FUZIL-556" class="profile-pic"><span class="material-text">FUZIL IMBEL 5.56 SERIAL: JAA01715 - BR - Nº03</span><div class="anotacoes"></div></li>  
+
+
+
+        <!-- =================== NOVOS FUZIS 7.62 =================== -->
+        <li data-id="IMBEL-762-274925"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="762_cano_longo_serrado.jpg" alt="7.62" class="profile-pic"><span class="material-text">FUZIL 7.62 SERIAL: 274925 - Nº01</span><div class="anotacoes"></div></li>
+        <li data-id="IMBEL-762-278660"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="762_cano_longo_serrado.jpg" alt="7.62" class="profile-pic"><span class="material-text">FUZIL 7.62 SERIAL: 278660 - Nº02</span><div class="anotacoes"></div></li>
+        <li data-id="IMBEL-762-160252"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="762_cano_longo_serrado.jpg" alt="7.62" class="profile-pic"><span class="material-text">FUZIL 7.62 SERIAL: 160252 - Nº03</span><div class="anotacoes"></div></li>
+        <li data-id="IMBEL-762-106715"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="762_cano_longo_serrado.jpg" alt="7.62" class="profile-pic"><span class="material-text">FUZIL 7.62 SERIAL: 106715 - Nº04</span><div class="anotacoes"></div></li>
+        <li data-id="IMBEL-762-106910"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="762_cano_longo_serrado.jpg" alt="7.62" class="profile-pic"><span class="material-text">FUZIL 7.62 SERIAL: 106910 - Nº05</span><div class="anotacoes"></div></li>
+        <li data-id="IMBEL-762-151215"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="762_cano_longo_serrado.jpg" alt="7.62" class="profile-pic"><span class="material-text">FUZIL 7.62 SERIAL: 151215 - Nº06</span><div class="anotacoes"></div></li>
+        <li data-id="IMBEL-762-27510"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="762_cano_longo_serrado.jpg" alt="7.62" class="profile-pic"><span class="material-text">FUZIL 7.62 SERIAL: 27510 - Nº07</span><div class="anotacoes"></div></li>
+        <li data-id="IMBEL-762-278642"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="762_cano_longo_serrado.jpg" alt="7.62" class="profile-pic"><span class="material-text">FUZIL 7.62 SERIAL: 278642 - Nº08</span><div class="anotacoes"></div></li>
+        <li data-id="IMBEL-762-274909"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="762_cano_longo_serrado.jpg" alt="7.62" class="profile-pic"><span class="material-text">FUZIL 7.62 SERIAL: 274909 - Nº09</span><div class="anotacoes"></div></li>
+        <li data-id="IMBEL-762-AJA03993"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="762_cano_longo_serrado.jpg" alt="7.62" class="profile-pic"><span class="material-text">FUZIL 7.62 SERIAL: AJA03993 - Nº10</span><div class="anotacoes"></div></li>
+        <li data-id="IMBEL-762-04349"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="762_cano_longo_serrado.jpg" alt="7.62" class="profile-pic"><span class="material-text">FUZIL 7.62 SERIAL: 04349 - Nº11</span><div class="anotacoes"></div></li>
+        <li data-id="IMBEL-762-27472"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="762_cano_longo_serrado.jpg" alt="7.62" class="profile-pic"><span class="material-text">FUZIL 7.62 SERIAL: 27472 - Nº12</span><div class="anotacoes"></div></li>
+        <li data-id="IMBEL-762-106673"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="762_cano_longo_serrado.jpg" alt="7.62" class="profile-pic"><span class="material-text">FUZIL 7.62 SERIAL: 106673 - Nº13</span><div class="anotacoes"></div></li>
+        <li data-id="IMBEL-762-277187"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="762_cano_longo_serrado.jpg" alt="7.62" class="profile-pic"><span class="material-text">FUZIL 7.62 SERIAL: 277187 - Nº14</span><div class="anotacoes"></div></li>
+        <li data-id="IMBEL-762-106991"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="762_cano_longo_serrado.jpg" alt="7.62" class="profile-pic"><span class="material-text">FUZIL 7.62 SERIAL: 106991 - Nº15</span><div class="anotacoes"></div></li>
+        <li data-id="IMBEL-762-159880"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="762_cano_longo_serrado.jpg" alt="7.62" class="profile-pic"><span class="material-text">FUZIL 7.62 SERIAL: 159880 - Nº16</span><div class="anotacoes"></div></li>
+        <li data-id="IMBEL-762-JAA04110"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="762_cano_longo_serrado.jpg" alt="7.62" class="profile-pic"><span class="material-text">FUZIL 7.62 SERIAL: JAA04110 - Nº17</span><div class="anotacoes"></div></li>
+
+
+        <!-- =================== NOVAS PISTOLAS PT100 =================== -->
+        <li data-id="PT100-SGU40740"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="pistola_pt100.png" alt="PISTOLA" class="profile-pic"><span class="material-text">PISTOLA PT100 SERIAL: SGU40740 - Nº01</span><div class="anotacoes"></div></li>
+        <li data-id="PT100-SGU40949"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="pistola_pt100.png" alt="PISTOLA" class="profile-pic"><span class="material-text">PISTOLA PT100 SERIAL: SGU40949 - Nº02</span><div class="anotacoes"></div></li>
+        <li data-id="PT100-SGU41872"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="pistola_pt100.png" alt="PISTOLA" class="profile-pic"><span class="material-text">PISTOLA PT100 SERIAL: SGU41872 - Nº03</span><div class="anotacoes"></div></li>
+        <li data-id="PT100-SGU40743"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="pistola_pt100.png" alt="PISTOLA" class="profile-pic"><span class="material-text">PISTOLA PT100 SERIAL: SGU40743 - Nº04</span><div class="anotacoes"></div></li>
+        <li data-id="PT100-SGU40745"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="pistola_pt100.png" alt="PISTOLA" class="profile-pic"><span class="material-text">PISTOLA PT100 SERIAL: SGU40745 - Nº05</span><div class="anotacoes"></div></li>
+        <li data-id="PT100-SGU41869"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="pistola_pt100.png" alt="PISTOLA" class="profile-pic"><span class="material-text">PISTOLA PT100 SERIAL: SGU41869 - Nº06</span><div class="anotacoes"></div></li>
+        <li data-id="PT100-SGU41876"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="pistola_pt100.png" alt="PISTOLA" class="profile-pic"><span class="material-text">PISTOLA PT100 SERIAL: SGU41876 - Nº07</span><div class="anotacoes"></div></li>
+        <li data-id="PT100-SGU40744"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="pistola_pt100.png" alt="PISTOLA" class="profile-pic"><span class="material-text">PISTOLA PT100 SERIAL: SGU40744 - Nº08</span><div class="anotacoes"></div></li>
+        <li data-id="PT100-SGU40956"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="pistola_pt100.png" alt="PISTOLA" class="profile-pic"><span class="material-text">PISTOLA PT100 SERIAL: SGU40956 - Nº09</span><div class="anotacoes"></div></li>
+        <li data-id="PT100-SGU40748"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="pistola_pt100.png" alt="PISTOLA" class="profile-pic"><span class="material-text">PISTOLA PT100 SERIAL: SGU40748 - Nº10</span><div class="anotacoes"></div></li>
+        <li data-id="PT100-SGU40747"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="pistola_pt100.png" alt="PISTOLA" class="profile-pic"><span class="material-text">PISTOLA PT100 SERIAL: SGU40747 - Nº11</span><div class="anotacoes"></div></li>
+        <li data-id="PT100-SGU40952"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="pistola_pt100.png" alt="PISTOLA" class="profile-pic"><span class="material-text">PISTOLA PT100 SERIAL: SGU40952 - Nº12</span><div class="anotacoes"></div></li>
+        <li data-id="PT100-SGU40746"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="pistola_pt100.png" alt="PISTOLA" class="profile-pic"><span class="material-text">PISTOLA PT100 SERIAL: SGU40746 - Nº13</span><div class="anotacoes"></div></li>
+        <li data-id="PT100-SGU40742"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="pistola_pt100.png" alt="PISTOLA" class="profile-pic"><span class="material-text">PISTOLA PT100 SERIAL: SGU40742 - Nº14</span><div class="anotacoes"></div></li>
+        <li data-id="PT100-SGU40741"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="pistola_pt100.png" alt="PISTOLA" class="profile-pic"><span class="material-text">PISTOLA PT100 SERIAL: SGU40741 - Nº15</span><div class="anotacoes"></div></li>
+        <li data-id="PT100-SGU40739"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="pistola_pt100.png" alt="PISTOLA" class="profile-pic"><span class="material-text">PISTOLA PT100 SERIAL: SGU40739 - Nº16</span><div class="anotacoes"></div></li>
+        <li data-id="PT100-SGU40957"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="pistola_pt100.png" alt="PISTOLA" class="profile-pic"><span class="material-text">PISTOLA PT100 SERIAL: SGU40957 - Nº17</span><div class="anotacoes"></div></li>
+        <li data-id="PT100-SGU41878"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="pistola_pt100.png" alt="PISTOLA" class="profile-pic"><span class="material-text">PISTOLA PT100 SERIAL: SGU41878 - Nº18</span><div class="anotacoes"></div></li>
+        <li data-id="PT100-SGU40954"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="pistola_pt100.png" alt="PISTOLA" class="profile-pic"><span class="material-text">PISTOLA PT100 SERIAL: SGU40954 - Nº19</span><div class="anotacoes"></div></li>
+        <li data-id="PT100-SGU40958"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="pistola_pt100.png" alt="PISTOLA" class="profile-pic"><span class="material-text">PISTOLA PT100 SERIAL: SGU40958 - Nº20</span><div class="anotacoes"></div></li>
+
+
+        <!-- =================== NOVAS PISTOLAS IMBEL =================== -->
+        <li data-id="IMBEL-P-EKA28715"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="pistola_imbel.png" alt="PISTOLA" class="profile-pic"><span class="material-text">PISTOLA IMBEL SERIAL: EKA28715 - Nº01</span><div class="anotacoes"></div></li>
+        <li data-id="IMBEL-P-EKA28739"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="pistola_imbel.png" alt="PISTOLA" class="profile-pic"><span class="material-text">PISTOLA IMBEL SERIAL: EKA28739 - Nº02</span><div class="anotacoes"></div></li>
+        <li data-id="IMBEL-P-EKA28732"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="pistola_imbel.png" alt="PISTOLA" class="profile-pic"><span class="material-text">PISTOLA IMBEL SERIAL: EKA28732 - Nº03</span><div class="anotacoes"></div></li>
+        <li data-id="IMBEL-P-EKA28734"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="pistola_imbel.png" alt="PISTOLA" class="profile-pic"><span class="material-text">PISTOLA IMBEL SERIAL: EKA28734 - Nº04</span><div class="anotacoes"></div></li>
+        <li data-id="IMBEL-P-EKA28723"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="pistola_imbel.png" alt="PISTOLA" class="profile-pic"><span class="material-text">PISTOLA IMBEL SERIAL: EKA28723 - Nº05</span><div class="anotacoes"></div></li>
+        <li data-id="IMBEL-P-EKA28706"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="pistola_imbel.png" alt="PISTOLA" class="profile-pic"><span class="material-text">PISTOLA IMBEL SERIAL: EKA28706 - Nº06</span><div class="anotacoes"></div></li>
+        <li data-id="IMBEL-P-EKA16717"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="pistola_imbel.png" alt="PISTOLA" class="profile-pic"><span class="material-text">PISTOLA IMBEL SERIAL: EKA16717 - Nº07</span><div class="anotacoes"></div></li>
+        <li data-id="IMBEL-P-EKA28747"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="pistola_imbel.png" alt="PISTOLA" class="profile-pic"><span class="material-text">PISTOLA IMBEL SERIAL: EKA28747 - Nº08</span><div class="anotacoes"></div></li>
+        <li data-id="IMBEL-P-EKA28729"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="pistola_imbel.png" alt="PISTOLA" class="profile-pic"><span class="material-text">PISTOLA IMBEL SERIAL: EKA28729 - Nº09</span><div class="anotacoes"></div></li>
+        <li data-id="IMBEL-P-EKA28722"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="pistola_imbel.png" alt="PISTOLA" class="profile-pic"><span class="material-text">PISTOLA IMBEL SERIAL: EKA28722 - Nº10</span><div class="anotacoes"></div></li>
+
+        <!-- =================== RÁDIOS =================== -->      
+<li data-id="radio-2130606"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="radio.png" alt="RÁDIO" class="profile-pic"><span class="material-text">RÁDIO PORTÁTIL SERIAL: 2130606 - Nº01</span><div class="anotacoes"></div></li>
+        
+<li data-id="radio-2130607"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="radio.png" alt="RÁDIO" class="profile-pic"><span class="material-text">RÁDIO PORTÁTIL SERIAL: 2130607 - Nº02</span><div class="anotacoes"></div></li>
+        
+<li data-id="radio-2130608"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="radio.png" alt="RÁDIO" class="profile-pic"><span class="material-text">RÁDIO PORTÁTIL SERIAL: 2130608 - Nº03</span><div class="anotacoes"></div></li>
+   
+<li data-id="radio-2130609"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="radio.png" alt="RÁDIO" class="profile-pic"><span class="material-text">RÁDIO PORTÁTIL SERIAL: 2130609 - Nº04</span><div class="anotacoes"></div></li>
+        
+<li data-id="radio-2130610"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="radio.png" alt="RÁDIO" class="profile-pic"><span class="material-text">RÁDIO PORTÁTIL SERIAL: 2130610 - Nº05</span><div class="anotacoes"></div></li>
+        
+<li data-id="radio-2131250"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="radio.png" alt="RÁDIO" class="profile-pic"><span class="material-text">RÁDIO PORTÁTIL SERIAL: 2131250 - Nº06</span><div class="anotacoes"></div></li>
+        
+<li data-id="radio-2131251"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="radio.png" alt="RÁDIO" class="profile-pic"><span class="material-text">RÁDIO PORTÁTIL SERIAL: 2131251 - Nº07</span><div class="anotacoes"></div></li>
+        
+<li data-id="radio-2131252"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="radio.png" alt="RÁDIO" class="profile-pic"><span class="material-text">RÁDIO PORTÁTIL SERIAL: 2131252 - Nº08</span><div class="anotacoes"></div></li>
+       
+<li data-id="radio-2131253"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="radio.png" alt="RÁDIO" class="profile-pic"><span class="material-text">RÁDIO PORTÁTIL SERIAL: 2131253 - Nº09</span><div class="anotacoes"></div></li>
+        
+<li data-id="radio-2131254"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="radio.png" alt="RÁDIO" class="profile-pic"><span class="material-text">RÁDIO PORTÁTIL SERIAL: 2131254 - Nº10</span><div class="anotacoes"></div></li>
+        
+<li data-id="radio-2131255"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="radio.png" alt="RÁDIO" class="profile-pic"><span class="material-text">RÁDIO PORTÁTIL SERIAL: 2131255 - Nº11</span><div class="anotacoes"></div></li>
+        
+<li data-id="radio-2131256"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="radio.png" alt="RÁDIO" class="profile-pic"><span class="material-text">RÁDIO PORTÁTIL SERIAL: 2131256 - Nº12</span><div class="anotacoes"></div></li>
+        
+<li data-id="radio-2131257"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="radio.png" alt="RÁDIO" class="profile-pic"><span class="material-text">RÁDIO PORTÁTIL SERIAL: 2131257 - Nº13</span><div class="anotacoes"></div></li>
+        
+<li data-id="radio-2130096"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="radio.png" alt="RÁDIO" class="profile-pic"><span class="material-text">RÁDIO PORTÁTIL SERIAL: 2130096 - Nº14</span><div class="anotacoes"></div></li>
+        
+<li data-id="radio-2130097"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="radio.png" alt="RÁDIO" class="profile-pic"><span class="material-text">RÁDIO PORTÁTIL SERIAL: 2130097 - Nº15</span><div class="anotacoes"></div></li>
+        
+<li data-id="radio-2130098"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="radio.png" alt="RÁDIO" class="profile-pic"><span class="material-text">RÁDIO PORTÁTIL SERIAL: 2130098 - Nº16</span><div class="anotacoes"></div></li>
+        
+<li data-id="radio-2130099"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="radio.png" alt="RÁDIO" class="profile-pic"><span class="material-text">RÁDIO PORTÁTIL SERIAL: 2130099 - Nº17</span><div class="anotacoes"></div></li>
+        
+<li data-id="radio-2130100"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="radio.png" alt="RÁDIO" class="profile-pic"><span class="material-text">RÁDIO PORTÁTIL SERIAL: 2130100 - Nº18</span><div class="anotacoes"></div></li>
+        
+<li data-id="radio-2130101"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="radio.png" alt="RÁDIO" class="profile-pic"><span class="material-text">RÁDIO PORTÁTIL SERIAL: 2130101 - Nº19</span><div class="anotacoes"></div></li>
+        
+<li data-id="radio-2130102"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="radio.png" alt="RÁDIO" class="profile-pic"><span class="material-text">RÁDIO PORTÁTIL SERIAL: 2130102 - Nº20</span><div class="anotacoes"></div></li>
+
+        <!-- =================== SPARK =================== -->
+        <li data-id="spark-SC0016953"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="spark.png" alt="SPARK" class="profile-pic"><span class="material-text">SPARK SERIAL: SC0016953 - Nº01</span><div class="anotacoes"></div></li>
+        <li data-id="spark-0016151"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="spark.png" alt="SPARK" class="profile-pic"><span class="material-text">SPARK SERIAL: 0016151 - Nº02</span><div class="anotacoes"></div></li>
+        <li data-id="spark-0015681"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="spark.png" alt="SPARK" class="profile-pic"><span class="material-text">SPARK SERIAL: 0015681 - Nº03</span><div class="anotacoes"></div></li>
+        <li data-id="spark-0016176"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="spark.png" alt="SPARK" class="profile-pic"><span class="material-text">SPARK SERIAL: 0016176 - Nº04</span><div class="anotacoes"></div></li>
+
+        <!-- =================== CAL.12 =================== -->
+        <li data-id="cal.12-00000"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="12.png" alt="CAL.12" class="profile-pic"><span class="material-text">Espingarda CAL.12 M3 A1 BENELLI NºSEPM-00267Y - Nº01</span><div class="anotacoes"></div></li>
+   
+        <!-- =================== Lançador cal.37/40mm =================== -->
+        <li data-id="cal.37/40mm"><input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()"><img src="37.png" alt="Cal.37" class="profile-pic"><span class="material-text">Lançador CAL.37/40mm: 01 unidade com 10 cartuchos. Nº de serie: G27609. - Nº01</span><div class="anotacoes"></div></li>
+
+        <!-- =================== MATERIAIS CONTÁVEIS =================== -->
+        <li data-id="cartucho-spark" data-max="10">
+            <input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()" title="Selecionar para envio múltiplo">
+            <img src="cartucho-spark.png" alt="Cartucho" class="profile-pic">
+            <span class="material-text">Cartuchos de SPARK</span>
+            <div class="anotacoes"></div>
+        </li>
+        <li data-id="gl108-max" data-max="4">
+            <input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()" title="Selecionar para envio múltiplo">
+            <img src="gl-108-max.png" alt="GL 108 MAX" class="profile-pic">
+            <span class="material-text">GL 108 MAX ESPARGIDOR DE PIMENTA 450g CONDOR LOT MUT-V</span>
+            <div class="anotacoes"></div>
+        </li>
+        <li data-id="gl108-mini" data-max="2">
+            <input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()" title="Selecionar para envio múltiplo">
+            <img src="gl-108-mini.png" alt="GL 108 MINI" class="profile-pic">
+            <span class="material-text">GL 108 MINI ESPARGIDOR DE PIMENTA 65g CONDOR LOT MUT-X</span>
+            <div class="anotacoes"></div>
+        </li>
+        <li data-id="capacetes" data-max="4">
+            <input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()" title="Selecionar para envio múltiplo">
+            <img src="capacete.png" alt="CAPACETES" class="profile-pic">
+            <span class="material-text">CAPACETES BALÍSTICO</span>
+            <div class="anotacoes"></div>
+        </li>
+        <li data-id="tonfas" data-max="26">
+            <input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()" title="Selecionar para envio múltiplo">
+            <img src="tonfa.png" alt="TONFAS" class="profile-pic">
+            <span class="material-text">TONFAS (Unidades)</span>
+            <div class="anotacoes"></div>
+        </li>
+        <li data-id="mun-elastomero" data-max="100">
+            <input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()" title="Selecionar para envio múltiplo">
+            <img src="bala-elastomero.png" alt="MUNIÇÕES" class="profile-pic">
+            <span class="material-text">MUNIÇÕES ELASTÔMERO</span>
+            <div class="anotacoes"></div>
+        </li>
+        <li data-id="granada-gl300" data-max="3">
+            <input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()" title="Selecionar para envio múltiplo">
+            <img src="gl-300.png" alt="GL-300" class="profile-pic">
+            <span class="material-text">GRANADAS GL-300</span>
+            <div class="anotacoes"></div>
+        </li>
+        <li data-id="granada-gl304" data-max="3">
+            <input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()" title="Selecionar para envio múltiplo">
+            <img src="gl-304.png" alt="GL-304" class="profile-pic">
+            <span class="material-text">GRANADAS GL-304</span>
+            <div class="anotacoes"></div>
+        </li>
+        <li data-id="granada-gb707" data-max="1">
+            <input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()" title="Selecionar para envio múltiplo">
+            <img src="gb-707.png" alt="GB 7O7" class="profile-pic">
+            <span class="material-text">GRANADAS GB 7O7</span>
+            <div class="anotacoes"></div>
+        </li>
+
+        <!-- =================== MATERIAIS CONTÁVEIS CARREGADORES E MUNIÇÕES =================== -->
+        <li data-id="carregador-7.62-c32" data-max="32">
+            <input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()" title="Selecionar para envio múltiplo">
+            <img src="carregador-762.png" alt="Carregador 7.62" class="profile-pic">
+            <span class="material-text">CARREGADORES 7.62</span>
+            <div class="anotacoes"></div>
+        </li>
+        <li data-id="carregador-5.56-c16" data-max="16">
+            <input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()" title="Selecionar para envio múltiplo">
+            <img src="carregador-556.png" alt="Carregador 5.56" class="profile-pic">
+            <span class="material-text">CARREGADORES 5.56</span>
+            <div class="anotacoes"></div>
+        </li>
+        <li data-id="carregador-pt100-c60" data-max="60">
+            <input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()" title="Selecionar para envio múltiplo">
+            <img src="carregador-pt100.png" alt="Carregador PT100" class="profile-pic">
+            <span class="material-text">CARREGADORES PT100</span>
+            <div class="anotacoes"></div>
+        </li>
+        <li data-id="carregador-imbel-c20" data-max="20">
+            <input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()" title="Selecionar para envio múltiplo">
+            <img src="carregador-imbel.png" alt="Carregador IMBEL" class="profile-pic">
+            <span class="material-text">CARREGADORES IMBEL</span>
+            <div class="anotacoes"></div>
+        </li>
+        <li data-id="bateria-radio-r40" data-max="40">
+            <input type="checkbox" class="checkbox-zap" onclick="atualizarContadorZap()" title="Selecionar para envio múltiplo">
+            <img src="bateria-radio.png" alt="Bateria Rádio digital" class="profile-pic">
+            <span class="material-text">BATERIA RÁDIO DIGITAL</span>
+            <div class="anotacoes"></div>
+        </li>
+    </ul>
+
+    <!-- MODAL DE OBSERVAÇÕES -->
+    <div id="obsModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="fecharModal('obsModal')">&times;</span>
+            <div class="modal-header">
+                <h2 id="modalTitle">Observação</h2>
+            </div>
+            <div class="modal-body">
+                <p style="font-size: 0.9rem; color: #666;">Descreva abaixo a avaria, pessoa acautelada ou motivo da baixa/retenção:</p>
+                <textarea id="obsInput" class="input-form" placeholder="Ex: Baixa por peça quebrada... (Deixe em branco se estiver OK)"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-clear" onclick="limparObs()">Limpar / OK</button>
+                <button class="btn-save" onclick="salvarObs()">Salvar Observação</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE PAGAMENTO NORMAL -->
+    <div id="pagarModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="fecharModal('pagarModal')">&times;</span>
+            <div class="modal-header">
+                <h2 id="pagarModalTitle">Pagar Armamento/Equipamento</h2>
+            </div>
+            <div class="modal-body">
+                <p style="font-size: 0.9rem; color: #666;">Preencha os dados do policial que está retirando o material:</p>
+                
+                <label style="font-weight:bold; color:#0d1b2a;">RG (Digite p/ buscar):</label>
+                <input type="text" id="pagarRG" list="listaPoliciais" oninput="preencherPolicialPagar()" class="input-form" placeholder="Ex: 99.999">
+                
+                <label style="font-weight:bold; color:#0d1b2a;">Nome do Policial (Digite p/ buscar):</label>
+                <input type="text" id="pagarNome" list="listaPoliciaisNomes" oninput="preencherRgPorNomePagar()" class="input-form" placeholder="Ex: SD Silva">
+
+                <label style="font-weight:bold; color:#0d1b2a;">Data de Saída:</label>
+                <input type="date" id="pagarData" class="input-form">
+            </div>
+            <div class="modal-footer">
+                <button class="btn-clear" style="background-color: #aaa;" onclick="fecharModal('pagarModal')">Cancelar</button>
+                <button class="btn-save" onclick="confirmarPagar()">Confirmar Pagamento</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: DIA ANTERIOR -->
+    <div id="anteriorModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="fecharModal('anteriorModal')">&times;</span>
+            <div class="modal-header">
+                <h2 id="anteriorModalTitle">Material do Serviço Anterior</h2>
+            </div>
+            <div class="modal-body">
+                <p style="font-size: 0.9rem; color: #666;">Preencha os dados do policial do serviço anterior (Escala passada):</p>
+                
+                <label style="font-weight:bold; color:#0d1b2a;">RG (Digite p/ buscar):</label>
+                <input type="text" id="anteriorRG" list="listaPoliciais" oninput="preencherPolicialAnterior()" class="input-form" placeholder="Ex: 99.999">
+                
+                <label style="font-weight:bold; color:#0d1b2a;">Nome do Policial (Digite p/ buscar):</label>
+                <input type="text" id="anteriorNome" list="listaPoliciaisNomes" oninput="preencherRgPorNomeAnterior()" class="input-form" placeholder="Ex: SD Silva">
+
+                <label style="font-weight:bold; color:#0d1b2a;">Data do Serviço Passado:</label>
+                <input type="date" id="anteriorData" class="input-form">
+            </div>
+            <div class="modal-footer">
+                <button class="btn-clear" style="background-color: #aaa;" onclick="fecharModal('anteriorModal')">Cancelar</button>
+                <button class="btn-save" onclick="confirmarAnterior()">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- NOVO MODAL: FIXO (OUTROS SETORES) -->
+    <div id="fixoModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="fecharModal('fixoModal')">&times;</span>
+            <div class="modal-header">
+                <h2 id="fixoModalTitle">Acautelamento Fixo / Outro Setor</h2>
+            </div>
+            <div class="modal-body">
+                <p style="font-size: 0.9rem; color: #666;">Preencha os dados do setor e responsável pelo material fixo:</p>
+                
+                <label style="font-weight:bold; color:#0d1b2a;">Setor de Destino:</label>
+                <input type="text" id="fixoSetor" class="input-form" list="setoresList" placeholder="Ex: P2, SOP, Permanência...">
+
+                <label style="font-weight:bold; color:#0d1b2a;">RG do Responsável (Opcional):</label>
+                <input type="text" id="fixoRG" list="listaPoliciais" oninput="preencherPolicialFixo()" class="input-form" placeholder="Ex: 99.999">
+                
+                <label style="font-weight:bold; color:#0d1b2a;">Nome do Responsável:</label>
+                <input type="text" id="fixoNome" list="listaPoliciaisNomes" oninput="preencherRgPorNomeFixo()" class="input-form" placeholder="Ex: SGT Silva">
+
+                <label style="font-weight:bold; color:#0d1b2a;">Data de Saída:</label>
+                <input type="date" id="fixoData" class="input-form">
+            </div>
+            <div class="modal-footer">
+                <button class="btn-clear" style="background-color: #aaa;" onclick="fecharModal('fixoModal')">Cancelar</button>
+                <button class="btn-save" onclick="confirmarFixo()">Confirmar Fixo</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE EMPRÉSTIMO PROEIS -->
+    <div id="proeisModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="fecharModal('proeisModal')">&times;</span>
+            <div class="modal-header">
+                <h2 id="proeisModalTitle">Empréstimo (PROEIS)</h2>
+            </div>
+            <div class="modal-body">
+                <p style="font-size: 0.9rem; color: #666;">Preencha os dados do policial para registrar o empréstimo (limite de 60 horas):</p>
+                
+                <label style="font-weight:bold; color:#0d1b2a;">RG (Digite p/ buscar):</label>
+                <input type="text" id="proeisRG" list="listaPoliciais" oninput="preencherPolicialProeis()" class="input-form" placeholder="Ex: 99.999">
+                
+                <label style="font-weight:bold; color:#0d1b2a;">Nome do Policial (Digite p/ buscar):</label>
+                <input type="text" id="proeisNome" list="listaPoliciaisNomes" oninput="preencherRgPorNomeProeis()" class="input-form" placeholder="Ex: SGT Silva">
+            </div>
+            <div class="modal-footer">
+                <button class="btn-clear" style="background-color: #aaa;" onclick="fecharModal('proeisModal')">Cancelar</button>
+                <button class="btn-save" onclick="confirmarProeis()">Confirmar Empréstimo</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE REPASSE DE ARMAMENTO -->
+    <div id="repasseModal" class="modal">
+        <div class="modal-content" style="max-width: 750px;">
+            <span class="close-btn" onclick="fecharModal('repasseModal')">&times;</span>
+            <div class="modal-header">
+                <h2>Repasse de Armamento</h2>
+            </div>
+            <div class="modal-body">
+                
+                <input type="hidden" id="repasseEditIndex" value="-1">
+                <input type="hidden" id="repasseItemId" value="">
+                <input type="hidden" id="repasseOrigemTel" value="">
+                <input type="hidden" id="repasseDestinoTel" value="">
+
+                <div style="margin-bottom: 15px;">
+                    <label style="font-weight:bold; font-size: 0.85rem;">Armamento / Material:</label>
+                    <input type="text" id="repasseMaterial" list="listaMateriais" class="input-form" style="padding: 8px; margin-bottom: 0;" placeholder="Selecione clicando no botão de Repasse do card ou digite aqui...">
+                    <datalist id="listaMateriais">
+                        <!-- Preenchido via JavaScript -->
+                    </datalist>
+                </div>
+                
+                <div style="display: flex; gap: 15px; margin-bottom: 15px;">
+                    <div style="flex: 1; border: 1px dashed #ccc; padding: 15px; border-radius: 4px; background-color: #f8fafc;">
+                        <h3 style="margin-top:0; font-size: 1rem; color: #0d1b2a;">De (Origem)</h3>
+                        <label style="font-weight:bold; font-size: 0.85rem;">RG (Digite p/ buscar):</label>
+                        <input type="text" id="repasseOrigemRG" list="listaPoliciais" oninput="preencherPolicial('Origem')" class="input-form" style="margin-bottom: 10px; padding: 8px;" placeholder="Ex: 110134">
+                        <label style="font-weight:bold; font-size: 0.85rem;">Nome / Patente:</label>
+                        <input type="text" id="repasseOrigemNome" class="input-form" style="margin-bottom: 10px; padding: 8px;" placeholder="Ex: SD LIMA">
+                        <label style="font-weight:bold; font-size: 0.85rem;">Data Origem:</label>
+                        <input type="date" id="repasseOrigemData" class="input-form" style="margin-bottom: 10px; padding: 8px;">
+                        <!-- NOVO CAMPO SETOR ORIGEM -->
+                        <label style="font-weight:bold; font-size: 0.85rem;">Setor Origem:</label>
+                        <input type="text" id="repasseOrigemSetor" class="input-form" list="setoresList" style="margin-bottom: 0; padding: 8px;" placeholder="Ex: Permanência">
+                    </div>
+
+                    <div style="flex: 1; border: 1px dashed #ccc; padding: 15px; border-radius: 4px; background-color: #f8fafc;">
+                        <h3 style="margin-top:0; font-size: 1rem; color: #0d1b2a;">Para (Destino)</h3>
+                        <label style="font-weight:bold; font-size: 0.85rem;">RG (Digite p/ buscar):</label>
+                        <input type="text" id="repasseDestinoRG" list="listaPoliciais" oninput="preencherPolicial('Destino')" class="input-form" style="margin-bottom: 10px; padding: 8px;" placeholder="Ex: 103097">
+                        <label style="font-weight:bold; font-size: 0.85rem;">Nome / Patente:</label>
+                        <input type="text" id="repasseDestinoNome" class="input-form" style="margin-bottom: 10px; padding: 8px;" placeholder="Ex: 3º SGT ALBUQUERQUE">
+                        <label style="font-weight:bold; font-size: 0.85rem;">Data Destino:</label>
+                        <input type="date" id="repasseDestinoData" class="input-form" style="margin-bottom: 10px; padding: 8px;">
+                        <!-- NOVO CAMPO SETOR DESTINO -->
+                        <label style="font-weight:bold; font-size: 0.85rem;">Setor Destino:</label>
+                        <input type="text" id="repasseDestinoSetor" class="input-form" list="setoresList" style="margin-bottom: 0; padding: 8px;" placeholder="Ex: GTPP">
+                    </div>
+                </div>
+
+                <datalist id="setoresList">
+                    <option value="Fiscal de Dia">
+                    <option value="Permanência">
+                    <option value="GTPP - Euclides">
+                    <option value="GTPP - Cabritos">
+                    <option value="GPP - Baptista">
+                    <option value="Gpp - Tabajaras">
+                    <option value="Apoio - PB03">
+                    <option value="P2">
+                    <option value="SOP">
+                    <option value="Reserva / Outros">
+                </datalist>
+
+                <button class="btn-save" style="width: 100%; font-weight: bold;" onclick="salvarRepasse()">Salvar Repasse</button>
+                
+                <h3 style="margin-top: 25px; font-size: 1.1rem; border-bottom: 1px solid #ccc; padding-bottom: 5px;">Histórico de Repasses (Confirmação via WhatsApp)</h3>
+                
+                <!-- Buscador do Histórico de Repasses -->
+                <input type="text" id="search-repasse" class="input-form" style="margin-bottom: 10px; padding: 8px;" placeholder="Buscar por material, nome ou equipe..." onkeyup="filtrarHistoricoRepasse()">
+                
+                <div style="max-height: 200px; overflow-y: auto; border: 1px solid #ccc; border-radius: 4px;">
+                    <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;" id="tabelaRepasse">
+                        <thead>
+                            <tr style="background-color: #0d1b2a; color: white; text-align: left;">
+                                <th style="padding: 8px; border-bottom: 2px solid #ddd;">Material</th>
+                                <th style="padding: 8px; border-bottom: 2px solid #ddd; text-align: center;">Setores</th>
+                                <th style="padding: 8px; border-bottom: 2px solid #ddd;">De ➡️ Para</th>
+                                <th style="padding: 8px; border-bottom: 2px solid #ddd; text-align: center;">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbodyRepasse">
+                            <!-- Preenchido via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer"><footer>- Direitos reservados a RUMB webdesign -</footer></div>
+
+    <script>
+        let filtroFaltantesAtivo = false;
+        let filtroStatusAtivo = 'TODOS';
+        let currentSerialId = null;
+        let currentPagarId = null; 
+        let currentAnteriorId = null;
+        let currentFixoId = null;
+
+        // --- FUNÇÃO PARA ALTERNAR A VISIBILIDADE DO PAINEL DE AÇÕES ---
+        function togglePainelAcoes() {
+            const painel = document.getElementById('painel-acoes');
+            if (painel.style.display === 'none' || painel.style.display === '') {
+                painel.style.display = 'flex';
+            } else {
+                painel.style.display = 'none';
+            }
+        }
+
+        // --- BANCO DE DADOS DOS POLICIAIS ---
+        const basePoliciais = [
+            { rg: '110134', nome: 'SD PM LIMA', tel: '5521970336379' },
+            { rg: '103097', nome: '3º SGT PM ALBUQUERQUE', tel: '5521970375724' },
+            { rg: '105324', nome: 'CB PM EUZÉBIO', tel: '5521982006815' },
+            { rg: '100235', nome: '3º SGT PM BRUNO', tel: '5521982566832' },
+            { rg: '103776', nome: '3º SGT PM CARNEIRO', tel: '5521970174485' },
+            { rg: '103800', nome: '3º SGT PM MELLO', tel: '5532998419962' },
+            { rg: '90521', nome: '3º SGT PM LOURO', tel: '5521964716337' },
+            { rg: '103190', nome: '3º SGT PM CASTRO', tel: '5521964544472' },
+            { rg: '101235', nome: '3º SGT PM XIMENES', tel: '5521983232636' },
+            { rg: '93330', nome: '3º SGT PM DA LUZ', tel: '5521964265794' },
+            { rg: '93977', nome: '3º SGT PM S. OLIVEIRA', tel: '5521993803418' },
+            { rg: '101492', nome: '3º SGT PM LEANDRO BAPTISTA', tel: '5521991122289' },
+            { rg: '98826', nome: '3º SGT PM BARROCO', tel: '5521996607799' },
+            { rg: '109091', nome: 'CB PM DAMASCENO', tel: '' },
+            { rg: '112380', nome: 'SD PM DYLLAN', tel: '5522998279364' },
+            { rg: '106071', nome: 'CB PM ANDERSON', tel: '5521964914757' },
+            { rg: '112377', nome: 'SD PM MATOS', tel: '5522997390919' },
+            { rg: '99934', nome: '3º SGT PM BAIA', tel: '5521964025323' },
+            { rg: '112350', nome: 'SD PM GILVAN FLOR', tel: '5522999678068' },
+            { rg: '108663', nome: 'CB PM ANTONIO ANDRE D', tel: '5521965997857' },
+            { rg: '96097', nome: '3º SGT PM GATTO', tel: '5521964941521' },
+            { rg: '98382', nome: '3º SGT PM NETO', tel: '5521983796752' },
+            { rg: '104072', nome: '3º SGT PM FLAVIO LUIZ', tel: '5521982893878' },
+            { rg: '96253', nome: '3º SGT PM SILVA GOMES', tel: '5521964011713' },
+            { rg: '104788', nome: 'CB PM MORGADO', tel: '' },
+            { rg: '97864', nome: '3º SGT PM BARRETO', tel: '5521971961216' },
+            { rg: '91951', nome: '3º SGT PM CARLA', tel: '5521975220505' },
+            { rg: '85446', nome: '2º SGT PM SEKIGUCHI', tel: '5521982554242' },
+            { rg: '85538', nome: '2º SGT PM GEORGE', tel: '5521964215356' },
+            { rg: '94010', nome: '3º SGT PM R. SIMÕES', tel: '5521982539175' },
+            { rg: '85523', nome: '2º SGT PM BRUNO LIMA', tel: '5521970059743' },
+            { rg: '94429', nome: '3º SGT PM MOURA', tel: '5521964211720' },
+            { rg: '103265', nome: '3º SGT PM ORTIZ', tel: '5522992868403' },
+            { rg: '102571', nome: '3º SGT PM L. MACHADO', tel: '5521964747153' },
+            { rg: '108023', nome: 'CB PM ALESSANDRO', tel: '5521975051238' },
+            { rg: '95976', nome: '3º SGT PM PATRICK', tel: '5521964310826' },
+            { rg: '101187', nome: '3º SGT PM ROBERTO', tel: '5521964196915' },
+            { rg: '102430', nome: '3º SGT PM INOCENCIO', tel: '5521971002524' },
+            { rg: '103780', nome: '3º SGT PM W. MARINHO', tel: '5521993769598' },
+            { rg: '92907', nome: '3º SGT PM VARJÃO', tel: '5521983630383' },
+            { rg: '106304', nome: 'CB PM DE OLIVEIRA', tel: '5521969069838' },
+            { rg: '98071', nome: '3º SGT PM LUIZ', tel: '5521996001871' },
+            { rg: '107521', nome: 'CB PM PANTOJA', tel: '5521980815284' },
+            { rg: '105475', nome: 'CB PM LUCIANO', tel: '5521965494587' },
+            { rg: '98631', nome: '3º SGT PM BARTHOLO', tel: '5521979955405' },
+            { rg: '94319', nome: '3º SGT PM CLESCIO', tel: '5521964417050' },
+            { rg: '105711', nome: 'CB PM SOUZA LIMA', tel: '5521968323211' },
+            { rg: '90431', nome: '3º SGT PM GELSON', tel: '5521971775779' },
+            { rg: '105219', nome: 'CB PM LUCAS (C)', tel: '5521998145601' },
+            { rg: '92931', nome: '3º SGT PM DE ANDRADE', tel: '5521964490314' },
+            { rg: '100941', nome: '3º SGT PM REIS', tel: '5521964362726' },
+            { rg: '105709', nome: 'CB PM LUIZ SILVA', tel: '5521991695707' },
+            { rg: '92156', nome: '3º SGT PM GRANJA', tel: '5521975935737' },
+            { rg: '103807', nome: '3º SGT PM PITZER', tel: '' },
+            { rg: '106876', nome: 'CB PM CRISTIANO', tel: '5521976672870' },
+            { rg: '102727', nome: '3º SGT PM AMAURI', tel: '' },
+            { rg: '106708', nome: 'CB PM COUTO', tel: '5521968388608' },
+            { rg: '98741', nome: '3º SGT PM EUGENIO', tel: '5521970393233' },
+            { rg: '86268', nome: '2º SGT PM SERGIO', tel: '5521964403044' },
+            { rg: '95872', nome: '3º SGT PM J. CARLOS', tel: '5521987123133' },
+            { rg: '101882', nome: '3º SGT PM CHAVES', tel: '' },
+            { rg: '105544', nome: 'CB PM GOMES', tel: '' },
+            { rg: '95865', nome: '3º SGT PM PEDROSO', tel: '5521969719181' },
+            { rg: '98598', nome: '3º SGT PM SATLES', tel: '' },
+            { rg: '100142', nome: '3º SGT PM HASSAN', tel: '5521975318805' },
+            { rg: '93431', nome: '3º SGT PM QUITETE', tel: '' },
+            { rg: '92616', nome: '3º SGT PM R PEGAS', tel: '5521976126928' },
+            { rg: '103353', nome: '3º SGT PM CHELQUE', tel: '5521964121798' },
+            { rg: '98697', nome: '3º SGT PM NARCISO', tel: '5521995795374' },
+            { rg: '96396', nome: '3º SGT PM ANA CAROLINA', tel: '5521970243046' },
+            { rg: '105154', nome: 'CB PM IMBUZEIRO', tel: '' },
+            { rg: '87913', nome: 'CAP PM CERQUEIRA', tel: '' },
+            { rg: '96773', nome: '3º SGT PM DE ALMEIDA', tel: '' },
+            { rg: '102154', nome: '3º SGT PM BONIFACIO', tel: '' },
+            { rg: '95999', nome: '3º SGT PM ESCOBAR', tel: '' },
+            { rg: '109234', nome: 'CB PM SOLEDADE', tel: '' },
+            { rg: '77200', nome: '1º SGT PM PRADO', tel: '21964648351' },
+            { rg: '83685', nome: '3º SGT PM Ausente', tel: '21xxxxxxxxx' },
+            { rg: '99044', nome: '3º SGT PM Ausente', tel: '21xxxxxxxxx' },
+            { rg: '88511', nome: '3º SGT PM Ausente', tel: '21xxxxxxxxx' },
+            { rg: '112047', nome: 'SD PM Ausente', tel: '21xxxxxxxxx' },
+            { rg: '70428', nome: 'SUBTEN PM SIRLEY', tel: '21964776159' },
+            { rg: '89822', nome: '3º SGT PM Ausente', tel: '21xxxxxxxxx' },
+            { rg: '99647', nome: '3º SGT PM Ausente', tel: '21xxxxxxxxx' },
+            { rg: '107840', nome: 'CB PM DO CARMO', tel: '21979727305' },
+            { rg: '69814', nome: 'SUBTEN PM JANDELSON', tel: '21970139016' },
+            { rg: '94031', nome: '3º SGT PM REGATTIERI', tel: 'xxxxxxxxxx' },
+            { rg: '91164', nome: '3º SGT PM D MARTINS', tel: 'xxxxxxxxx' },
+            { rg: '89822', nome: '3º SGT PM BENJAMIM', tel: 'xxxxxxxxx' },
+            { rg: '106186', nome: 'CB PM R. SILVA', tel: 'xxxxxxxxx' }
+
+        ];
+
+        function carregarListaPoliciais() {
+            const datalist = document.getElementById('listaPoliciais');
+            const datalistNomes = document.getElementById('listaPoliciaisNomes');
+            basePoliciais.forEach(policial => {
+                const option = document.createElement('option');
+                option.value = policial.rg;
+                option.text = policial.nome;
+                datalist.appendChild(option);
+                
+                if (datalistNomes) {
+                    const optionNome = document.createElement('option');
+                    optionNome.value = policial.nome;
+                    datalistNomes.appendChild(optionNome);
+                }
+            });
+        }
+
+        // --- NOVA FUNÇÃO PARA CARREGAR MATERIAIS NO DATALIST ---
+        function carregarListaMateriais() {
+            const datalist = document.getElementById('listaMateriais');
+            const itens = document.querySelectorAll('#name-list li');
+            datalist.innerHTML = ''; 
+            itens.forEach(li => {
+                const textoMaterial = li.querySelector('.material-text').innerText;
+                const option = document.createElement('option');
+                option.value = textoMaterial;
+                datalist.appendChild(option);
+            });
+        }
+
+        function preencherPolicial(tipo) {
+            const rgDigitado = document.getElementById(`repasse${tipo}RG`).value.trim();
+            const policial = basePoliciais.find(p => p.rg === rgDigitado);
+            
+            if (policial) {
+                document.getElementById(`repasse${tipo}Nome`).value = policial.nome;
+                document.getElementById(`repasse${tipo}Tel`).value = policial.tel;
+            } else {
+                document.getElementById(`repasse${tipo}Tel`).value = '';
+            }
+        }
+        
+        function preencherPolicialProeis() {
+            const rgDigitado = document.getElementById('proeisRG').value.trim();
+            const policial = basePoliciais.find(p => p.rg === rgDigitado);
+            if (policial) document.getElementById('proeisNome').value = policial.nome;
+        }
+        
+        function preencherRgPorNomeProeis() {
+            const nomeDigitado = document.getElementById('proeisNome').value.trim();
+            const policial = basePoliciais.find(p => p.nome === nomeDigitado);
+            if (policial) document.getElementById('proeisRG').value = policial.rg;
+        }
+
+        function preencherPolicialPagar() {
+            const rgDigitado = document.getElementById('pagarRG').value.trim();
+            const policial = basePoliciais.find(p => p.rg === rgDigitado);
+            if (policial) document.getElementById('pagarNome').value = policial.nome;
+        }
+
+        function preencherRgPorNomePagar() {
+            const nomeDigitado = document.getElementById('pagarNome').value.trim();
+            const policial = basePoliciais.find(p => p.nome === nomeDigitado);
+            if (policial) document.getElementById('pagarRG').value = policial.rg;
+        }
+
+        function preencherPolicialAnterior() {
+            const rgDigitado = document.getElementById('anteriorRG').value.trim();
+            const policial = basePoliciais.find(p => p.rg === rgDigitado);
+            if (policial) document.getElementById('anteriorNome').value = policial.nome;
+        }
+
+        function preencherRgPorNomeAnterior() {
+            const nomeDigitado = document.getElementById('anteriorNome').value.trim();
+            const policial = basePoliciais.find(p => p.nome === nomeDigitado);
+            if (policial) document.getElementById('anteriorRG').value = policial.rg;
+        }
+
+        // --- PREENCHIMENTO FIXO ---
+        function preencherPolicialFixo() {
+            const rgDigitado = document.getElementById('fixoRG').value.trim();
+            const policial = basePoliciais.find(p => p.rg === rgDigitado);
+            if (policial) document.getElementById('fixoNome').value = policial.nome;
+        }
+
+        function preencherRgPorNomeFixo() {
+            const nomeDigitado = document.getElementById('fixoNome').value.trim();
+            const policial = basePoliciais.find(p => p.nome === nomeDigitado);
+            if (policial) document.getElementById('fixoRG').value = policial.rg;
+        }
+
+        function inicializarMateriais() {
+            let historico = JSON.parse(localStorage.getItem('historico_repasses')) || [];
+            let alterouHistorico = false;
+            const agora = Date.now();
+
+            historico.forEach(r => {
+                if (!r.baixado) {
+                    let isOld = false;
+                    if (r.timestamp) {
+                        isOld = (agora - r.timestamp) > (48 * 60 * 60 * 1000);
+                    } else if (r.destinoData) {
+                        const dataRep = new Date(r.destinoData).getTime();
+                        isOld = (agora - dataRep) > (48 * 60 * 60 * 1000);
+                    }
+
+                    if (isOld) {
+                        r.baixado = true; 
+                        if (r.itemId) {
+                            localStorage.removeItem('rep_status_' + r.itemId);
+                        } else {
+                            const itensBusca = document.querySelectorAll('#name-list li');
+                            itensBusca.forEach(liBusca => {
+                                if (liBusca.querySelector('.material-text').innerText === r.material) {
+                                    localStorage.removeItem('rep_status_' + liBusca.getAttribute('data-id'));
+                                }
+                            });
+                        }
+                        alterouHistorico = true;
+                    }
+                }
+            });
+
+            if (alterouHistorico) {
+                localStorage.setItem('historico_repasses', JSON.stringify(historico));
+            }
+
+            const itens = document.querySelectorAll('#name-list li');
+            
+            let qtdConferidas = 0;
+            let qtdPagas = 0;
+            let qtdAnterior = 0; 
+            let qtdFixo = 0; // Novo
+            let qtdProeis = 0;
+            let qtdRepasse = 0;
+            let qtdRetidas = 0;
+            let qtdGuardadas = 0;
+            let totalMateriais = 0;
+
+            itens.forEach(li => {
+                const id = li.getAttribute('data-id');
+                const savedObs = localStorage.getItem('obs_' + id);
+
+                // --- Lógica para itens CONTÁVEIS ---
+                if (li.hasAttribute('data-max')) {
+                    const baseMax = parseInt(li.getAttribute('data-max'));
+                    let emprestados = parseInt(localStorage.getItem('emprestados_' + id)) || 0;
+                    const max = baseMax - emprestados;
+
+                    let current = parseInt(localStorage.getItem('count_' + id)) || 0;
+                    
+                    if (current > max) {
+                        current = max;
+                        localStorage.setItem('count_' + id, current);
+                    }
+                    
+                    if (current === max) li.className = "card-checked";
+                    else if (current > 0) li.className = "card-partial";
+                    else li.className = "";
+
+                    let btnObsClass = "status-ok";
+                    let btnObsText = "Verificar / Relatar";
+                    if (savedObs && savedObs.trim() !== "") {
+                        btnObsClass = "status-alert";
+                        btnObsText = "⚠️ VER OBS/AVARIA";
+                    }
+
+                    let btnContainer = li.querySelector('.action-buttons');
+                    if (!btnContainer) {
+                        btnContainer = document.createElement('div');
+                        btnContainer.className = 'action-buttons';
+                        li.appendChild(btnContainer);
+                    }
+
+                    btnContainer.innerHTML = `
+                        <div class="contador-container">
+                            <button class="btn-count minus" onclick="alterarContador('${id}', -1)">-</button>
+                            <span id="count_${id}" class="count-display">${current} / ${max}</span>
+                            <button class="btn-count plus" onclick="alterarContador('${id}', 1)">+</button>
+                        </div>
+                        <div style="text-align: center; font-size: 0.75rem; color: #ea580c; font-weight: bold; margin-top: 4px; margin-bottom: 4px; cursor: pointer;" onclick="ajustarAlocados('${id}')" title="Clique para corrigir se o valor estiver errado">
+                            ⚠️ ${emprestados} alocados em armas
+                        </div>
+                        <button class="btn-status ${btnObsClass}" onclick="abrirObs('${id}')">
+                            ${btnObsText}
+                        </button>
+                        <button class="btn-status btn-whatsapp" onclick="enviarZap('${id}')" title="Enviar dados via WhatsApp">
+                            📲 Enviar p/ WhatsApp
+                        </button>
+                        <button class="btn-status btn-repasse-card" style="margin-top:5px; width:100%; border:1px solid #7dd3fc;" onclick="abrirModalRepasse('${id}')">
+                            🔄 Repasse
+                        </button>
+                    `;
+
+                } else {
+                    // --- Lógica para Itens Individuais (Com Status Completos) ---
+                    let isChecked = localStorage.getItem('chk_' + id) === 'true';
+                    let isPaid = localStorage.getItem('pag_' + id) === 'true';
+                    let isAnterior = localStorage.getItem('ant_' + id) === 'true'; 
+                    let isFixo = localStorage.getItem('fixo_' + id) === 'true'; // Novo status
+                    let isRetained = localStorage.getItem('ret_' + id) === 'true';
+                    let isProeis = localStorage.getItem('proeis_' + id) === 'true';
+                    let isGuardado = localStorage.getItem('gua_' + id) === 'true';
+                    let isRepasse = localStorage.getItem('rep_status_' + id) === 'true';
+
+                    // Ajuste de classes visuais
+                    let cardClass = "";
+                    if (isRepasse) cardClass = "card-repasse-active";
+                    else if (isRetained) cardClass = "card-retained";
+                    else if (isGuardado) cardClass = "card-guardado";
+                    else if (isFixo) cardClass = "card-fixo"; // Novo estilo Fixo
+                    else if (isAnterior) cardClass = "card-anterior"; 
+                    else if (isProeis) cardClass = "card-proeis";
+                    else if (isPaid) cardClass = "card-pago";
+                    else if (isChecked) cardClass = "card-checked";
+                    li.className = cardClass;
+
+                    let btnObsClass = "status-ok";
+                    let btnObsText = "Verificar / Relatar";
+                    if (savedObs && savedObs.trim() !== "") {
+                        btnObsClass = "status-alert";
+                        btnObsText = "⚠️ VER OBS/AVARIA";
+                    }
+
+                    let proeisTextHTML = "";
+                    let pagoTextHTML = "";
+                    let anteriorTextHTML = "";
+                    let fixoTextHTML = ""; // Novo Html Fixo
+                    let isExpired = false;
+                    let btnZapText = "📲 Enviar p/ WhatsApp";
+                    let btnZapAction = `enviarZap('${id}')`;
+                    let btnZapClass = "btn-whatsapp";
+
+                    // NOVO: Exibição visual de "Fixo"
+                    if (isFixo) {
+                        let fSetor = localStorage.getItem('fixo_setor_' + id) || "Outro Setor";
+                        let fName = localStorage.getItem('fixo_nome_' + id) || "Não Informado";
+                        let fDataRaw = localStorage.getItem('fixo_data_' + id);
+                        let fDataStr = fDataRaw ? fDataRaw.split('-').reverse().join('/') : "";
+
+                        fixoTextHTML = `
+                            <div style="color: #0f766e; font-weight: bold; margin-top: 5px; font-size: 0.8rem; border: 1px dashed #0d9488; padding: 4px; border-radius: 4px;">
+                                📌 FIXO: ${fSetor}<br>Resp: ${fName}<br>${fDataStr ? '📅 ' + fDataStr : ''}
+                            </div>
+                            <button class="btn-status" style="background-color: #0d9488; color: white; margin-top: 5px; padding: 4px; border: none; border-radius: 4px;" onclick="abrirEdicaoFixo('${id}')" title="Renovar prazo ou alterar o responsável">🔄 Renovar / Trocar</button>
+                        `;
+                        btnZapText = "🚨 Cobrar Setor Fixo";
+                        btnZapAction = `cobrarFixo('${id}')`;
+                    }
+
+                    if (isAnterior) {
+                        let antName = localStorage.getItem('ant_nome_' + id) || "Não Informado";
+                        let antRG = localStorage.getItem('ant_rg_' + id) || "---";
+                        let antDataRaw = localStorage.getItem('ant_data_' + id);
+                        let antDataStr = antDataRaw ? antDataRaw.split('-').reverse().join('/') : "";
+
+                        anteriorTextHTML = `
+                            <div style="color: #4338ca; font-weight: bold; margin-top: 5px; font-size: 0.8rem; border: 1px dashed #4f46e5; padding: 4px; border-radius: 4px;">
+                                ⏪ SERVIÇO ANTERIOR:<br>${antName} (RG: ${antRG})<br>${antDataStr ? '📅 ' + antDataStr : ''}
+                            </div>
+                        `;
+                        btnZapText = "🚨 Cobrar Dia Anterior";
+                        btnZapAction = `cobrarAnterior('${id}')`;
+                    }
+
+                    if (isPaid) {
+                        let pagName = localStorage.getItem('pag_nome_' + id) || "Não Informado";
+                        let pagRG = localStorage.getItem('pag_rg_' + id) || "---";
+                        let pagDataRaw = localStorage.getItem('pag_data_' + id);
+                        let pagDataStr = pagDataRaw ? pagDataRaw.split('-').reverse().join('/') : "";
+
+                        let corBordaPago = "#3b82f6";
+                        let corTextoPago = "#3b82f6";
+                        let iconePago = "🔵";
+                        let txtAlerta = "";
+                        let animacao = "";
+
+                        if (pagDataRaw) {
+                            let now = new Date();
+                            now.setHours(now.getHours() - 5); 
+                            now.setHours(0, 0, 0, 0); 
+                            
+                            let dtPag = new Date(pagDataRaw + 'T00:00:00'); 
+                            let diffTime = now.getTime() - dtPag.getTime();
+                            let diffDays = Math.floor(diffTime / (1000 * 3600 * 24));
+
+                            if (diffDays === 1) {
+                                corBordaPago = "#f97316"; 
+                                corTextoPago = "#ea580c";
+                                iconePago = "🟠";
+                                txtAlerta = "<br><span style='color:#ea580c; font-weight:bold;'>⚠️ Serviço Anterior (+24h)</span>";
+                                btnZapClass = "btn-whatsapp status-alert";
+                            } else if (diffDays >= 2) {
+                                corBordaPago = "#b91c1c"; 
+                                corTextoPago = "#b91c1c";
+                                iconePago = "🔴";
+                                txtAlerta = "<br><span style='color:#b91c1c; font-weight:bold;'>🚨 ALERTA (+48h)</span>";
+                                animacao = "animation: pulse 2s infinite;";
+                                btnZapClass = "btn-whatsapp status-alert";
+                            } else {
+                                btnZapClass = "btn-whatsapp status-alert"; 
+                            }
+                        } else {
+                            btnZapClass = "btn-whatsapp status-alert";
+                        }
+
+                        pagoTextHTML = `
+                            <div style="color: ${corTextoPago}; font-weight: bold; margin-top: 5px; font-size: 0.8rem; border: 1px dashed ${corBordaPago}; padding: 4px; border-radius: 4px; ${animacao}">
+                                ${iconePago} PAGO PARA:<br>${pagName} (RG: ${pagRG})<br>${pagDataStr ? '📅 ' + pagDataStr : ''}${txtAlerta}
+                            </div>
+                        `;
+                        btnZapText = "🚨 Cobrar Destino";
+                        btnZapAction = `cobrarPago('${id}')`;
+                    }
+
+                    if (isProeis) {
+                        let proeisName = localStorage.getItem('proeis_nome_' + id) || "";
+                        let proeisRG = localStorage.getItem('proeis_rg_' + id) || "";
+                        let proeisTime = localStorage.getItem('proeis_time_' + id) || 0;
+                        
+                        let elapsedHours = (Date.now() - parseInt(proeisTime)) / (1000 * 60 * 60);
+                        
+                        if (elapsedHours > 60) {
+                            isExpired = true;
+                            proeisTextHTML = `
+                                <div style="color: #b91c1c; font-weight: bold; margin-top: 5px; font-size: 0.8rem; animation: pulse 2s infinite; cursor: pointer; border: 1px dashed #b91c1c; padding: 4px; border-radius: 4px;" onclick="cobrarProeis('${id}')" title="Cobrar devolução via WhatsApp">
+                                    ⚠️ PROEIS EXPIRADO (>60h)<br>${proeisName} (RG: ${proeisRG})
+                                </div>
+                                <button class="btn-status" style="background-color: #f59e0b; color: white; margin-top: 5px; padding: 4px; border: none; border-radius: 4px;" onclick="renovarProeis('${id}')" title="Zerar tempo do empréstimo">🔄 Renovar Prazo</button>
+                            `;
+                            btnZapText = "🚨 Cobrar Devolução";
+                            btnZapAction = `cobrarProeis('${id}')`;
+                            btnZapClass = "btn-whatsapp status-alert";
+                        } else {
+                            proeisTextHTML = `
+                                <div style="color: #ea580c; font-weight: bold; margin-top: 5px; font-size: 0.8rem;">
+                                    🟠 PROEIS<br>${proeisName} (RG: ${proeisRG})
+                                </div>
+                                <button class="btn-status" style="background-color: #f59e0b; color: white; margin-top: 5px; padding: 4px; border: none; border-radius: 4px;" onclick="renovarProeis('${id}')" title="Zerar tempo do empréstimo">🔄 Renovar Prazo</button>
+                            `;
+                            btnZapText = "📲 Enviar (PROEIS)";
+                            btnZapAction = `cobrarProeis('${id}')`;
+                        }
+                    }
+
+                    let btnChkClass = isChecked ? "chk-checked" : "chk-uncheck";
+                    let btnChkText = isChecked ? "✅ RUMB" : "⚪ RUMB";
+
+                    let btnPagClass = isPaid ? "pag-checked" : "pag-uncheck";
+                    let btnPagText = isPaid ? "🔵 Paga" : "Pagar";
+
+                    let btnAntClass = isAnterior ? "ant-checked" : "ant-uncheck";
+                    let btnAntText = isAnterior ? "⏪ Dia Ant." : "Dia Ant.";
+
+                    let btnFixoClass = isFixo ? "fixo-checked" : "fixo-uncheck";
+                    let btnFixoText = isFixo ? "📌 Fixo" : "Fixo";
+
+                    let btnProeisClass = isProeis ? "proeis-checked" : "proeis-uncheck";
+                    let btnProeisText = isProeis ? "🟠 PROEIS" : "PROEIS";
+
+                    let btnRetClass = isRetained ? "ret-checked" : "ret-uncheck";
+                    let btnRetText = isRetained ? "⚫ Retida" : "Reter";
+
+                    let btnGuaClass = isGuardado ? "gua-checked" : "gua-uncheck";
+                    let btnGuaText = isGuardado ? "🗄️ Guardada" : "Guardar";
+
+                    let btnRepClass = isRepasse ? "rep-checked" : "btn-repasse-card";
+                    let btnRepText = isRepasse ? "🔄 EM REPASSE" : "🔄 Repasse";
+
+                    let btnContainer = li.querySelector('.action-buttons');
+                    if (!btnContainer) {
+                        btnContainer = document.createElement('div');
+                        btnContainer.className = 'action-buttons';
+                        li.appendChild(btnContainer);
+                    }
+
+                    btnContainer.innerHTML = `
+                        ${fixoTextHTML}
+                        ${anteriorTextHTML}
+                        ${pagoTextHTML}
+                        ${proeisTextHTML}
+                        <button class="btn-status ${btnObsClass}" onclick="abrirObs('${id}')">
+                            ${btnObsText}
+                        </button>
+                        <button class="btn-status ${btnZapClass}" onclick="${btnZapAction}" title="Ação WhatsApp">
+                            ${btnZapText}
+                        </button>
+                        <div class="btn-group">
+                            <button class="btn-status ${btnChkClass}" onclick="toggleCheck('${id}')">
+                                ${btnChkText}
+                            </button>
+                            <button class="btn-status ${btnPagClass}" onclick="togglePago('${id}')">
+                                ${btnPagText}
+                            </button>
+                            <button class="btn-status ${btnAntClass}" onclick="toggleAnterior('${id}')">
+                                ${btnAntText}
+                            </button>
+                            <button class="btn-status ${btnFixoClass}" onclick="toggleFixo('${id}')">
+                                ${btnFixoText}
+                            </button>
+                            <button class="btn-status ${btnProeisClass}" onclick="toggleProeis('${id}')">
+                                ${btnProeisText}
+                            </button>
+                            <button class="btn-status ${btnRetClass}" onclick="toggleReter('${id}')">
+                                ${btnRetText}
+                            </button>
+                            <button class="btn-status ${btnGuaClass}" onclick="toggleGuardado('${id}')">
+                                ${btnGuaText}
+                            </button>
+                            <!-- Nova Opção: Repasse -->
+                            <button class="btn-status ${btnRepClass}" onclick="abrirModalRepasse('${id}')">
+                                ${btnRepText}
+                            </button>
+                        </div>
+                    `;
+                }
+            });
+
+            atualizarContadorZap();
+            executarBusca(); 
+        }
+
+        // --- SISTEMAS DE DEVOLUÇÃO E STATUS EXCLUSIVOS ---
+        function devolverCarregadores(id) {
+            let idCarregador = null;
+            if (id.startsWith('PT100-')) idCarregador = 'carregador-pt100-c60';
+            else if (id.startsWith('IMBEL-P-')) idCarregador = 'carregador-imbel-c20';
+            else if (id.startsWith('IA2-') || id.startsWith('FUZIL-556-')) idCarregador = 'carregador-5.56-c16';
+            else if (id.startsWith('IMBEL-762-')) idCarregador = 'carregador-7.62-c32';
+
+            if (idCarregador) {
+                let qtdDevolver = parseInt(localStorage.getItem('qtd_carregadores_pago_' + id)) || 0;
+                if (qtdDevolver > 0) {
+                    let emprestados = parseInt(localStorage.getItem('emprestados_' + idCarregador)) || 0;
+                    emprestados -= qtdDevolver;
+                    if (emprestados < 0) emprestados = 0;
+                    localStorage.setItem('emprestados_' + idCarregador, emprestados);
+                    localStorage.removeItem('qtd_carregadores_pago_' + id);
+                }
+            }
+        }
+
+        function emprestarCarregadores(id) {
+            let idCarregador = null;
+            if (id.startsWith('PT100-')) idCarregador = 'carregador-pt100-c60';
+            else if (id.startsWith('IMBEL-P-')) idCarregador = 'carregador-imbel-c20';
+            else if (id.startsWith('IA2-') || id.startsWith('FUZIL-556-')) idCarregador = 'carregador-5.56-c16';
+            else if (id.startsWith('IMBEL-762-')) idCarregador = 'carregador-7.62-c32';
+
+            if (idCarregador) {
+                let inputQtd = prompt("Quantos carregadores estão saindo com o armamento?", "2");
+                if (inputQtd !== null && !isNaN(inputQtd) && inputQtd.trim() !== "") {
+                    let qtd = parseInt(inputQtd);
+                    if (qtd > 0) {
+                        let emprestados = parseInt(localStorage.getItem('emprestados_' + idCarregador)) || 0;
+                        emprestados += qtd;
+                        localStorage.setItem('emprestados_' + idCarregador, emprestados);
+                        localStorage.setItem('qtd_carregadores_pago_' + id, qtd);
+                    }
+                }
+            }
+        }
+
+        function toggleCheck(id) {
+            const isChecked = localStorage.getItem('chk_' + id) === 'true';
+            if (isChecked) {
+                localStorage.removeItem('chk_' + id);
+            } else {
+                localStorage.setItem('chk_' + id, 'true');
+                devolverCarregadores(id);
+                localStorage.removeItem('pag_' + id);
+                localStorage.removeItem('pag_nome_' + id);
+                localStorage.removeItem('pag_rg_' + id);
+                localStorage.removeItem('pag_data_' + id);
+                localStorage.removeItem('ant_' + id); 
+                localStorage.removeItem('ant_nome_' + id);
+                localStorage.removeItem('ant_rg_' + id);
+                localStorage.removeItem('ant_data_' + id);
+                localStorage.removeItem('fixo_' + id); 
+                localStorage.removeItem('fixo_setor_' + id);
+                localStorage.removeItem('fixo_nome_' + id);
+                localStorage.removeItem('fixo_rg_' + id);
+                localStorage.removeItem('fixo_data_' + id);
+                localStorage.removeItem('ret_' + id);
+                localStorage.removeItem('gua_' + id);
+                localStorage.removeItem('rep_status_' + id);
+                limparDadosProeis(id);
+            }
+            inicializarMateriais();
+        }
+
+        function togglePago(id) {
+            const isPaid = localStorage.getItem('pag_' + id) === 'true';
+            if (isPaid) {
+                devolverCarregadores(id);
+                localStorage.removeItem('pag_' + id);
+                localStorage.removeItem('pag_nome_' + id);
+                localStorage.removeItem('pag_rg_' + id);
+                localStorage.removeItem('pag_data_' + id);
+                inicializarMateriais();
+            } else {
+                currentPagarId = id;
+                document.getElementById('pagarNome').value = "";
+                document.getElementById('pagarRG').value = "";
+                document.getElementById('pagarData').value = new Date().toISOString().slice(0, 10);
+                document.getElementById('pagarModal').style.display = "block";
+                document.getElementById('pagarRG').focus();
+            }
+        }
+
+        function confirmarPagar() {
+            const nome = document.getElementById('pagarNome').value.trim();
+            const rg = document.getElementById('pagarRG').value.trim();
+            const dataPagamento = document.getElementById('pagarData').value;
+            
+            if (!nome || !rg || !dataPagamento) {
+                alert("Preencha o Nome, o RG e a Data para pagar o material.");
+                return;
+            }
+
+            localStorage.setItem('pag_' + currentPagarId, 'true');
+            localStorage.setItem('pag_nome_' + currentPagarId, nome);
+            localStorage.setItem('pag_rg_' + currentPagarId, rg);
+            localStorage.setItem('pag_data_' + currentPagarId, dataPagamento);
+
+            localStorage.removeItem('chk_' + currentPagarId);
+            localStorage.removeItem('ant_' + currentPagarId);
+            localStorage.removeItem('fixo_' + currentPagarId);
+            localStorage.removeItem('ret_' + currentPagarId);
+            localStorage.removeItem('gua_' + currentPagarId);
+            localStorage.removeItem('rep_status_' + currentPagarId);
+            limparDadosProeis(currentPagarId);
+            
+            emprestarCarregadores(currentPagarId);
+            
+            fecharModal('pagarModal');
+            inicializarMateriais(); 
+        }
+
+        function toggleAnterior(id) {
+            const isAnterior = localStorage.getItem('ant_' + id) === 'true';
+            if (isAnterior) {
+                devolverCarregadores(id);
+                localStorage.removeItem('ant_' + id);
+                localStorage.removeItem('ant_nome_' + id);
+                localStorage.removeItem('ant_rg_' + id);
+                localStorage.removeItem('ant_data_' + id);
+                inicializarMateriais();
+            } else {
+                currentAnteriorId = id;
+                document.getElementById('anteriorNome').value = "";
+                document.getElementById('anteriorRG').value = "";
+                
+                let ontem = new Date();
+                ontem.setDate(ontem.getDate() - 1);
+                document.getElementById('anteriorData').value = ontem.toISOString().slice(0, 10);
+                
+                document.getElementById('anteriorModal').style.display = "block";
+                document.getElementById('anteriorRG').focus();
+            }
+        }
+
+        function confirmarAnterior() {
+            const nome = document.getElementById('anteriorNome').value.trim();
+            const rg = document.getElementById('anteriorRG').value.trim();
+            const dataAnterior = document.getElementById('anteriorData').value;
+            
+            if (!nome || !rg || !dataAnterior) {
+                alert("Preencha o Nome, o RG e a Data do policial do serviço passado.");
+                return;
+            }
+
+            localStorage.setItem('ant_' + currentAnteriorId, 'true');
+            localStorage.setItem('ant_nome_' + currentAnteriorId, nome);
+            localStorage.setItem('ant_rg_' + currentAnteriorId, rg);
+            localStorage.setItem('ant_data_' + currentAnteriorId, dataAnterior);
+
+            localStorage.removeItem('chk_' + currentAnteriorId);
+            localStorage.removeItem('pag_' + currentAnteriorId); 
+            localStorage.removeItem('fixo_' + currentAnteriorId); 
+            localStorage.removeItem('ret_' + currentAnteriorId);
+            localStorage.removeItem('gua_' + currentAnteriorId);
+            localStorage.removeItem('rep_status_' + currentAnteriorId);
+            limparDadosProeis(currentAnteriorId);
+            
+            emprestarCarregadores(currentAnteriorId);
+            
+            fecharModal('anteriorModal');
+            inicializarMateriais(); 
+        }
+
+        // --- NOVA LÓGICA DE FIXO ---
+        function toggleFixo(id) {
+            const isFixo = localStorage.getItem('fixo_' + id) === 'true';
+            if (isFixo) {
+                devolverCarregadores(id);
+                localStorage.removeItem('fixo_' + id);
+                localStorage.removeItem('fixo_setor_' + id);
+                localStorage.removeItem('fixo_nome_' + id);
+                localStorage.removeItem('fixo_rg_' + id);
+                localStorage.removeItem('fixo_data_' + id);
+                inicializarMateriais();
+            } else {
+                currentFixoId = id;
+                document.getElementById('fixoSetor').value = "";
+                document.getElementById('fixoNome').value = "";
+                document.getElementById('fixoRG').value = "";
+                document.getElementById('fixoData').value = new Date().toISOString().slice(0, 10);
+                document.getElementById('fixoModal').style.display = "block";
+                document.getElementById('fixoSetor').focus();
+            }
+        }
+
+        function confirmarFixo() {
+            const setor = document.getElementById('fixoSetor').value.trim();
+            const nome = document.getElementById('fixoNome').value.trim();
+            const rg = document.getElementById('fixoRG').value.trim();
+            const dataFixo = document.getElementById('fixoData').value;
+            
+            if (!setor || !nome || !dataFixo) {
+                alert("Preencha o Setor, o Nome do responsável e a Data de Saída.");
+                return;
+            }
+
+            localStorage.setItem('fixo_' + currentFixoId, 'true');
+            localStorage.setItem('fixo_setor_' + currentFixoId, setor);
+            localStorage.setItem('fixo_nome_' + currentFixoId, nome);
+            localStorage.setItem('fixo_rg_' + currentFixoId, rg);
+            localStorage.setItem('fixo_data_' + currentFixoId, dataFixo);
+
+            localStorage.removeItem('chk_' + currentFixoId);
+            localStorage.removeItem('pag_' + currentFixoId); 
+            localStorage.removeItem('pag_nome_' + currentFixoId);
+            localStorage.removeItem('pag_rg_' + currentFixoId);
+            localStorage.removeItem('pag_data_' + currentFixoId);
+            localStorage.removeItem('ant_' + currentFixoId);
+            localStorage.removeItem('ant_nome_' + currentFixoId);
+            localStorage.removeItem('ant_rg_' + currentFixoId);
+            localStorage.removeItem('ant_data_' + currentFixoId);
+            localStorage.removeItem('ret_' + currentFixoId);
+            localStorage.removeItem('gua_' + currentFixoId);
+            localStorage.removeItem('rep_status_' + currentFixoId);
+            limparDadosProeis(currentFixoId);
+            
+            emprestarCarregadores(currentFixoId);
+            
+            fecharModal('fixoModal');
+            inicializarMateriais(); 
+        }
+
+        function abrirEdicaoFixo(id) {
+            currentFixoId = id;
+            
+            // Puxa os dados atuais do LocalStorage para preencher o Modal
+            document.getElementById('fixoSetor').value = localStorage.getItem('fixo_setor_' + id) || "";
+            document.getElementById('fixoNome').value = localStorage.getItem('fixo_nome_' + id) || "";
+            document.getElementById('fixoRG').value = localStorage.getItem('fixo_rg_' + id) || "";
+            
+            // Atualiza a data para o momento da renovação/troca
+            document.getElementById('fixoData').value = new Date().toISOString().slice(0, 10);
+            
+            // Exibe o modal e foca no primeiro campo
+            document.getElementById('fixoModal').style.display = "block";
+            document.getElementById('fixoSetor').focus();
+        }
+
+        function toggleReter(id) {
+            const isRetained = localStorage.getItem('ret_' + id) === 'true';
+            if (isRetained) {
+                localStorage.removeItem('ret_' + id);
+            } else {
+                localStorage.setItem('ret_' + id, 'true');
+                devolverCarregadores(id);
+                localStorage.removeItem('chk_' + id);
+                localStorage.removeItem('pag_' + id);
+                localStorage.removeItem('pag_nome_' + id);
+                localStorage.removeItem('pag_rg_' + id);
+                localStorage.removeItem('pag_data_' + id);
+                localStorage.removeItem('ant_' + id);
+                localStorage.removeItem('fixo_' + id);
+                localStorage.removeItem('gua_' + id);
+                localStorage.removeItem('rep_status_' + id);
+                limparDadosProeis(id);
+            }
+            inicializarMateriais();
+        }
+
+        function toggleGuardado(id) {
+            const isGuardado = localStorage.getItem('gua_' + id) === 'true';
+            if (isGuardado) {
+                localStorage.removeItem('gua_' + id);
+            } else {
+                localStorage.setItem('gua_' + id, 'true');
+                devolverCarregadores(id); 
+                localStorage.removeItem('chk_' + id);
+                localStorage.removeItem('pag_' + id);
+                localStorage.removeItem('pag_nome_' + id);
+                localStorage.removeItem('pag_rg_' + id);
+                localStorage.removeItem('pag_data_' + id);
+                localStorage.removeItem('ant_' + id);
+                localStorage.removeItem('fixo_' + id);
+                localStorage.removeItem('ret_' + id);
+                localStorage.removeItem('rep_status_' + id);
+                limparDadosProeis(id);
+            }
+            inicializarMateriais();
+        }
+
+        function toggleProeis(id) {
+            const isProeis = localStorage.getItem('proeis_' + id) === 'true';
+            if (isProeis) {
+                devolverCarregadores(id);
+                limparDadosProeis(id);
+                inicializarMateriais();
+            } else {
+                currentSerialId = id;
+                document.getElementById('proeisNome').value = "";
+                document.getElementById('proeisRG').value = "";
+                document.getElementById('proeisModal').style.display = "block";
+                document.getElementById('proeisRG').focus();
+            }
+        }
+
+        function confirmarProeis() {
+            const nome = document.getElementById('proeisNome').value.trim();
+            const rg = document.getElementById('proeisRG').value.trim();
+            
+            if (!nome || !rg) {
+                alert("Preencha o Nome e o RG do policial.");
+                return;
+            }
+
+            devolverCarregadores(currentSerialId); 
+
+            localStorage.setItem('proeis_' + currentSerialId, 'true');
+            localStorage.setItem('proeis_nome_' + currentSerialId, nome);
+            localStorage.setItem('proeis_rg_' + currentSerialId, rg);
+            localStorage.setItem('proeis_time_' + currentSerialId, Date.now());
+
+            localStorage.removeItem('chk_' + currentSerialId);
+            localStorage.removeItem('pag_' + currentSerialId);
+            localStorage.removeItem('pag_nome_' + currentSerialId);
+            localStorage.removeItem('pag_rg_' + currentSerialId);
+            localStorage.removeItem('pag_data_' + currentSerialId);
+            localStorage.removeItem('ant_' + currentSerialId);
+            localStorage.removeItem('fixo_' + currentSerialId);
+            localStorage.removeItem('ret_' + currentSerialId);
+            localStorage.removeItem('gua_' + currentSerialId);
+            localStorage.removeItem('rep_status_' + currentSerialId);
+
+            emprestarCarregadores(currentSerialId); 
+
+            fecharModal('proeisModal');
+            inicializarMateriais();
+        }
+
+        function limparDadosProeis(id) {
+            localStorage.removeItem('proeis_' + id);
+            localStorage.removeItem('proeis_nome_' + id);
+            localStorage.removeItem('proeis_rg_' + id);
+            localStorage.removeItem('proeis_time_' + id);
+        }
+
+        function renovarProeis(id) {
+            if(confirm("Deseja renovar o prazo do PROEIS para este material? O contador voltará para 0 horas.")) {
+                localStorage.setItem('proeis_time_' + id, Date.now());
+                inicializarMateriais();
+            }
+        }
+        
+        function alterarContador(id, delta) {
+            const li = document.querySelector(`li[data-id="${id}"]`);
+            const baseMax = parseInt(li.getAttribute('data-max'));
+            let emprestados = parseInt(localStorage.getItem('emprestados_' + id)) || 0;
+            const max = baseMax - emprestados;
+            
+            let current = parseInt(localStorage.getItem('count_' + id)) || 0;
+            
+            current += delta;
+            if (current < 0) current = 0;
+            if (current > max) current = max;
+            
+            localStorage.setItem('count_' + id, current);
+            inicializarMateriais();
+        }
+
+        function atualizarPainelResumo(conferidas, pagas, anterior, fixo, proeis, repasses, retidas, guardadas, total) {
+            const faltam = total - conferidas - pagas - anterior - fixo - proeis - repasses - retidas - guardadas;
+            
+            const getClass = (nomeFiltro, extraClasses = "") => {
+                return filtroStatusAtivo === nomeFiltro ? extraClasses + " filtro-ativo" : extraClasses;
+            };
+
+            document.getElementById('summary-text').innerHTML = 
+                `<span onclick="filtrarPorStatus('TODOS')" title="Mostrar Todos" class="${getClass('TODOS')}" style="cursor: pointer;">Total: <strong>${total}</strong></span> | ` +
+                `<span onclick="filtrarPorStatus('RUMB')" title="Filtrar RUMB" class="${getClass('RUMB', 'conferidas span-conferidas')}" style="cursor: pointer;">✅ RUMB: ${conferidas}</span> | ` +
+                `<span onclick="filtrarPorStatus('PAGAS')" title="Filtrar Pagas" class="${getClass('PAGAS', 'span-pagas')}" style="cursor: pointer; color:#3b82f6; font-weight:bold;">🔵 Pagas: ${pagas}</span> | ` +
+                `<span onclick="filtrarPorStatus('ANTERIOR')" title="Filtrar Dia Anterior" class="${getClass('ANTERIOR', 'span-anterior')}" style="cursor: pointer; color:#4f46e5; font-weight:bold;">⏪ Dia Ant: ${anterior}</span> | ` +
+                `<span onclick="filtrarPorStatus('FIXO')" title="Filtrar Fixo" class="${getClass('FIXO', 'span-fixo')}" style="cursor: pointer; color:#0f766e; font-weight:bold;">📌 Fixo: ${fixo}</span> | ` +
+                `<span onclick="filtrarPorStatus('PROEIS')" title="Filtrar PROEIS" class="${getClass('PROEIS', 'span-proeis')}" style="cursor: pointer; color:#ea580c; font-weight:bold;">🟠 PROEIS: ${proeis}</span> | ` +
+                `<span onclick="filtrarPorStatus('REPASSE')" title="Filtrar Repasse" class="${getClass('REPASSE', 'span-repasses')}" style="cursor: pointer; color:#0ea5e9; font-weight:bold;">🔄 Repasse: ${repasses}</span> | ` +
+                `<span onclick="filtrarPorStatus('GUARDADAS')" title="Filtrar Guardadas" class="${getClass('GUARDADAS', 'span-guardadas')}" style="cursor: pointer; color:#a855f7; font-weight:bold;">🗄️ Guard: ${guardadas}</span> | ` +
+                `<span onclick="filtrarPorStatus('RETIDAS')" title="Filtrar Retidas" class="${getClass('RETIDAS', 'retidas span-retidas')}" style="cursor: pointer;">⚫ Retidas: ${retidas}</span> | ` +
+                `<span onclick="filtrarPorStatus('FALTAM')" title="Filtrar Faltam" class="${getClass('FALTAM', 'faltam span-faltam')}" style="cursor: pointer;">❌ Faltam: ${faltam}</span>`;
+        }
+
+        function filtrarPorStatus(status) {
+            if (filtroStatusAtivo === status) {
+                filtroStatusAtivo = 'TODOS'; 
+            } else {
+                filtroStatusAtivo = status;
+                filtroFaltantesAtivo = false; 
+                const btn = document.getElementById('btn-filter');
+                btn.innerText = "Filtrar Faltantes";
+                btn.style.backgroundColor = "#ffd700";
+            }
+            executarBusca();
+        }
+
+        function toggleFaltantes() {
+            filtroFaltantesAtivo = !filtroFaltantesAtivo;
+            const btn = document.getElementById('btn-filter');
+            if (filtroFaltantesAtivo) {
+                filtroStatusAtivo = 'TODOS'; 
+                btn.innerText = "Mostrar Todos";
+                btn.style.backgroundColor = "#e2e8f0";
+            } else {
+                btn.innerText = "Filtrar Faltantes";
+                btn.style.backgroundColor = "#ffd700";
+            }
+            executarBusca();
+        }
+
+        function zerarConferencia() {
+            if(confirm("ATENÇÃO: Deseja iniciar uma nova conferência? Isso vai zerar apenas os materiais 'Conferidos', 'Pagos' e 'Dia Anterior'. Os materiais fixos, retidos, guardados, em repasse e PROEIS permanecerão intocados.")) {
+                const itens = document.querySelectorAll('#name-list li');
+                itens.forEach(li => {
+                    const id = li.getAttribute('data-id');
+                    
+                    if (localStorage.getItem('pag_' + id) === 'true' || localStorage.getItem('ant_' + id) === 'true') {
+                        devolverCarregadores(id);
+                    }
+
+                    localStorage.removeItem('chk_' + id);
+                    localStorage.removeItem('pag_' + id);
+                    localStorage.removeItem('pag_nome_' + id);
+                    localStorage.removeItem('pag_rg_' + id);
+                    localStorage.removeItem('pag_data_' + id);
+                    
+                    localStorage.removeItem('ant_' + id);
+                    localStorage.removeItem('ant_nome_' + id);
+                    localStorage.removeItem('ant_rg_' + id);
+                    localStorage.removeItem('ant_data_' + id);
+                    
+                    if (li.hasAttribute('data-max')) {
+                        localStorage.removeItem('count_' + id);
+                        localStorage.removeItem('emprestados_' + id);
+                    }
+                });
+                inicializarMateriais();
+            }
+        }
+
+        function finalizarConferencia() {
+            let faltantes = [];
+            
+            const itens = document.querySelectorAll('#name-list li');
+            itens.forEach(li => {
+                const id = li.getAttribute('data-id');
+                const text = li.querySelector('.material-text').innerText;
+                
+                if (li.hasAttribute('data-max')) {
+                    const baseMax = parseInt(li.getAttribute('data-max'));
+                    let emprestados = parseInt(localStorage.getItem('emprestados_' + id)) || 0;
+                    const max = baseMax - emprestados;
+                    const current = parseInt(localStorage.getItem('count_' + id)) || 0;
+                    if (current < max) {
+                        faltantes.push(`❌ ${text} (Faltam ${max - current} de ${max})`);
+                    }
+                } else {
+                    let isChecked = localStorage.getItem('chk_' + id) === 'true';
+                    let isPaid = localStorage.getItem('pag_' + id) === 'true';
+                    let isAnterior = localStorage.getItem('ant_' + id) === 'true';
+                    let isFixo = localStorage.getItem('fixo_' + id) === 'true';
+                    let isRetained = localStorage.getItem('ret_' + id) === 'true';
+                    let isProeis = localStorage.getItem('proeis_' + id) === 'true';
+                    let isGuardado = localStorage.getItem('gua_' + id) === 'true';
+                    let isRepasse = localStorage.getItem('rep_status_' + id) === 'true';
+                    
+                    if (!isChecked && !isPaid && !isAnterior && !isFixo && !isRetained && !isProeis && !isGuardado && !isRepasse) {
+                        faltantes.push(`❌ ${text}`);
+                    }
+                }
+            });
+
+            if (faltantes.length > 0) {
+                if(confirm(`⚠️ ATENÇÃO: Faltam contabilizar materiais neste turno!\n\nDeseja enviar o relatório de faltas no WhatsApp?`)) {
+                    let textoMensagem = "*🚨 ALERTA DE FALTAS - MATERIAIS RUMB / 3ª UPP*\n\n";
+                    textoMensagem += "Informo que, após a conferência de turno, os seguintes equipamentos encontram-se *PENDENTES*:\n\n";
+                    
+                    faltantes.forEach(item => {
+                        textoMensagem += `${item}\n`;
+                    });
+
+                    const url = `https://wa.me/?text=${encodeURIComponent(textoMensagem)}`;
+                    window.open(url, '_blank');
+                }
+            } else {
+                alert("✅ Conferência concluída com sucesso! Nenhum material faltando no turno atual.");
+            }
+        }
+
+        // --- SISTEMA DE OBSERVAÇÃO ---
+        function abrirObs(id) {
+            currentSerialId = id;
+            const li = document.querySelector(`li[data-id="${id}"]`);
+            const fullText = li.querySelector('.material-text').innerText;
+            const parts = fullText.split(" - ");
+            const tituloText = parts.length >= 2 ? parts[0] + " - " + parts[parts.length -1] : fullText;
+            
+            document.getElementById("modalTitle").innerText = tituloText;
+            document.getElementById("obsInput").value = localStorage.getItem('obs_' + id) || "";
+            document.getElementById("obsModal").style.display = "block";
+            document.getElementById("obsInput").focus();
+        }
+
+        function salvarObs() {
+            if(!currentSerialId) return;
+            const textoInput = document.getElementById("obsInput").value.trim();
+            
+            if(textoInput) {
+                localStorage.setItem('obs_' + currentSerialId, textoInput);
+            } else {
+                localStorage.removeItem('obs_' + currentSerialId);
+            }
+            
+            fecharModal('obsModal');
+            inicializarMateriais(); 
+        }
+
+        function limparObs() {
+            document.getElementById("obsInput").value = "";
+            salvarObs();
+        }
+
+        function fecharModal(modalId) { 
+            document.getElementById(modalId).style.display = "none"; 
+        }
+
+        window.onclick = function(event) {
+            if (event.target == document.getElementById("obsModal")) fecharModal('obsModal');
+            if (event.target == document.getElementById("proeisModal")) fecharModal('proeisModal');
+            if (event.target == document.getElementById("repasseModal")) fecharModal('repasseModal');
+            if (event.target == document.getElementById("pagarModal")) fecharModal('pagarModal');
+            if (event.target == document.getElementById("anteriorModal")) fecharModal('anteriorModal');
+            if (event.target == document.getElementById("fixoModal")) fecharModal('fixoModal');
+        }
+
+        // --- SISTEMA DE WHATSAPP INDIVIDUAL E COBRANÇA ---
+        function enviarZap(id) {
+            const li = document.querySelector(`li[data-id="${id}"]`);
+            const tituloText = li.querySelector('.material-text').innerText;
+            const savedObs = localStorage.getItem('obs_' + id);
+            
+            let countText = "";
+            if (li.hasAttribute('data-max')) {
+                const baseMax = parseInt(li.getAttribute('data-max'));
+                let emprestados = parseInt(localStorage.getItem('emprestados_' + id)) || 0;
+                const max = baseMax - emprestados;
+                const current = parseInt(localStorage.getItem('count_' + id)) || 0;
+                countText = `\n*Quantidade Conferida:* ${current} / ${max}`;
+            }
+
+            let msgFinal = `*MATERIAL RUMB*\n${tituloText}${countText}`;
+            if (savedObs && savedObs.trim() !== "") {
+                msgFinal += `\n\n*Atenção/Obs:* ${savedObs}`;
+            }
+
+            const mensagem = encodeURIComponent(msgFinal);
+            const url = `https://wa.me/?text=${mensagem}`;
+            window.open(url, '_blank');
+        }
+
+        function cobrarProeis(id) {
+            const li = document.querySelector(`li[data-id="${id}"]`);
+            const tituloText = li.querySelector('.material-text').innerText;
+            let proeisName = localStorage.getItem('proeis_nome_' + id) || "";
+            let proeisRG = localStorage.getItem('proeis_rg_' + id) || "";
+            let proeisTime = localStorage.getItem('proeis_time_' + id) || 0;
+            
+            let isExpired = ((Date.now() - parseInt(proeisTime)) / (1000 * 60 * 60)) > 60;
+            
+            let msg = `*EMPRÉSTIMO DE MATERIAL - PROEIS / 3ª UPP*\n\nPolicial: *${proeisName}* (RG: ${proeisRG})\n\n`;
+            
+            if (isExpired) {
+                msg = `*🚨 COBRANÇA DE MATERIAL - PROEIS / 3ª UPP*\n\nPolicial: *${proeisName}* (RG: ${proeisRG})\n\nConsta em nosso sistema que o limite de 60 horas para o empréstimo do equipamento expirou:\n\n🔹 ${tituloText}\n\nSolicitamos a devolução imediata do material à Reserva de Armamento (RUMB).`;
+            } else {
+                msg += `Equipamento em cautela:\n🔹 ${tituloText}`;
+            }
+            
+            window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+        }
+
+        function cobrarPago(id) {
+            const li = document.querySelector(`li[data-id="${id}"]`);
+            const tituloText = li.querySelector('.material-text').innerText;
+            let pagName = localStorage.getItem('pag_nome_' + id) || "Policial";
+            let pagRG = localStorage.getItem('pag_rg_' + id) || "";
+            let pagDataRaw = localStorage.getItem('pag_data_' + id);
+            let dataTexto = pagDataRaw ? ` no dia *${pagDataRaw.split('-').reverse().join('/')}*` : "";
+
+            let prefixoAlerta = "*COBRANÇA DE MATERIAL - RUMB / 3ª UPP*";
+
+            if (pagDataRaw) {
+                let now = new Date();
+                now.setHours(now.getHours() - 5);
+                now.setHours(0, 0, 0, 0);
+                let dtPag = new Date(pagDataRaw + 'T00:00:00');
+                let diffDays = Math.floor((now.getTime() - dtPag.getTime()) / (1000 * 3600 * 24));
+
+                if (diffDays === 1) {
+                    prefixoAlerta = "*🚨 ALERTA: MATERIAL DO SERVIÇO ANTERIOR (+24H) - RUMB / 3ª UPP*";
+                } else if (diffDays >= 2) {
+                    prefixoAlerta = "*🚨 URGENTE: MATERIAL RETIDO HÁ MAIS DE 48H - RUMB / 3ª UPP*";
+                }
+            }
+
+            let msg = `${prefixoAlerta}\n\nSaudações, *${pagName}*${pagRG ? ' (RG: ' + pagRG + ')' : ''}!\n\nConsta em nosso sistema que o seguinte equipamento/armamento foi pago/acautelado para você${dataTexto}:\n\n🔹 ${tituloText}\n\nPor favor, informe o *destino atual* deste material ou realize a sua devolução à Reserva de Armamento (RUMB).`;
+
+            const policial = basePoliciais.find(p => p.rg === pagRG);
+            let tel = policial && policial.tel ? policial.tel : '';
+
+            if (tel) {
+                 window.open(`https://wa.me/${tel}?text=${encodeURIComponent(msg)}`, '_blank');
+            } else {
+                 window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+            }
+        }
+
+        function cobrarAnterior(id) {
+            const li = document.querySelector(`li[data-id="${id}"]`);
+            const tituloText = li.querySelector('.material-text').innerText;
+            let antName = localStorage.getItem('ant_nome_' + id) || "Policial";
+            let antRG = localStorage.getItem('ant_rg_' + id) || "";
+            let antDataRaw = localStorage.getItem('ant_data_' + id);
+            let dataTexto = antDataRaw ? ` referente ao serviço do dia *${antDataRaw.split('-').reverse().join('/')}*` : "";
+
+let msg = `Hop!*🚨 COBRANÇA DE MATERIAL: SERVIÇO ANTERIOR - RUMB / 3ª UPP*\n\nSaudações, *${antName}*${antRG ? ' (RG: ' + antRG + ')' : ''}!\n\nConsta no sistema da RUMB que o seguinte armamento/equipamento${dataTexto} encontra-se PENDENTE de devolução ou repasse oficial:\n\n🔹 ${tituloText}\n\nSolicitamos regularizar a situação com a máxima brevidade.`;
+
+            const policial = basePoliciais.find(p => p.rg === antRG);
+            let tel = policial && policial.tel ? policial.tel : '';
+
+            if (tel) {
+                 window.open(`https://wa.me/${tel}?text=${encodeURIComponent(msg)}`, '_blank');
+            } else {
+                 window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+            }
+        }
+
+        function cobrarFixo(id) {
+            const li = document.querySelector(`li[data-id="${id}"]`);
+            const tituloText = li.querySelector('.material-text').innerText;
+            let fSetor = localStorage.getItem('fixo_setor_' + id) || "Outro Setor";
+            let fName = localStorage.getItem('fixo_nome_' + id) || "Policial";
+            let fRG = localStorage.getItem('fixo_rg_' + id) || "";
+            let fDataRaw = localStorage.getItem('fixo_data_' + id);
+            let dataTexto = fDataRaw ? ` desde o dia *${fDataRaw.split('-').reverse().join('/')}*` : "";
+
+            let msg = `*CONTROLE DE MATERIAL FIXO - RUMB / 3ª UPP*\n\nSaudações, *${fName}*${fRG ? ' (RG: ' + fRG + ')' : ''}!\n\nConsta em nosso sistema que o seguinte equipamento/armamento encontra-se acautelado para o setor *${fSetor}*${dataTexto}:\n\n🔹 ${tituloText}\n\nPor favor, informe a situação atual deste material ou realize a sua devolução à Reserva de Armamento (RUMB).`;
+
+            const policial = basePoliciais.find(p => p.rg === fRG);
+            let tel = policial && policial.tel ? policial.tel : '';
+
+            if (tel) {
+                 window.open(`https://wa.me/${tel}?text=${encodeURIComponent(msg)}`, '_blank');
+            } else {
+                 window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+            }
+        }
+
+        // --- SISTEMA DE WHATSAPP MÚLTIPLO ---
+        function atualizarContadorZap() {
+            const qtd = document.querySelectorAll('.checkbox-zap:checked').length;
+            const btn = document.getElementById('btn-zap-multiplo');
+            if (btn) {
+                btn.innerText = `📲 Enviar Selecionadas (${qtd})`;
+            }
+        }
+
+        function enviarZapMultiplos() {
+            const checkboxesMarcadas = document.querySelectorAll('.checkbox-zap:checked');
+            
+            if (checkboxesMarcadas.length === 0) {
+                alert("Selecione pelo menos um material para enviar.");
+                return;
+            }
+
+            const tipoMsg = document.getElementById('select-tipo-msg').value;
+            let textoMensagem = "";
+
+            if (tipoMsg === "padrao") {
+                textoMensagem = "*INFORME - RUMB / 3ª UPP*\n\n";
+                textoMensagem += "Cumprimentando-o cordialmente, encaminho a relação dos materiais selecionados para ciência e devidos fins:\n\n";
+            } else if (tipoMsg === "nao_devolvido") {
+                textoMensagem = "*🚨 ATENÇÃO: MATERIAL NÃO DEVOLVIDO - RUMB / 3ª UPP*\n\n";
+                textoMensagem += "Cumprimentando-o cordialmente, informo que consta(m) em aberto a devolução do(s) seguinte(s) material(is) à Reserva de Armamento e Equipamento. Solicito o comparecimento imediato para regularização:\n\n";
+            } else if (tipoMsg === "avaria") {
+                textoMensagem = "*🛠️ RELATÓRIO DE AVARIA/MANUTENÇÃO - RUMB / 3ª UPP*\n\n";
+                textoMensagem += "Cumprimentando-o cordialmente, encaminho a relação dos materiais que apresentam avaria ou necessitam de manutenção, conforme observações registradas:\n\n";
+            }
+
+            let categorias = {};
+            let totalEquipamentos = checkboxesMarcadas.length;
+
+            checkboxesMarcadas.forEach(chk => {
+                const li = chk.closest('li');
+                const id = li.getAttribute('data-id');
+                const fullText = li.querySelector('.material-text').innerText;
+                const savedObs = localStorage.getItem('obs_' + id);
+                
+                let cat = "Outros Materiais";
+                let upperText = fullText.toUpperCase();
+                
+                if (li.hasAttribute('data-max')) cat = "Equipamentos Contáveis/Diversos";
+                else if (upperText.includes("COLETE")) cat = "Coletes Balísticos";
+                else if (upperText.includes("5.56")) cat = "Fuzis 5.56";
+                else if (upperText.includes("FUZIL 7.62")) cat = "Fuzis 7.62";
+                else if (upperText.includes("CARABINA") || upperText.includes("ESPINGARDA")) cat = "Armamento Cal. 12";
+                else if (upperText.includes("PISTOLA PT100")) cat = "Pistolas PT100";
+                else if (upperText.includes("PISTOLA IMBEL")) cat = "Pistolas Imbel";
+                else if (upperText.includes("RÁDIO")) cat = "Rádios Comunicadores";
+                else if (upperText.includes("SPARK")) cat = "Equipamento Spark";
+
+                if (!categorias[cat]) categorias[cat] = [];
+                
+                let currentCountTxt = "";
+                if (li.hasAttribute('data-max')) {
+                    const baseMax = parseInt(li.getAttribute('data-max'));
+                    let emprestados = parseInt(localStorage.getItem('emprestados_' + id)) || 0;
+                    const max = baseMax - emprestados;
+                    const current = parseInt(localStorage.getItem('count_' + id)) || 0;
+                    currentCountTxt = ` [${current}/${max} unid]`;
+                }
+
+                let itemText = `🔹 ${fullText}${currentCountTxt}`;
+                
+                if (tipoMsg === "avaria" && savedObs) {
+                    itemText += `\n   *Obs:* ${savedObs}`;
+                }
+                categorias[cat].push(itemText);
+            });
+
+            textoMensagem += "*📊 RESUMO (TIPO/QTD):*\n";
+            for (let cat in categorias) {
+                textoMensagem += `🔸 ${categorias[cat].length}x ${cat}\n`;
+            }
+            textoMensagem += "\n";
+
+            textoMensagem += "*📋 RELAÇÃO DETALHADA:*\n";
+            for (let cat in categorias) {
+                textoMensagem += `\n*${cat} (${categorias[cat].length})*\n`;
+                categorias[cat].forEach(item => {
+                    textoMensagem += `${item}\n`;
+                });
+            }
+
+            textoMensagem += `\n*TOTAL GERAL:* ${totalEquipamentos} equipamento(s).`;
+
+            const url = `https://wa.me/?text=${encodeURIComponent(textoMensagem)}`;
+            window.open(url, '_blank');
+            
+            checkboxesMarcadas.forEach(chk => chk.checked = false);
+            atualizarContadorZap();
+        }
+
+        // --- SISTEMA DE PESQUISA INTEGRADA E FILTROS DINÂMICOS ---
+        const searchInput = document.getElementById('search-input');
+        const clearBtn = document.getElementById('clear-search');
+
+        function executarBusca() {
+            const termo = searchInput.value.toUpperCase();
+            const materialFilter = document.getElementById('material-filter').value.toUpperCase(); 
+            const itens = document.querySelectorAll('#name-list li');
+            let encontrou = false;
+
+            let qtdConferidas = 0;
+            let qtdPagas = 0;
+            let qtdAnterior = 0; 
+            let qtdFixo = 0; // Novo contador
+            let qtdProeis = 0;
+            let qtdRepasse = 0;
+            let qtdRetidas = 0;
+            let qtdGuardadas = 0;
+            let totalMateriais = 0;
+
+            if (termo.length > 0) {
+                clearBtn.style.display = "block";
+            } else {
+                clearBtn.style.display = "none";
+            }
+
+            itens.forEach(li => {
+                const id = li.getAttribute('data-id');
+                const texto = li.innerText.toUpperCase();
+                
+                let isChecked = localStorage.getItem('chk_' + id) === 'true';
+                let isPaid = localStorage.getItem('pag_' + id) === 'true';
+                let isAnterior = localStorage.getItem('ant_' + id) === 'true';
+                let isFixo = localStorage.getItem('fixo_' + id) === 'true';
+                let isRetained = localStorage.getItem('ret_' + id) === 'true';
+                let isProeis = localStorage.getItem('proeis_' + id) === 'true';
+                let isGuardado = localStorage.getItem('gua_' + id) === 'true';
+                let isRepasse = localStorage.getItem('rep_status_' + id) === 'true';
+
+                let currentCount = 0;
+                let maxCount = 0;
+                let isContavel = li.hasAttribute('data-max');
+
+                if (isContavel) {
+                    const baseMax = parseInt(li.getAttribute('data-max'));
+                    let emprestados = parseInt(localStorage.getItem('emprestados_' + id)) || 0;
+                    maxCount = baseMax - emprestados;
+                    currentCount = parseInt(localStorage.getItem('count_' + id)) || 0;
+                }
+
+                let showByMaterial = true;
+                if (materialFilter !== "") {
+                    if (materialFilter === "CONTÁVEIS") {
+                        showByMaterial = isContavel;
+                    } else if (isContavel) {
+                        showByMaterial = false;
+                    } else if (materialFilter === "12") {
+                        showByMaterial = texto.includes("CAL.12");
+                    } else if (materialFilter === "FUZIL 5.56") {
+                        showByMaterial = texto.includes("5.56");
+                    } else {
+                        showByMaterial = texto.includes(materialFilter);
+                    }
+                }
+
+                let showBySearch = texto.indexOf(termo) > -1;
+
+                if (showByMaterial && showBySearch) {
+                    if (isContavel) {
+                        totalMateriais += maxCount;
+                        qtdConferidas += currentCount;
+                    } else {
+                        totalMateriais += 1;
+                        if (isRepasse) qtdRepasse++;
+                        else if (isRetained) qtdRetidas++;
+                        else if (isGuardado) qtdGuardadas++;
+                        else if (isProeis) qtdProeis++;
+                        else if (isFixo) qtdFixo++;
+                        else if (isAnterior) qtdAnterior++;
+                        else if (isPaid) qtdPagas++;
+                        else if (isChecked) qtdConferidas++;
+                    }
+                }
+
+                let showByFaltantes = true;
+                if (filtroFaltantesAtivo) {
+                    if (isContavel) {
+                        if (currentCount === maxCount) showByFaltantes = false;
+                    } else {
+                        if (isChecked || isPaid || isAnterior || isFixo || isRetained || isProeis || isGuardado || isRepasse) showByFaltantes = false;
+                    }
+                }
+
+                let showByStatusClick = true;
+                if (filtroStatusAtivo !== 'TODOS') {
+                    if (isContavel) {
+                        if (filtroStatusAtivo === 'RUMB' && currentCount === maxCount) { showByStatusClick = true; }
+                        else if (filtroStatusAtivo === 'FALTAM' && currentCount < maxCount) { showByStatusClick = true; }
+                        else { showByStatusClick = false; } 
+                    } else {
+                        if (filtroStatusAtivo === 'RUMB' && !isChecked) showByStatusClick = false;
+                        if (filtroStatusAtivo === 'PAGAS' && !isPaid) showByStatusClick = false;
+                        if (filtroStatusAtivo === 'ANTERIOR' && !isAnterior) showByStatusClick = false;
+                        if (filtroStatusAtivo === 'FIXO' && !isFixo) showByStatusClick = false;
+                        if (filtroStatusAtivo === 'PROEIS' && !isProeis) showByStatusClick = false;
+                        if (filtroStatusAtivo === 'GUARDADAS' && !isGuardado) showByStatusClick = false;
+                        if (filtroStatusAtivo === 'RETIDAS' && !isRetained) showByStatusClick = false;
+                        if (filtroStatusAtivo === 'REPASSE' && !isRepasse) showByStatusClick = false;
+                        if (filtroStatusAtivo === 'FALTAM' && (isChecked || isPaid || isAnterior || isFixo || isProeis || isGuardado || isRetained || isRepasse)) showByStatusClick = false;
+                    }
+                }
+
+                if (showByFaltantes && showByStatusClick && showBySearch && showByMaterial) {
+                    li.style.display = "";
+                    encontrou = true;
+                } else {
+                    li.style.display = "none";
+                }
+            });
+
+            document.getElementById('no-results').style.display = encontrou || itens.length === 0 ? "none" : "block";
+            
+            atualizarPainelResumo(qtdConferidas, qtdPagas, qtdAnterior, qtdFixo, qtdProeis, qtdRepasse, qtdRetidas, qtdGuardadas, totalMateriais);
+        }
+
+        searchInput.addEventListener('input', executarBusca);
+
+        clearBtn.addEventListener('click', function() {
+            searchInput.value = '';             
+            executarBusca();
+            searchInput.focus();                
+        });
+
+        // --- EXPORTAR E IMPORTAR ---
+        function exportarBackup() {
+            const dadosSalvos = {};
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key.startsWith('obs_') || key.startsWith('chk_') || key.startsWith('pag_') || key.startsWith('ant_') || key.startsWith('fixo_') || key.startsWith('ret_') || key.startsWith('proeis_') || key.startsWith('count_') || key.startsWith('gua_') || key.startsWith('rep_status_') || key.startsWith('emprestados_') || key === 'historico_repasses') {
+                    dadosSalvos[key] = localStorage.getItem(key);
+                }
+            }
+            
+            if (Object.keys(dadosSalvos).length === 0) {
+                alert("Nenhum material modificado/conferido para fazer backup.");
+                return;
+            }
+
+            const backupData = { extras: dadosSalvos }; 
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData));
+            const downloadAnchorNode = document.createElement('a');
+            const hoje = new Date().toISOString().slice(0, 10);
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", `backup_rumb_materiais_${hoje}.json`);
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+        }
+
+        function importarBackup(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    if (importedData.extras) { 
+                        for (const [key, value] of Object.entries(importedData.extras)) {
+                            localStorage.setItem(key, value);
+                        }
+                    }
+                    alert("Backup restaurado com sucesso! Recarregando...");
+                    location.reload(); 
+                } catch (err) {
+                    alert("Erro ao ler o arquivo. Certifique-se que é um arquivo .json válido gerado pelo sistema.");
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // --- SISTEMA DE REPASSE DE ARMAMENTO ---
+        function abrirModalRepasse(itemId = null) {
+            document.getElementById('repasseEditIndex').value = '-1'; 
+            const hoje = new Date().toISOString().slice(0, 10);
+            document.getElementById('repasseOrigemData').value = hoje;
+            document.getElementById('repasseDestinoData').value = hoje;
+            
+            if (itemId) {
+                document.getElementById('repasseItemId').value = itemId;
+                const li = document.querySelector(`li[data-id="${itemId}"]`);
+                if (li) {
+                    const texto = li.querySelector('.material-text').innerText;
+                    document.getElementById('repasseMaterial').value = texto;
+                }
+            } else {
+                document.getElementById('repasseItemId').value = '';
+                document.getElementById('repasseMaterial').value = '';
+            }
+
+            document.getElementById('repasseOrigemSetor').value = '';
+            document.getElementById('repasseDestinoSetor').value = '';
+
+            renderizarHistoricoRepasse();
+            document.getElementById('repasseModal').style.display = 'block';
+        }
+
+        function salvarRepasse() {
+            const itemIdInput = document.getElementById('repasseItemId').value;
+            const material = document.getElementById('repasseMaterial').value.trim();
+            const origemRG = document.getElementById('repasseOrigemRG').value.trim();
+            const origemNome = document.getElementById('repasseOrigemNome').value.trim();
+            const origemTel = document.getElementById('repasseOrigemTel').value.trim();
+            const origemData = document.getElementById('repasseOrigemData').value;
+            const origemSetor = document.getElementById('repasseOrigemSetor').value.trim();
+            
+            const destinoRG = document.getElementById('repasseDestinoRG').value.trim();
+            const destinoNome = document.getElementById('repasseDestinoNome').value.trim();
+            const destinoTel = document.getElementById('repasseDestinoTel').value.trim();
+            const destinoData = document.getElementById('repasseDestinoData').value;
+            const destinoSetor = document.getElementById('repasseDestinoSetor').value.trim();
+            
+            const editIndex = parseInt(document.getElementById('repasseEditIndex').value);
+
+            if (!material) {
+                alert('Por favor, preencha o campo Material.');
+                return;
+            }
+            if ((!origemRG || !origemNome) && (!destinoRG || !destinoNome)) {
+                 alert('Por favor, informe pelo menos o policial de Origem OU o policial de Destino para salvar.');
+                 return;
+            }
+            if (origemNome && (!origemData || !origemSetor)) {
+                alert('Por favor, informe a Data e o Setor de Origem.'); return;
+            }
+            if (destinoNome && (!destinoData || !destinoSetor)) {
+                alert('Por favor, informe a Data e o Setor de Destino.'); return;
+            }
+
+            let currentItemId = itemIdInput;
+            if (!currentItemId && material) {
+                const itensLista = document.querySelectorAll('#name-list li');
+                itensLista.forEach(li => {
+                    const spanTexto = li.querySelector('.material-text');
+                    if (spanTexto && spanTexto.innerText === material) {
+                        currentItemId = li.getAttribute('data-id');
+                    }
+                });
+            }
+
+            const nomeOrigemFinal = origemNome || 'A Confirmar';
+            const rgOrigemFinal = origemRG || '---';
+            const nomeDestinoFinal = destinoNome || 'A Confirmar';
+            const rgDestinoFinal = destinoRG || '---';
+
+            let historico = JSON.parse(localStorage.getItem('historico_repasses')) || gerarHistoricoRepasseFake();
+
+            const novoRepasse = { 
+                itemId: currentItemId || (editIndex >= 0 ? historico[editIndex].itemId : ''), 
+                timestamp: (editIndex >= 0 && historico[editIndex].timestamp) ? historico[editIndex].timestamp : Date.now(), 
+                baixado: (editIndex >= 0 && historico[editIndex].baixado) ? historico[editIndex].baixado : false,
+                material, 
+                origemRG: rgOrigemFinal, 
+                origemNome: nomeOrigemFinal, 
+                origemTel, 
+                origemData,
+                origemSetor,
+                destinoRG: rgDestinoFinal, 
+                destinoNome: nomeDestinoFinal, 
+                destinoTel, 
+                destinoData,
+                destinoSetor 
+            };
+            
+            if (editIndex >= 0) {
+                historico[editIndex] = novoRepasse; 
+            } else {
+                historico.unshift(novoRepasse);     
+            }
+            
+            // --- INÍCIO DA NOVA LÓGICA DE REPASSE -> PAGO ---
+            const origemCompleta = origemNome && origemRG && origemData && origemSetor;
+            const destinoCompleto = destinoNome && destinoRG && destinoData && destinoSetor;
+            const idCard = novoRepasse.itemId;
+
+            if (idCard) {
+                if (origemCompleta && destinoCompleto) {
+                    // Transforma em PAGO usando o Destino
+                    devolverCarregadores(idCard);
+
+                    localStorage.setItem('pag_' + idCard, 'true');
+                    localStorage.setItem('pag_nome_' + idCard, destinoNome);
+                    localStorage.setItem('pag_rg_' + idCard, destinoRG);
+                    localStorage.setItem('pag_data_' + idCard, destinoData);
+
+                    localStorage.removeItem('rep_status_' + idCard);
+                    localStorage.removeItem('chk_' + idCard);
+                    localStorage.removeItem('ant_' + idCard);
+                    localStorage.removeItem('fixo_' + idCard);
+                    localStorage.removeItem('ret_' + idCard);
+                    localStorage.removeItem('gua_' + idCard);
+                    limparDadosProeis(idCard);
+
+                    emprestarCarregadores(idCard);
+                    
+                    // Como virou "Pago", podemos dar baixa no repasse para não poluir
+                    novoRepasse.baixado = true;
+                    if (editIndex >= 0) {
+                        historico[editIndex].baixado = true;
+                    }
+                    
+                } else if (editIndex < 0) {
+                    // Se não estiver completo e for NOVO repasse, mantém status de repasse
+                    devolverCarregadores(idCard); 
+
+                    localStorage.setItem('rep_status_' + idCard, 'true');
+                    localStorage.removeItem('chk_' + idCard);
+                    localStorage.removeItem('pag_' + idCard);
+                    localStorage.removeItem('pag_nome_' + idCard);
+                    localStorage.removeItem('pag_rg_' + idCard);
+                    localStorage.removeItem('pag_data_' + idCard);
+                    localStorage.removeItem('ant_' + idCard); 
+                    localStorage.removeItem('fixo_' + idCard); 
+                    localStorage.removeItem('ret_' + idCard);
+                    localStorage.removeItem('gua_' + idCard);
+                    limparDadosProeis(idCard);
+
+                    emprestarCarregadores(idCard); 
+                }
+            }
+            // --- FIM DA NOVA LÓGICA ---
+            
+            localStorage.setItem('historico_repasses', JSON.stringify(historico));
+            
+            document.getElementById('repasseMaterial').value = '';
+            document.getElementById('repasseOrigemRG').value = '';
+            document.getElementById('repasseOrigemNome').value = '';
+            document.getElementById('repasseOrigemTel').value = '';
+            document.getElementById('repasseOrigemSetor').value = '';
+            document.getElementById('repasseDestinoRG').value = '';
+            document.getElementById('repasseDestinoNome').value = '';
+            document.getElementById('repasseDestinoTel').value = '';
+            document.getElementById('repasseDestinoSetor').value = '';
+            document.getElementById('repasseEditIndex').value = '-1';
+            document.getElementById('repasseItemId').value = '';
+            
+            renderizarHistoricoRepasse();
+            inicializarMateriais(); 
+            alert('Repasse salvo com sucesso!');
+        }
+
+        function darBaixaRepasse(index) {
+            if(confirm("Deseja confirmar a BAIXA deste repasse?\n\nO material retornará ao status 'Pendente' na RUMB e a cor do registro ficará apagada.")) {
+                let historico = JSON.parse(localStorage.getItem('historico_repasses'));
+                historico[index].baixado = true;
+                
+                if (historico[index].itemId) {
+                    localStorage.removeItem('rep_status_' + historico[index].itemId);
+                } else {
+                    const itens = document.querySelectorAll('#name-list li');
+                    itens.forEach(li => {
+                        if (li.querySelector('.material-text').innerText === historico[index].material) {
+                            localStorage.removeItem('rep_status_' + li.getAttribute('data-id'));
+                        }
+                    });
+                }
+                
+                localStorage.setItem('historico_repasses', JSON.stringify(historico));
+                renderizarHistoricoRepasse();
+                inicializarMateriais(); 
+            }
+        }
+
+        function solicitarConfirmacaoZap(index) {
+            let historico = JSON.parse(localStorage.getItem('historico_repasses'));
+            let r = historico[index];
+
+            if (!r.destinoTel && !r.origemTel) {
+                alert("Não há telefone cadastrado para nenhum dos policiais envolvidos neste repasse para enviar o Zap.");
+                return;
+            }
+
+            let mensagem = "";
+            let telefoneAlvo = "";
+            const dtOrig = r.origemData ? r.origemData.split('-').reverse().join('/') : '---';
+            const dtDest = r.destinoData ? r.destinoData.split('-').reverse().join('/') : '---';
+            const oSetor = r.origemSetor || r.setor || 'Não informado';
+            const dSetor = r.destinoSetor || r.setor || 'Não informado';
+
+            const origemConfirmada = r.origemRG !== '---' && r.origemNome !== 'A Confirmar';
+            const destinoConfirmado = r.destinoRG !== '---' && r.destinoNome !== 'A Confirmar';
+
+            if (origemConfirmada && destinoConfirmado) {
+                if (r.destinoTel) {
+                    telefoneAlvo = r.destinoTel;
+                    mensagem = `*CONFIRMAÇÃO DE REPASSE DE MATERIAL - RUMB / 3ª UPP*\n\nSaudações, *${r.destinoNome}*!\n\nConsta no sistema da RUMB que você assumiu a cautela do seguinte material no dia *${dtDest}*, repassado por *${r.origemNome} (RG: ${r.origemRG})* no dia *${dtOrig}*:\n\n🔹 *${r.material}*\n📍 *Setor de Origem:* ${oSetor}\n📍 *Seu Setor (Destino):* ${dSetor}\n\nPor favor, responda esta mensagem com *SIM* para confirmar o recebimento, ou informe caso haja alguma divergência.`;
+                } else if (r.origemTel) {
+                    telefoneAlvo = r.origemTel;
+                    mensagem = `*CONFIRMAÇÃO DE REPASSE DE MATERIAL - RUMB / 3ª UPP*\n\nSaudações, *${r.origemNome}*!\n\nConsta no sistema da RUMB que você repassou o seguinte material para *${r.destinoNome} (RG: ${r.destinoRG})*:\n\n🔹 *${r.material}*\n📅 *Data Origem:* ${dtOrig}\n📅 *Data Destino:* ${dtDest}\n📍 *Seu Setor (Origem):* ${oSetor}\n📍 *Setor de Destino:* ${dSetor}\n\nPor favor, responda esta mensagem com *SIM* para confirmarmos a transferência da sua cautela no sistema.`;
+                }
+            } 
+            else if (origemConfirmada && !destinoConfirmado) {
+                if (r.origemTel) {
+                    telefoneAlvo = r.origemTel;
+                    mensagem = `*CONTROLE DE MATERIAL - RUMB / 3ª UPP/19ºBPM*\n\nSaudações, *${r.origemNome}*!\n\nConsta em nosso sistema que o seguinte material estava sob sua cautela:\n\n🔹 *${r.material}*\n📅 *Data Origem:* ${dtOrig}\n📍 *Seu Setor:* ${oSetor}\n\nComo o seu turno já encerrou, por favor, nos confirme: você realizou o repasse deste material em serviço? Se sim, *PARA QUEM* o material foi repassado? Aguardamos seu retorno para atualizar o sistema.`;
+                } else {
+                    alert("Não há telefone da Origem para enviar a cobrança.");
+                    return;
+                }
+            }
+            else if (!origemConfirmada && destinoConfirmado) {
+                if (r.destinoTel) {
+                    telefoneAlvo = r.destinoTel;
+                    mensagem = `*CONTROLE DE MATERIAL - RUMB / 3ª UPP*\n\nSaudações, *${r.destinoNome}*!\n\nConsta no sistema da RUMB que você assumiu a cautela do seguinte material:\n\n🔹 *${r.material}*\n📅 *Data Destino:* ${dtDest}\n📍 *Seu Setor:* ${dSetor}\n\nPor favor, responda esta mensagem confirmando se o material está com você e informe *DE QUEM* você recebeu este armamento/equipamento para atualizarmos o controle da Reserva.`;
+                } else {
+                    alert("Não há telefone do Destino para enviar a cobrança.");
+                    return;
+                }
+            }
+
+            if (telefoneAlvo && mensagem) {
+                window.open(`https://wa.me/${telefoneAlvo}?text=${encodeURIComponent(mensagem)}`, '_blank');
+            }
+        }
+
+        function editarRepasse(index) {
+            let historico = JSON.parse(localStorage.getItem('historico_repasses'));
+            if (!historico || !historico[index]) return;
+            
+            const r = historico[index];
+            
+            document.getElementById('repasseMaterial').value = r.material || '';
+            document.getElementById('repasseOrigemRG').value = (r.origemRG === '---' ? '' : r.origemRG);
+            document.getElementById('repasseOrigemNome').value = (r.origemNome === 'A Confirmar' ? '' : r.origemNome);
+            document.getElementById('repasseOrigemTel').value = r.origemTel || '';
+            document.getElementById('repasseOrigemData').value = r.origemData || '';
+            document.getElementById('repasseOrigemSetor').value = r.origemSetor || r.setor || '';
+            
+            document.getElementById('repasseDestinoRG').value = (r.destinoRG === '---' ? '' : r.destinoRG);
+            document.getElementById('repasseDestinoNome').value = (r.destinoNome === 'A Confirmar' ? '' : r.destinoNome);
+            document.getElementById('repasseDestinoTel').value = r.destinoTel || '';
+            document.getElementById('repasseDestinoData').value = r.destinoData || '';
+            document.getElementById('repasseDestinoSetor').value = r.destinoDestor || r.setor || '';
+            
+            document.getElementById('repasseEditIndex').value = index;
+            
+            document.querySelector('#repasseModal .modal-content').scrollTop = 0;
+        }
+
+        function excluirRepasse(index) {
+            if(confirm("Deseja realmente EXCLUIR este registro de repasse?")) {
+                let historico = JSON.parse(localStorage.getItem('historico_repasses'));
+                
+                if (historico[index].itemId) {
+                    localStorage.removeItem('rep_status_' + historico[index].itemId);
+                } else {
+                    const itens = document.querySelectorAll('#name-list li');
+                    itens.forEach(li => {
+                        if (li.querySelector('.material-text').innerText === historico[index].material) {
+                            localStorage.removeItem('rep_status_' + li.getAttribute('data-id'));
+                        }
+                    });
+                }
+                
+                historico.splice(index, 1);
+                localStorage.setItem('historico_repasses', JSON.stringify(historico));
+                renderizarHistoricoRepasse();
+                inicializarMateriais();
+            }
+        }
+
+        function filtrarHistoricoRepasse() {
+            const termo = document.getElementById('search-repasse').value.toLowerCase();
+            const linhas = document.querySelectorAll('#tbodyRepasse tr');
+            
+            linhas.forEach(tr => {
+                const textoLinha = tr.innerText.toLowerCase();
+                if (textoLinha.includes(termo)) {
+                    tr.style.display = "";
+                } else {
+                    tr.style.display = "none";
+                }
+            });
+        }
+
+        function gerarHistoricoRepasseFake() {
+            const hoje = new Date();
+            const historico = [];
+            
+            for(let i = 1; i <= 5; i++) {
+                let dataRetroativa = new Date(hoje);
+                dataRetroativa.setDate(dataRetroativa.getDate() - i);
+                
+                historico.push({
+                    itemId: '',
+                    timestamp: dataRetroativa.getTime(), 
+                    baixado: false,
+                    material: 'Exemplo: PISTOLA PT100 SERIAL ' + (40000 + i),
+                    origemRG: '103097', 
+                    origemNome: '3º SGT ALBUQUERQUE',
+                    origemTel: '5521970375724',
+                    origemData: dataRetroativa.toISOString().slice(0, 10),
+                    origemSetor: i % 2 === 0 ? 'Fiscal de Dia' : 'GTPP - Euclides',
+                    destinoRG: '110134', 
+                    destinoNome: 'SD LIMA',
+                    destinoTel: '5521970336379',
+                    destinoData: dataRetroativa.toISOString().slice(0, 10),
+                    destinoSetor: i % 2 === 0 ? 'GTPP - Cabritos' : 'Permanência'
+                });
+            }
+            return historico;
+        }
+
+        function renderizarHistoricoRepasse() {
+            let historico = JSON.parse(localStorage.getItem('historico_repasses'));
+            
+            if (!historico || historico.length === 0) {
+                historico = gerarHistoricoRepasseFake();
+                localStorage.setItem('historico_repasses', JSON.stringify(historico));
+            }
+
+            const tbody = document.getElementById('tbodyRepasse');
+            tbody.innerHTML = '';
+            
+            historico.forEach((r, index) => {
+                const tr = document.createElement('tr');
+                
+                let isOld = false;
+                if (r.timestamp) {
+                    isOld = (Date.now() - r.timestamp) > (48 * 60 * 60 * 1000);
+                } else if (r.destinoData) {
+                    const dataRep = new Date(r.destinoData).getTime();
+                    isOld = (Date.now() - dataRep) > (48 * 60 * 60 * 1000);
+                }
+
+                const isBaixado = r.baixado === true;
+
+                if (isOld || isBaixado) {
+                    tr.style.backgroundColor = '#e2e8f0';
+                    tr.style.opacity = '0.55';
+                } else {
+                    tr.style.backgroundColor = index % 2 === 0 ? '#fff' : '#f1f5f9';
+                    tr.style.opacity = '1';
+                }
+                
+                const dO = r.origemData ? (r.origemData.split('-').length === 3 ? `${r.origemData.split('-')[2]}/${r.origemData.split('-')[1]}` : r.origemData) : '--/--';
+                const dD = r.destinoData ? (r.destinoData.split('-').length === 3 ? `${r.destinoData.split('-')[2]}/${r.destinoData.split('-')[1]}` : r.destinoData) : '--/--';
+                
+                const oSetor = r.origemSetor || r.setor || '---';
+                const dSetor = r.destinoSetor || r.setor || '---';
+
+                const textoMaterial = r.material ? r.material.split('-')[0] : 'Não especificado';
+
+                const temZap = r.destinoTel || r.origemTel;
+                const corZap = temZap ? "#25D366" : "#cbd5e1";
+                const cursorZap = temZap ? "pointer" : "not-allowed";
+                const clickZap = temZap ? `onclick="solicitarConfirmacaoZap(${index})"` : "";
+
+                let btnBaixa = "";
+                if (!isBaixado) {
+                    btnBaixa = `<button onclick="darBaixaRepasse(${index})" title="Dar Baixa" style="flex:1; background:#10b981; color:white; border:none; padding:4px; border-radius:4px; cursor:pointer; font-size:0.75rem;">✅ Baixa</button>`;
+                } else {
+                    btnBaixa = `<span style="flex:1; text-align:center; font-size: 0.75rem; color: #059669; font-weight: bold; align-self: center;">✔️ Baixado</span>`;
+                }
+
+                tr.innerHTML = `
+                    <td style="padding: 8px; border: 1px solid #e2e8f0; font-size: 0.75rem;" title="${r.material}">${textoMaterial}</td>
+                    <td style="padding: 8px; border: 1px solid #e2e8f0; text-align: center; font-size: 0.75rem;">
+                        <span style="color:#b91c1c;">${oSetor}</span><br>⬇️<br><span style="color:#10b981;">${dSetor}</span>
+                    </td>
+                    <td style="padding: 8px; border: 1px solid #e2e8f0; font-size: 0.75rem;">
+                        <span style="color:#b91c1c;">🔴 ${r.origemNome} (${dO})</span> <br> 
+                        <span style="color:#10b981;">🟢 ${r.destinoNome} (${dD})</span>
+                    </td>
+                    <td style="padding: 8px; border: 1px solid #e2e8f0; text-align: center;">
+                        <div style="display: flex; flex-direction: column; gap: 4px; align-items: center;">
+                            <button ${clickZap} title="Confirmar via WhatsApp" style="background:${corZap}; color:white; border:none; padding:4px 6px; border-radius:4px; cursor:${cursorZap}; font-size:0.8rem; width:100%;">💬 Zap</button>
+                            <div style="display: flex; gap: 4px; width: 100%; margin-top: 4px;">
+                                ${btnBaixa}
+                                <button onclick="editarRepasse(${index})" title="Editar" style="flex:1; background:#f59e0b; color:white; border:none; padding:4px; border-radius:4px; cursor:pointer; font-size:0.75rem;">✏️</button>
+                                <button onclick="excluirRepasse(${index})" title="Excluir" style="flex:1; background:#ef4444; color:white; border:none; padding:4px; border-radius:4px; cursor:pointer; font-size:0.75rem;">🗑️</button>
+                            </div>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+        
+        function ajustarAlocados(id) {
+            let atual = parseInt(localStorage.getItem('emprestados_' + id)) || 0;
+            let novoValor = prompt(`O sistema acusa ${atual} carregadores alocados.\nSe este valor estiver travado/errado, digite o valor correto abaixo (ex: 0 para zerar):`, atual);
+            
+            if (novoValor !== null && !isNaN(novoValor) && novoValor.trim() !== "") {
+                let valorValidado = parseInt(novoValor);
+                if (valorValidado >= 0) {
+                    localStorage.setItem('emprestados_' + id, valorValidado);
+                    inicializarMateriais();
+                } else {
+                    alert("Por favor, digite um número válido (0 ou maior).");
+                }
+            }
+        }
+
+        // STARTUP DA PÁGINA
+        window.addEventListener('load', function() {
+            carregarListaPoliciais(); 
+            carregarListaMateriais(); 
+            
+            const listaItens = document.querySelectorAll('#name-list li');
+            listaItens.forEach(li => {
+                if(!li.querySelector('.checkbox-zap')) {
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.className = 'checkbox-zap';
+                    checkbox.title = 'Selecionar para envio múltiplo';
+                    checkbox.onclick = atualizarContadorZap;
+                    li.insertBefore(checkbox, li.firstChild);
+                }
+            });
+
+            inicializarMateriais();
+        });
+
+    </script>
+</body>
+</html>

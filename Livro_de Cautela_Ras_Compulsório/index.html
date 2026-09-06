@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>RAS Compulsório / Voluntário - RUMB</title>
+    <link rel="shortcut icon" type="imagex/png" href="../IMAGENS/caveira.ico">
+
+<style>
+  /* ESTILO GERAL */
+  body { 
+    font-family: 'Segoe UI', Arial, sans-serif; 
+    background: #0d1b2a; 
+    color: #fff; 
+    padding: 20px; 
+    padding-top: 130px; 
+    font-size: 11px; 
+  }
+  
+  /* CABEÇALHO FIXO */
+  .header { 
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: #0d1b2a;
+    z-index: 1000;
+    box-sizing: border-box;
+    padding: 10px 20px;
+    display: grid; 
+    grid-template-columns: 70px 1fr 70px; 
+    align-items: center; 
+    border-bottom: 3px solid #b8860b; 
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+  }
+
+  .titulo h1 { text-align: center; font-size: 20px; margin: 0; color: #f0f0f0; text-transform: uppercase; letter-spacing: 1px; }
+  .titulo p { text-align: center; margin: 5px 0; color: #b8860b; font-weight: bold; }
+
+  /* FORMULÁRIO */
+  .form-container { background: #1b263b; padding: 20px; border-radius: 8px; border: 1px solid #1f3c88; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+  
+  .bloco-titulo { 
+    background: linear-gradient(90deg, #1f3c88, #0d1b2a); 
+    color: #ffd700; 
+    padding: 6px; 
+    font-weight: bold; 
+    text-align: center; 
+    margin: 15px 0 10px 0; 
+    border-left: 5px solid #b8860b;
+    text-transform: uppercase; 
+    font-size: 12px;
+  }
+
+  .grid-campos { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; }
+  .campo-grupo { display: flex; flex-direction: column; }
+  
+  label { font-size: 10px; margin-bottom: 4px; color: #aabbd1; font-weight: bold; }
+  input, select { padding: 8px; border-radius: 4px; border: 1px solid #415a77; background: #0f1c2e; color: #fff; font-size: 12px; }
+  input:focus, select:focus { border-color: #ffd700; outline: none; }
+  
+  /* BOTÕES DE AÇÃO */
+  .btn-area { margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap; }
+  button { padding: 10px 20px; cursor: pointer; font-weight: bold; border-radius: 4px; border: none; text-transform: uppercase; font-size: 11px; color: white;}
+  
+  .btn-salvar { background: #b8860b; color: #000; } .btn-salvar:hover { background: #d4af37; }
+  .btn-print { background: #415a77; } .btn-print:hover { background: #2c3e50; }
+  .btn-backup { background: #059669; } .btn-backup:hover { background: #047857; }
+  .btn-restore { background: #dc2626; } .btn-restore:hover { background: #b91c1c; }
+
+  /* ÁREA DE PESQUISA E FILTROS */
+  .search-container { margin-top: 20px; margin-bottom: 10px; display: flex; flex-direction: column; gap: 8px;}
+  
+  .filter-area { display: flex; gap: 10px; margin-bottom: 8px; align-items: center; flex-wrap: wrap; }
+  
+  .btn-filter { background: #1b263b; border: 1px solid #b8860b; color: #b8860b; transition: all 0.2s; padding: 10px; border-radius: 4px; cursor: pointer; font-weight: bold;}
+  .btn-filter:hover { background: #162a42; }
+  .btn-filter.active { background: #b8860b; color: #0d1b2a; box-shadow: 0 0 8px rgba(184, 134, 11, 0.6); }
+
+  /* ÁREA DO ZAP RESUMO */
+  .zap-area { margin-left: auto; display: flex; align-items: center; gap: 8px; background: #0f1c2e; padding: 5px 10px; border-radius: 5px; border: 1px solid #1f3c88; }
+  .zap-area label { color: #ffd700; margin: 0; font-size: 11px; }
+  .btn-zap-resumo { background: #25D366; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.3); font-size: 11px; }
+  .btn-zap-resumo:hover { background: #128C7E; }
+
+  .contador-box { align-self: flex-start; background: #b8860b; color: #000; padding: 6px 12px; border-radius: 4px; font-weight: bold; font-size: 12px; box-shadow: 0 0 8px rgba(184, 134, 11, 0.5); }
+
+  #inputBusca { width: 100%; padding: 10px; background: #1b263b; border: 1px solid #1f3c88; color: white; border-radius: 5px; font-weight: bold; box-sizing: border-box; }
+  
+  /* TABELA */
+  table { width: 100%; border-collapse: collapse; margin-top: 5px; background: white; color: black; box-shadow: 0 2px 5px rgba(0,0,0,0.2); table-layout: fixed; }
+  th, td { border: 1px solid #ccc; padding: 6px; text-align: center; font-size: 10px; word-wrap: break-word; }
+  th { background: #1f3c88; color: white; text-transform: uppercase; letter-spacing: 0.5px; }
+  
+  .col-rumb { background-color: #fcf8e3; font-weight: bold; color: #8a6d3b; white-space: nowrap; }
+  .col-cop { color: #b91c1c; font-weight: bold; }
+  
+  /* ESTILO PARA COLUNA OBSERVAÇÃO NÃO QUEBRAR O LAYOUT */
+  .col-obs { 
+      color: #d35400; 
+      font-weight: bold; 
+      max-width: 120px; 
+      white-space: nowrap; 
+      overflow: hidden; 
+      text-overflow: ellipsis; 
+  }
+  
+  tr:nth-child(even) { background: #f8f9fa; }
+  
+  .btn-baixa { background: #15803d; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 10px; }
+  .btn-zap { background: #25D366; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 10px; margin-left: 4px; font-weight: bold; }
+  
+  /* NOVOS BOTÕES DE EDIÇÃO E EXCLUSÃO */
+  .btn-editar { background: #f59e0b; color: white; border: none; padding: 4px 6px; border-radius: 3px; cursor: pointer; font-size: 10px; margin-left: 2px; font-weight: bold; }
+  .btn-excluir { background: #ef4444; color: white; border: none; padding: 4px 6px; border-radius: 3px; cursor: pointer; font-size: 10px; margin-left: 2px; font-weight: bold; }
+  
+  @media print {
+    .form-container, .btn-area, .search-container, .no-print, .btn-zap, .btn-baixa, .btn-editar, .btn-excluir { display: none; }
+    body { background: white; color: black; padding: 0; }
+    .header { position: relative; border-bottom: 1px solid #000; }
+    th { background: #ddd !important; color: black; border: 1px solid #000; }
+    td { border: 1px solid #000; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <a href="../dashboard.html"><img src="caveira-armada.png" width="60" alt="RUMB" onerror="this.style.display='none'" title="Voltar ao Painel"></a> 
+  <div class="titulo">
+    <h1>Polícia Militar do Estado do Rio de Janeiro</h1>
+    <p>LIVRO DE CAUTELA COMPULSÓRIO/VOLUNTÁRIO - UPP TABAJARAS / RUMB</p>
+  </div>
+  <img src="logo_pmerj.png" width="60" alt="PMERJ" onerror="this.style.display='none'">
+</div>
+
+<div class="form-container">
+  <form id="formMaterial">
+    
+    <div class="bloco-titulo">1. IDENTIFICAÇÃO DO POLICIAL (CAUTELA)</div>
+    <div class="grid-campos">
+      <div class="campo-grupo">
+        <label>RG (Digite para buscar)</label>
+        <input type="text" id="rg" list="lista-rgs" required placeholder="00.000" autocomplete="off">
+        <datalist id="lista-rgs"></datalist>
+      </div>
+      <div class="campo-grupo" style="flex-grow: 2;">
+        <label>NOME DE GUERRA</label>
+        <input type="text" id="nomePolicial" list="lista-nomes" required placeholder="Nome do Policial" autocomplete="off">
+        <datalist id="lista-nomes"></datalist>
+      </div>
+      <div class="campo-grupo">
+        <label>GH</label>
+        <input type="text" id="gh" required placeholder="Ex: CB">
+      </div>
+      <div class="campo-grupo">
+        <label>LOCAL DE SERVIÇO</label>
+        <input type="text" id="local" list="lista-locais" placeholder="VOLUNTÁRIO / COMPULSÓRIO..." autocomplete="off">
+        <datalist id="lista-locais">
+          <option value="VOLUNTÁRIO"></option>
+          <option value="COMPULSÓRIO"></option>
+        </datalist>
+      </div>
+    </div>
+
+    <div class="bloco-titulo">2. ARMAMENTO E EQUIPAMENTO</div>
+    <div class="grid-campos">
+      <div class="campo-grupo">
+        <label>ARMA (SÉRIE)</label>
+        <input type="text" id="armaInd" list="lista-armas-ind" autocomplete="off">
+        <datalist id="lista-armas-ind"></datalist>
+      </div>
+      <div class="campo-grupo"><label>Q.MUNIÇÃO</label><input type="number" id="qmI" style="width:50px"></div>
+      <div class="campo-grupo"><label>Q.CARREGADOR</label><input type="number" id="qcI" style="width:50px"></div>
+      
+      <div class="campo-grupo">
+        <label>ARMA LONGA</label>
+        <input type="text" id="armaCol" list="lista-armas-col" autocomplete="off">
+        <datalist id="lista-armas-col"></datalist>
+      </div>
+      <div class="campo-grupo"><label>Q.MUNIÇÃO</label><input type="number" id="qmC" style="width:50px"></div>
+      <div class="campo-grupo"><label>Q.CARREGADOR</label><input type="number" id="qcC" style="width:50px"></div>
+      
+      <div class="campo-grupo"><label>BATERIA</label><input type="text" id="bateria"></div>
+      
+      <div class="campo-grupo">
+        <label>COLETE</label>
+        <input type="text" id="colete" list="lista-coletes" autocomplete="off">
+        <datalist id="lista-coletes"></datalist>
+      </div>
+      
+      <div class="campo-grupo">
+        <label>RÁDIO HT</label>
+        <input type="text" id="radio" list="lista-radios" autocomplete="off">
+        <datalist id="lista-radios"></datalist>
+      </div>
+    </div>
+
+    <div class="bloco-titulo">3. CÂMERAS OPERACIONAIS (COP) E DETALHES</div>
+    <div class="grid-campos">
+      <div class="campo-grupo">
+        <label>COP 01 (SERIAL)</label>
+        <input type="text" id="cop1" list="lista-cops" placeholder="Digite ou selecione...">
+      </div>
+      <div class="campo-grupo">
+        <label>COP 02 (SERIAL)</label>
+        <input type="text" id="cop2" list="lista-cops" placeholder="Digite ou selecione...">
+      </div>
+      <datalist id="lista-cops"></datalist>
+      <div class="campo-grupo" style="grid-column: span 2;">
+        <label>OBSERVAÇÕES / AVARIAS</label>
+        <input type="text" id="obs" placeholder="Alguma alteração no material?">
+      </div>
+    </div>
+
+    <div class="bloco-titulo">4. DATA E RESPONSÁVEL (ENTREGA)</div>
+    <div class="grid-campos">
+        <div class="campo-grupo">
+            <label style="color: #ffd700;">DATA SAÍDA</label>
+            <input type="date" id="dataSaida" required>
+        </div>
+        <div class="campo-grupo">
+            <label style="color: #ffd700;">HORA SAÍDA</label>
+            <input type="time" id="horaSaida" required>
+        </div>
+        <div class="campo-grupo" style="flex-grow: 2;">
+            <label style="color: #ffd700;">NOME DO RUMB (QUEM ENTREGOU)</label>
+            <input type="text" id="rumbSaidaManual" required placeholder="Digite quem está entregando o material...">
+        </div>
+    </div>
+
+    <div class="btn-area">
+      <button type="submit" class="btn-salvar" id="btnSalvar">📝 REGISTRAR SAÍDA</button>
+      <button type="button" class="btn-print" onclick="window.print()">🖨️ IMPRIMIR</button>
+      <button type="button" class="btn-backup" onclick="fazerBackup()">💾 SALVAR BACKUP</button>
+      <input type="file" id="fileInput" style="display:none" onchange="restaurarBackup(this)">
+      <button type="button" class="btn-restore" onclick="document.getElementById('fileInput').click()">📂 IMPORTAR</button>
+    </div>
+  </form>
+</div>
+
+<div class="search-container">
+  <div class="filter-area">
+    <button class="btn-filter active" id="btnTodas" onclick="setFiltro('TODOS')">👀 VER TODAS</button>
+    <button class="btn-filter" id="btnAbertas" onclick="setFiltro('ABERTO')">⚠️ VER APENAS ABERTAS</button>
+    
+    <div style="display: flex; align-items: center; gap: 5px; background: #0f1c2e; padding: 5px 10px; border-radius: 5px; border: 1px solid #1f3c88;">
+        <label for="filtroDataTabela" style="margin: 0; color: #ffd700; font-size: 11px;">📅 FILTRAR DIA:</label>
+        <input type="date" id="filtroDataTabela" style="padding: 6px; font-size: 11px;" onchange="setFiltro('DATA')">
+        <button class="btn-filter" id="btnFiltrarData" onclick="setFiltro('DATA')" style="padding: 6px 12px;">BUSCAR DATA</button>
+    </div>
+    
+    <div class="zap-area">
+      <label for="dataResumoZap">ESCOLHER DATA (ZAP):</label>
+      <input type="date" id="dataResumoZap" style="padding: 6px; font-size: 11px;">
+      
+      <select id="turnoResumoZap" style="padding: 6px; font-size: 11px; border-radius: 4px; font-weight: bold; background: #1b263b; color: #ffd700; border: 1px solid #1f3c88;">
+        <option value="ALL">Dia Completo</option>
+        <option value="DIA">07:00 às 19:00</option>
+        <option value="NOITE">19:00 às 07:00</option>
+      </select>
+
+      <button class="btn-zap-resumo" onclick="enviarZapResumoDoDia()">📱 ZAP: RESUMO DO DIA</button>
+    </div>
+  </div>
+  
+  <div class="contador-box" id="contadorAbertas">🚨 CAUTELAS EM ABERTO: 0</div>
+  <input type="text" id="inputBusca" placeholder="🔍 BUSCAR REGISTRO (Digite RG, Nome, Arma, Obs, ou RUMB...)" onkeyup="filtrarTabela()">
+</div>
+
+<table id="tabelaMateriais">
+  <thead>
+    <tr>
+      <th colspan="4" style="background:#0d1b2a">POLICIAL</th>
+      <th colspan="3">INDIVIDUAL</th>
+      <th colspan="3">COLETIVA</th> <th colspan="3">OUTROS</th>
+      <th colspan="2">CÂMERAS</th>
+      <th colspan="4" style="background:#b8860b; color:black">SAÍDA (CAUTELA)</th>
+      <th colspan="3" style="background:#15803d; color:white">RETORNO (BAIXA)</th>
+    </tr>
+    <tr>
+      <th style="width: 35px;">GH</th><th style="width: 50px;">RG</th><th>NOME</th><th>LOCAL</th>
+      <th>ARMA</th><th style="width: 30px;">QM</th><th style="width: 30px;">QC</th>
+      <th>ARMA</th><th style="width: 30px;">QM</th><th style="width: 30px;">QC</th> <th>BATERIA</th><th>COL.</th><th>HT</th>
+      <th>COP I</th><th>COP II</th>
+      <th style="width: 60px;">DATA</th><th style="width: 40px;">HORA</th><th>OBS...</th><th>RUMB (ENTREGOU)</th>
+      <th style="width: 60px;">DATA</th><th style="width: 40px;">HORA</th><th>RUMB (RECEBEU)</th>
+    </tr>
+  </thead>
+  <tbody id="tabelaCorpo"></tbody>
+</table>
+
+<script>
+  // ==========================================
+  // COLOQUE SEU LINK DO GOOGLE APPS SCRIPT AQUI
+  // ==========================================
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxIvzLpe8m39ABqfNMV-OQITNViE2wvjQnFj-GMQ19uQm1pGmh9cQuKN8Zul0NUMxvloA/exec"; 
+
+  // --- BANCO DE DADOS (EFETIVO COMPLETO) ---
+  const dbEfetivo = [
+    { gh: "CB PM", rg: "101823", nome: "S. LEMOS" }, { gh: "SD PM", rg: "110297", nome: "L. BARBOSA" },
+    { gh: "CB PM", rg: "106260", nome: "BAPTISTA" }, { gh: "3º SGT PM", rg: "91071", nome: "DIAS" },
+    { gh: "CB PM", rg: "108786", nome: "TORRES" }, { gh: "3º SGT PM", rg: "99488", nome: "DE PAULA" },
+    { gh: "3º SGT PM", rg: "91665", nome: "R. ALCANTARA" }, { gh: "3º SGT PM", rg: "100032", nome: "R. LACERDA" },
+    { gh: "1º SGT PM", rg: "77614", nome: "ALZIR" }, { gh: "SUBTEN PM", rg: "66381", nome: "J. MARCELO" },
+    { gh: "3º SGT PM", rg: "94010", nome: "R. SIMÕES" }, { gh: "3º SGT PM", rg: "97196", nome: "DAN" },
+    { gh: "CB PM", rg: "106561", nome: "MARCOS" }, { gh: "3º SGT PM", rg: "99242", nome: "ADRIEL" },
+    { gh: "CB PM", rg: "105249", nome: "R. FILHO" }, { gh: "CB PM", rg: "102712", nome: "JOAQUIM" },
+    { gh: "3º SGT PM", rg: "100360", nome: "ULISSES" }, { gh: "CB PM", rg: "105375", nome: "RANGEL" },
+    { gh: "3º SGT PM", rg: "102181", nome: "JUNIOR" }, { gh: "CB PM", rg: "106533", nome: "CORTEZ" },
+    { gh: "3º SGT PM", rg: "98121", nome: "JOHNATHAN" }, { gh: "3º SGT PM", rg: "96990", nome: "CLEISON" },
+    { gh: "CB PM", rg: "104197", nome: "DA SILVA" }, { gh: "3º SGT PM", rg: "98408", nome: "NASCIMENTO" },
+    { gh: "3º SGT PM", rg: "93752", nome: "CARDOSO" }, { gh: "2º SGT PM", rg: "85458", nome: "SANTOS" },
+    { gh: "CB PM", rg: "107510", nome: "DA SILVA" }, { gh: "SD PM", rg: "110796", nome: "ERICA" },
+    { gh: "2º SGT PM", rg: "83708", nome: "A. MENDES" }, { gh: "3º SGT PM", rg: "98607", nome: "SOUZA" },
+    { gh: "3º SGT PM", rg: "102704", nome: "J. ANDRÉ" }, { gh: "CB PM", rg: "106351", nome: "M. ARAUJO" },
+    { gh: "3º SGT PM", rg: "103727", nome: "BIZONI" }, { gh: "3º SGT PM", rg: "93998", nome: "F. PERES" },
+    { gh: "CB PM", rg: "107520", nome: "T. RODRIGUES" }, { gh: "CB PM", rg: "107561", nome: "COUTINHO" },
+    { gh: "CB PM", rg: "108292", nome: "JULIANO" }, { gh: "SD PM", rg: "110387", nome: "JOSUÉ" },
+    { gh: "CB PM", rg: "108824", nome: "CARMO" }, { gh: "CB PM", rg: "107805", nome: "M. PAULO" },
+    { gh: "3º SGT PM", rg: "98339", nome: "SOUZA" }, { gh: "3º SGT PM", rg: "95629", nome: "FULLY" },
+    { gh: "CB PM", rg: "104953", nome: "PINHEIRO" }, { gh: "CB PM", rg: "103051", nome: "TIRADENTES" },
+    { gh: "3º SGT PM", rg: "104291", nome: "FELIX" }, { gh: "2º SGT PM", rg: "86615", nome: "ISAIAS" },
+    { gh: "1º SGT PM", rg: "73888", nome: "COIMBRA" }, { gh: "3º SGT PM", rg: "93331", nome: "FERREIRA" },
+    { gh: "3º SGT PM", rg: "98596", nome: "VIDAL" }, { gh: "CB PM", rg: "108190", nome: "UERBERT" },
+    { gh: "CB PM", rg: "102190", nome: "D. SILVA" }, { gh: "SD PM", rg: "110594", nome: "JULIANA FERREIRA" },
+    { gh: "SUBTEN PM", rg: "65727", nome: "SANTANA" }, { gh: "CB PM", rg: "105341", nome: "AZEVEDO" },
+    { gh: "3º SGT PM", rg: "100228", nome: "MIRANDA" }, { gh: "3º SGT PM", rg: "99791", nome: "ALMEIDA" },
+    { gh: "CB PM", rg: "105284", nome: "LEONARDO" }, { gh: "CB PM", rg: "109067", nome: "CAMILO" },
+    { gh: "CB PM", rg: "106467", nome: "L. SILVA" }, { gh: "SD PM", rg: "109738", nome: "MARIANO" },
+    { gh: "CB PM", rg: "105248", nome: "DE SOUZA" }, { gh: "3º SGT PM", rg: "93168", nome: "F. ABREU" },
+    { gh: "CB PM", rg: "109109", nome: "RODRIGUES" }, { gh: "SD PM", rg: "110470", nome: "TELES" },
+    { gh: "CB PM", rg: "108677", nome: "ÉDVAN" }, { gh: "3º SGT PM", rg: "91049", nome: "JHONATHAN" },
+    { gh: "2º SGT PM", rg: "86367", nome: "REGALDINO" }, { gh: "2º SGT PM", rg: "85426", nome: "BRITO" },
+    { gh: "3º SGT PM", rg: "93606", nome: "A. ALCANTARA" }, { gh: "CB PM", rg: "109510", nome: "MAGANO" },
+    { gh: "CB PM", rg: "109414", nome: "BIANCHI" }, { gh: "SD PM", rg: "109754", nome: "CAMELO" },
+    { gh: "SUBTEN PM", rg: "70372", nome: "MENDES" }, { gh: "SD PM", rg: "110433", nome: "D. SANTOS" },
+    { gh: "3º SGT PM", rg: "95714", nome: "MALAQUIAS" }, { gh: "SUBTEN PM", rg: "76452", nome: "WAGNER" },
+    { gh: "3º SGT PM", rg: "93081", nome: "GUEDES" }, { gh: "3º SGT PM", rg: "92119", nome: "CAIO" },
+    { gh: "3º SGT PM", rg: "100000", nome: "ALACRINO" }, { gh: "3º SGT PM", rg: "99164", nome: "R. MACHADO" },
+    { gh: "3º SGT PM", rg: "91783", nome: "CHARLES" }, { gh: "CB PM", rg: "106348", nome: "SOARES" },
+    { gh: "3º SGT PM", rg: "92732", nome: "MARCIO ESTEVÃO" }, { gh: "CB PM", rg: "105377", nome: "F. RIBEIRO" },
+    { gh: "SD PM", rg: "108664", nome: "SOUSA SILVA" }, { gh: "CB PM", rg: "105374", nome: "LAIA" },
+    { gh: "3º SGT PM", rg: "92490", nome: "VALIM" }, { gh: "CB PM", rg: "106650", nome: "MATHEUS" },
+    { gh: "3º SGT PM", rg: "96287", nome: "RODRIGUES" }, { gh: "2º SGT PM", rg: "85664", nome: "DENILSON" },
+    { gh: "3º SGT PM", rg: "92258", nome: "DOMINGOS" }, { gh: "3º SGT PM", rg: "93341", nome: "L. FRANCISCO" },
+    { gh: "SD PM", rg: "109908", nome: "TRIUMPHO" }, { gh: "3º SGT PM", rg: "91131", nome: "CONDE" },
+    { gh: "CB PM", rg: "101752", nome: "TRINDADE" }, { gh: "3º SGT PM", rg: "91115", nome: "ITALO" },
+    { gh: "3º SGT PM", rg: "96003", nome: "JONATHA" }, { gh: "CB PM", rg: "105391", nome: "HENRIQUE" },
+    { gh: "CB PM", rg: "106037", nome: "CAIQUE" }, { gh: "3º SGT PM", rg: "98202", nome: "CRISTIANO" },
+    { gh: "3º SGT PM", rg: "99226", nome: "M. JUNIOR" }, { gh: "3º SGT PM", rg: "96541", nome: "SILVEIRA" },
+    { gh: "2º SGT PM", rg: "85995", nome: "VINICIUS" }, { gh: "3º SGT PM", rg: "90521", nome: "LOURO" },
+    { gh: "CB PM", rg: "103776", nome: "CARNEIRO" }, { gh: "3º SGT PM", rg: "95865", nome: "PEDROSO" },
+    { gh: "3º SGT PM", rg: "94319", nome: "CLÉSCIO" }, { gh: "CB PM", rg: "105711", nome: "SOUZA LIMA" },
+    { gh: "3º SGT PM", rg: "103097", nome: "ALBUQUERQUE" }, { gh: "CB PM", rg: "105324", nome: "EUZÉBIO" },
+    { gh: "SD PM", rg: "109832", nome: "GUEDES" }, { gh: "CB PM", rg: "106708", nome: "S. COUTO" },
+    { gh: "3º SGT PM", rg: "93227", nome: "L. ALMEIDA" }, { gh: "3º SGT PM", rg: "93408", nome: "SANTOS" }, { gh: "3º SGT PM", rg: "95837", nome: "LACERDA" }, { gh: "3º SGT PM", rg: "102727", nome: "AMAURI" }, { gh: "3º SGT PM", rg: "101492", nome: "L. BATISTA" }, { gh: "CB PM", rg: "108023", nome: "ALESSANDRO" }, { gh: "SD PM", rg: "109832", nome: "GUEDES" }, { gh: "2º SGT PM", rg: "80567", nome: "ROCHA" }, { gh: "3º SGT PM", rg: "92681", nome: "MORAES" }, { gh: "3º SGT PM", rg: "103190", nome: "CASTRO" }, { gh: "CB PM", rg: "106876", nome: "CRUZ" }, { gh: "3º SGT PM", rg: "100348", nome: "CABRAL" }, { gh: "3º SGT PM", rg: "100915", nome: "RODRIGO" }, { gh: "3º SGT PM", rg: "92156", nome: "GRANJA" }, { gh: "CB PM", rg: "106678", nome: "GUILHERME MEIRELES" }, { gh: "SUBTEN PM", rg: "70428", nome: "SYRLEI" }, { gh: "2º SGT PM", rg: "85785", nome: "NETO" }, { gh: "CB PM", rg: "103993", nome: "ANDRESA" }, { gh: "3º SGT PM", rg: "100915", nome: "SANT'ANA" }, { gh: "SD PM", rg: "112166", nome: "SIMÕES" }, { gh: "CB PM", rg: "103353", nome: "CHELQUE" }, { gh: "3º SGT PM", rg: "95976", nome: "PATRICK" }, { gh: "3º SGT PM", rg: "90521", nome: "REIS" }, { gh: "CB PM", rg: "103800", nome: "MOTA" }, { gh: "CB PM", rg: "103807", nome: "PITZER" }, { gh: "3º SGT PM", rg: "91901", nome: "LIMA" }, { gh: "3º SGT PM", rg: "104678", nome: "GUIMARÃES" }, { gh: "3º SGT PM", rg: "101882", nome: "CHAVES" }, { gh: "3º SGT PM", rg: "104072", nome: "FLÁVIO LUIZ" }, { gh: "1º SGT PM", rg: "77200", nome: "PRADO" }, { gh: "SD PM", rg: "112028", nome: "LESSA" }, { gh: "CB PM", rg: "103780", nome: "W. MARINHO" }, { gh: "3º SGT PM", rg: "100235", nome: "BRUNO" }, { gh: "SD PM", rg: "111965", nome: "NANDES" }, { gh: "3º SGT PM", rg: "102889", nome: "RAIMUNDO" }, { gh: "3º SGT PM", rg: "98939", nome: "ANAVANTE" }, { gh: "CB PM", rg: "105363", nome: "C. AURÉLIO" }, { gh: "SD PM", rg: "105600", nome: "MAGNO" }, { gh: "SD PM", rg: "111436", nome: "XAVIER" }, { gh: "3º SGT PM", rg: "93491", nome: "GARCIA" }, { gh: "3º SGT PM", rg: "93330", nome: "FRANCISCO" }, { gh: "SD PM", rg: "111585", nome: "PATRICK" }, { gh: "3º SGT PM", rg: "90431", nome: "PEREIRA" }, { gh: "CB PM", rg: "107521", nome: "DOMICIANO" }, { gh: "3º SGT PM", rg: "101187", nome: "LIMA SILVA" }, { gh: "3º SGT PM", rg: "102430", nome: "INOCENCIO" }, { gh: "CB PM", rg: "103265", nome: "ORTIZ" }, { gh: "SD PM", rg: "105219", nome: "CONCEIÇÃO" }, { gh: "CB PM", rg: "106304", nome: "L. OLIVEIRA" }, { gh: "SD PM", rg: "110134", nome: "A. LIMA" }, { gh: "CB PM", rg: "105709", nome: "SILVA" }, { gh: "CB PM", rg: "109234", nome: "MARTINS" }, { gh: "CB PM", rg: "107871", nome: "CORREIA" }, { gh: "CB PM", rg: "105507", nome: "ALISSON" }, { gh: "CB PM", rg: "106071", nome: "GULHERME" }, { gh: "CB PM", rg: "108663", nome: "SANTOS" }, { gh: "3º SGT PM", rg: "101276", nome: "BARRETO" }, { gh: "3º SGT PM", rg: "98382", nome: "NETO" }, { gh: "SD PM", rg: "111971", nome: "LARISSA" }, { gh: "3º SGT PM", rg: "98711", nome: "LETÍCIA" }, { gh: "3º SGT PM", rg: "94429", nome: "MOURA" }, { gh: "CB PM", rg: "108228", nome: "MENEZES" }, { gh: "3º SGT PM", rg: "92626", nome: "VITAL" }, { gh: "CB PM", rg: "109091", nome: "DAMASCENO" }, { gh: "3º SGT PM", rg: "101843", nome: "DA SILVA" }, { gh: "3º SGT PM", rg: "102571", nome: "L. MACHADO" }, { gh: "3º SGT PM", rg: "93977", nome: "DUARTE" }, { gh: "CB PM", rg: "104841", nome: "C. FERREIRA" }, { gh: "CB PM", rg: "105475", nome: "LUCIANO" }, { gh: "CB PM", rg: "105313", nome: "MIQUELINE" }, { gh: "3º SGT PM", rg: "102861", nome: "R. ARAÚJO" }, { gh: "3º SGT PM", rg: "98631", nome: "BARTHLO" }, { gh: "3º SGT PM", rg: "96097", nome: "GATO" }, { gh: "SD PM", rg: "112296", nome: "LOURENÇO" }, { gh: "3° SGT PM", rg: "94418", nome: "R. Pereira" }, { gh: "CB PM", rg: "105303", nome: "Vargas" }, { gh: "CB PM", rg: "105405", nome: "Cardoso" }, { gh: "CB PM", rg: "107723", nome: "Silveira" }, { gh: "SD PM", rg: "111386", nome: "PEREIRA" }, { gh: "3º PM", rg: "92721", nome: "L. HENRIQUE" },
+{ gh: "SD PM", rg: "110309", nome: "KLOPPER" },
+{ gh: "CB PM", rg: "106295", nome: "MEZAVILLA" },
+{ gh: "3º PM", rg: "99647", nome: "LIMA" },
+{ gh: "CB PM", rg: "105693", nome: "VIDAL" },
+{ gh: "3º SGT PM", rg: "100610", nome: "xxxxx" },
+{ gh: "SD PM", rg: "112338", nome: "xxxxx" },
+{ gh: "3º SGT PM", rg: "94418", nome: "xxxxx" },
+{ gh: "3º SGT PM", rg: "102657", nome: "xxxxx" },
+{ gh: "3º SGT PM", rg: "94031", nome: "REGATTIERI" },
+{ gh: "3º SGT PM", rg: "103285", nome: "SIQUEIRA" },
+{ gh: "3º SGT PM", rg: "97650", nome: "MANOEL" },
+{ gh: "3º SGT PM", rg: "101235", nome: "XIMENES" },
+{ gh: "3º SGT PM", rg: "98071", nome: "LUIS" },
+{ gh: "3º SGT PM", rg: "103116", nome: "MARLON" },
+{ gh: "CB PM", rg: "107720", nome: "AMARO" },
+{ gh: "3º SGT PM", rg: "101663", nome: "CABRAL" },
+{ gh: "2º SGT PM", rg: "88511", nome: "WILLIAM" },
+{ gh: "3º SGT PM", rg: "104134", nome: "MARINHO" },
+{ gh: "3º SGT PM", rg: "104548", nome: "BARRETO" },
+{ gh: "3º SGT PM", rg: "99065", nome: "FÁBIO GOMES" },
+{ gh: "3º SGT PM", rg: "100124", nome: "RIBEIRO" },
+{ gh: "3º SGT PM", rg: "91164", nome: "D MARTINS" },
+{ gh: "3º SGT PM", rg: "101662", nome: "CABRAL" },
+{ gh: "3º SGT PM", rg: "89822", nome: "BENJAMIM" },
+{ gh: "CB PM", rg: "106186", nome: "R. SILVA" }
+
+
+
+
+  ];
+
+  const seriaisCop = [
+    "01 - J32840821", "02 - J33583945", "03 - J16688174", "04 - J25656078", "05 - J33583817", "06 - J25656201", 
+    "07 - J25656140", "08 - J16688176", "09 - J16688329", "10 - J24884419", "11 - J16688112", "12 - J16688217", 
+    "13 - J17292213", "14 - J16688139", "15 - J33583852", "16 - J16688219", "17 - J24884620", "18 - J16688102", 
+    "19 - J25656198", "20 - J17292241", "21 - J24884338", "22 - J33583725", "23 - J33583812", "24 - J33583750",
+    "25 - J33583975", "26 - J30313691", "27 - J24884393", "28 - J16046060", "29 - J16688120", "30 - J33583781", 
+    "31 - J33583938", "32 - J24884060", "33 - J16688138", "34 - J32841250", "35 - J24884617", "36 - J17292280", 
+    "37 - J16046199", "38 - J17292235", "39 - J17292275", "40 - J16688201", "41 - J24884061", "42 - J33583742", 
+    "43 - J15634783", "44 - J16046173", "45 - J16344240", "46 - J16344577", "47 - J32345866", "48 - J16688351", 
+    "49 - J30913118", "50 - J16046234", "51 - J16654122", "52 - J33583803", "53 - J32612221", "54 - J30911909", 
+    "55 - J24884369", "56 - J30912289", "57 - J33583794", "58 - J30914427", "59 - J32923637", "60 - J32970633", 
+    "61 - J24884222", "62 - J32841027", "63 - J17292254", "64 - J12957374"
+  ];
+
+  const listaArmasIndividuais = [
+    // Pistola PT.100
+    "PT.100 - 40740", "PT.100 - 40949", "PT.100 - 41872", "PT.100 - 40743", "PT.100 - 40745", "PT.100 - 41869", "PT.100 - 41876", "PT.100 - 40744", "PT.100 - 40956", "PT.100 - 40748", "PT.100 - 40747", "PT.100 - 40952", "PT.100 - 40594", "PT.100 - 40598", "PT.100 - 40746", "PT.100 - 40742", "PT.100 - 40741", "PT.100 - 40739", "PT.100 - 40957", "PT.100 - 41878",
+    // Pistola IMBEL MDS
+    "IMBEL - 28715", "IMBEL - 28739", "IMBEL - 28732", "IMBEL - 28734", "IMBEL - 28723", "IMBEL - 28706", "IMBEL - 16717", "IMBEL - 28747", "IMBEL - 28729", "IMBEL - 28722"
+  ];
+
+  const listaArmasColetivas = [
+    // Fuzil 5.56
+    "5.56 - 08080", "5.56 - 07916", "5.56 - 11759", "5.56 - JFA07926", "5.56 - JFA07925", "5.56 - JCA00599", "5.56 - JAA00378", "5.56 - JAA01715",
+    // Fuzil 7.62
+    "7.62 - 274925", "7.62 - 278660", "7.62 - 160252", "7.62 - 106715", "7.62 - 106910", "7.62 - 151215", "7.62 - 27510", "7.62 - 278642", "7.62 - 274909", "7.62 - 03993", "7.62 - 04349", "7.62 - 27472", "7.62 - 106673", "7.62 - 277187", "7.62 - 106991", "7.62 - 159880", "7.62 - JAA04110"
+  ];
+
+  const listaDeColetes = [
+    // Tamanho M
+    "M - 351364", "M - 351365", "M - 351033", "M - 351032", "M - 351362", "M - 351363", "M - 351044", "M - 351045", "M - 351354", "M - 351355", "M - 351462", "M - 351463", "M - 351492", "M - 351493", "M - 350926", "M - 350927", "M - 351460", "M - 351461", "M - 351458", "M - 351459",
+    // Tamanho G
+    "G - 2763625", "G - 2763626", "G - 2763605", "G - 2763606", "G - 2763663", "G - 2763664", "G - 2763641", "G - 276342", "G - 2763235", "G - 2763236", "G - 2763379", "G - 2763308", "G - 2763631", "G - 2763632", "G - 2763309", "G - 2764285", "G - 2764286", "G - 2764414", "G - 2764415", "G - 2764416",
+    // Tamanho GG
+    "GG - 2765915", "GG - 2765916", "GG - 2765941", "GG - 2765942", "GG - 2765897", "GG - 2765898", "GG - 2765895", "GG - 2765985", "GG - 2765896", "GG - 2765986", "GG - 2766031", "GG - 2766032", "GG - 2765919", "GG - 2765920", "GG - 2765929", "GG - 2765930", "GG - 2765955", "GG - 2765956", "GG - 2767312", "GG - 2767313", "GG - 2767320", "GG - 2767321", "GG - 2766990", "GG - 2766991", "GG - 2767262", "GG - 2767263", "GG - 2767258", "GG - 2767259", "GG - 2767272", "GG - 2767273", "GG - 2766693", "GG - 2766694", "GG - 2767930", "GG - 2767931", "GG - 2768102", "GG - 2768103", "GG - 2768316"
+  ];
+
+  const listaDeRadios = [
+    "2130606", "2130607", "2130608", "2130609", "2130610", "2131250", "2131251", "2131252", "2131253", "2131254", "2131255", "2131256", "2131257", "2130096", "2130097", "2130098", "2130099", "21300100", "2130100", "2130101", "2130102"
+  ];
+
+  // AQUI FOI ALTERADA A ESCALA DA RUMB 24x72
+  const dbRumb = {
+      sekiguchi: { posto: "2º SGT PM", nome: "SEKIGUCHI" },
+      george: { posto: "2º SGT PM", nome: "GEORGE" },
+      simoes: { posto: "3º SGT PM", nome: "R. SIMÕES" },
+      bruno: { posto: "2º SGT PM", nome: "BRUNO LIMA" }
+  };
+
+  const sequenciaEscala = [
+      dbRumb.sekiguchi, dbRumb.george, dbRumb.simoes, dbRumb.bruno
+  ];
+
+  // Mês em JavaScript começa do 0, então Julho é representado pelo número 6.
+  const dataAncora = new Date(2026, 6, 18, 0, 0, 0);
+
+  function popularSelects() {
+    // COP
+    const dlCop = document.getElementById('lista-cops');
+    seriaisCop.sort().forEach(serial => {
+      const opt = document.createElement('option');
+      opt.value = serial; dlCop.appendChild(opt);
+    });
+
+    // Armas Individuais
+    const dlArmasInd = document.getElementById('lista-armas-ind');
+    listaArmasIndividuais.forEach(arma => {
+      const opt = document.createElement('option');
+      opt.value = arma; dlArmasInd.appendChild(opt);
+    });
+
+    // Armas Coletivas (Fuzis)
+    const dlArmasCol = document.getElementById('lista-armas-col');
+    listaArmasColetivas.forEach(arma => {
+      const opt = document.createElement('option');
+      opt.value = arma; dlArmasCol.appendChild(opt);
+    });
+
+    // Coletes
+    const dlColetes = document.getElementById('lista-coletes');
+    listaDeColetes.forEach(colete => {
+      const opt = document.createElement('option');
+      opt.value = colete; dlColetes.appendChild(opt);
+    });
+
+    // Rádios
+    const dlRadios = document.getElementById('lista-radios');
+    listaDeRadios.forEach(radio => {
+      const opt = document.createElement('option');
+      opt.value = radio; dlRadios.appendChild(opt);
+    });
+  }
+
+  function initAutocomplete() {
+    const dlRg = document.getElementById('lista-rgs');
+    const dlNome = document.getElementById('lista-nomes');
+    const unicos = new Set();
+    
+    dbEfetivo.forEach(p => {
+      const chave = p.rg + p.nome;
+      if (!unicos.has(chave)) {
+        unicos.add(chave);
+        const optR = document.createElement('option');
+        optR.value = p.rg; optR.label = `${p.nome} (${p.gh})`; dlRg.appendChild(optR);
+        const optN = document.createElement('option');
+        optN.value = p.nome; optN.label = `${p.gh} - RG: ${p.rg}`; dlNome.appendChild(optN);
+      }
+    });
+  }
+
+  function atualizarRumbAutomatico() {
+      const inputData = document.getElementById('dataSaida').value;
+      const inputHora = document.getElementById('horaSaida').value;
+      if (!inputData || !inputHora) return;
+
+      const partesData = inputData.split('-');
+      const partesHora = inputHora.split(':');
+      const dataSelecionada = new Date(partesData[0], partesData[1] - 1, partesData[2], partesHora[0], partesHora[1], 0);
+
+      // CÁLCULO ATUALIZADO PARA 24x72
+      const diffMs = dataSelecionada.getTime() - dataAncora.getTime();
+      const diffDias = Math.floor(diffMs / (1000 * 60 * 60 * 24)); // Mudança para base em dias (24 horas)
+      const indiceTurno = ((diffDias % sequenciaEscala.length) + sequenciaEscala.length) % sequenciaEscala.length;
+      document.getElementById('rumbSaidaManual').value = sequenciaEscala[indiceTurno].nome;
+  }
+
+  const inputRg = document.getElementById('rg');
+  const inputNome = document.getElementById('nomePolicial');
+  const inputGh = document.getElementById('gh');
+
+  inputRg.addEventListener('input', function() {
+    const val = this.value;
+    const found = dbEfetivo.find(p => p.rg === val);
+    if (found) { inputNome.value = found.nome; inputGh.value = found.gh; }
+  });
+
+  inputNome.addEventListener('input', function() {
+    const val = this.value;
+    const found = dbEfetivo.find(p => p.nome === val);
+    if (found) { inputRg.value = found.rg; inputGh.value = found.gh; }
+  });
+
+  const form = document.getElementById('formMaterial');
+  let registros = JSON.parse(localStorage.getItem('livroCautela_Ras-Compulsorio')) || [];
+  let filtroAtual = 'TODOS'; 
+  let indexEmEdicao = -1;
+
+  function excluirRegistro(index) {
+    if(confirm("⚠️ Tem certeza que deseja EXCLUIR definitivamente este registro do livro?")) {
+      registros.splice(index, 1);
+      salvarERenderizar();
+    }
+  }
+
+  function editarRegistro(index) {
+    const r = registros[index];
+    
+    document.getElementById('gh').value = r.gh || '';
+    document.getElementById('rg').value = r.rg || '';
+    document.getElementById('nomePolicial').value = r.nomePolicial || '';
+    document.getElementById('local').value = r.local || '';
+    document.getElementById('armaInd').value = r.armaInd || '';
+    document.getElementById('qmI').value = r.qmI || '';
+    document.getElementById('qcI').value = r.qcI || '';
+    document.getElementById('armaCol').value = r.armaCol || '';
+    document.getElementById('qmC').value = r.qmC || '';
+    document.getElementById('qcC').value = r.qcC || '';
+    document.getElementById('bateria').value = r.bateria || '';
+    document.getElementById('colete').value = r.colete || '';
+    document.getElementById('radio').value = r.radio || '';
+    document.getElementById('cop1').value = r.cop1 || '';
+    document.getElementById('cop2').value = r.cop2 || '';
+    document.getElementById('obs').value = r.obs || '';
+    
+    if(r.dataS) {
+       const d = r.dataS.split('/');
+       if(d.length === 3) document.getElementById('dataSaida').value = `${d[2]}-${d[1]}-${d[0]}`;
+    }
+    document.getElementById('horaSaida').value = r.horaS || '';
+    document.getElementById('rumbSaidaManual').value = r.rumbSaida || '';
+
+    indexEmEdicao = index;
+    
+    const btnSubmit = document.getElementById('btnSalvar');
+    btnSubmit.innerHTML = '🔄 ATUALIZAR REGISTRO';
+    btnSubmit.style.background = '#f59e0b';
+    
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  form.onsubmit = (e) => {
+    e.preventDefault();
+    const c1 = document.getElementById('cop1').value;
+    const c2 = document.getElementById('cop2').value;
+    if(c1 !== "" && c2 !== "" && c1 === c2) { alert("ERRO: Mesma COP selecionada duas vezes!"); return; }
+
+    const nomeRumbSaida = document.getElementById('rumbSaidaManual').value;
+    if (!nomeRumbSaida.trim()) { alert("Preencha o nome do RUMB que está entregando."); return; }
+
+    const dataS_Input = document.getElementById('dataSaida').value; 
+    const horaS_Input = document.getElementById('horaSaida').value;
+    const dataFormatada = dataS_Input.split('-').reverse().join('/');
+
+    const novoRegistro = {
+      gh: document.getElementById('gh').value.toUpperCase(),
+      rg: document.getElementById('rg').value,
+      nomePolicial: document.getElementById('nomePolicial').value.toUpperCase(),
+      local: document.getElementById('local').value.toUpperCase(),
+      armaInd: document.getElementById('armaInd').value,
+      qmI: document.getElementById('qmI').value, qcI: document.getElementById('qcI').value,
+      armaCol: document.getElementById('armaCol').value,
+      qmC: document.getElementById('qmC').value, qcC: document.getElementById('qcC').value,
+      bateria: document.getElementById('bateria').value, colete: document.getElementById('colete').value,
+      radio: document.getElementById('radio').value,
+      cop1: c1, cop2: c2, obs: document.getElementById('obs').value,
+      dataS: dataFormatada, horaS: horaS_Input,
+      rumbSaida: nomeRumbSaida.toUpperCase(),
+      status: 'ABERTO'
+    };
+
+    if (indexEmEdicao >= 0) {
+      novoRegistro.status = registros[indexEmEdicao].status;
+      novoRegistro.dataR = registros[indexEmEdicao].dataR;
+      novoRegistro.horaR = registros[indexEmEdicao].horaR;
+      novoRegistro.rumbEntrada = registros[indexEmEdicao].rumbEntrada;
+      
+      registros[indexEmEdicao] = novoRegistro;
+      
+      indexEmEdicao = -1;
+      const btnSubmit = document.getElementById('btnSalvar');
+      btnSubmit.innerHTML = '📝 REGISTRAR SAÍDA';
+      btnSubmit.style.background = '#b8860b';
+    } else {
+      registros.push(novoRegistro);
+      
+      if(SCRIPT_URL !== "SUA_URL_DO_APP_DA_WEB_AQUI") {
+          fetch(SCRIPT_URL, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+              body: new URLSearchParams({
+                  action: 'add_ras',
+                  dataS: novoRegistro.dataS,
+                  horaS: novoRegistro.horaS,
+                  gh: novoRegistro.gh,
+                  nome: novoRegistro.nomePolicial,
+                  rg: novoRegistro.rg,
+                  local: novoRegistro.local,
+                  armaInd: novoRegistro.armaInd,
+                  armaCol: novoRegistro.armaCol,
+                  cop1: novoRegistro.cop1,
+                  cop2: novoRegistro.cop2,
+                  rumbSaida: novoRegistro.rumbSaida
+              })
+          }).catch(err => console.error("Erro ao enviar para planilha na nuvem:", err));
+      }
+    }
+
+    salvarERenderizar();
+
+    form.reset();
+    document.getElementById('dataSaida').valueAsDate = new Date();
+    document.getElementById('horaSaida').value = new Date().toLocaleTimeString('pt-BR').slice(0,5);
+    atualizarRumbAutomatico();
+    document.getElementById('rg').focus();
+  };
+
+  function enviarZap(index) {
+    const r = registros[index];
+    let texto = `*PMERJ - RUMB | REGISTRO DE CAUTELA*
+
+`;
+    texto += `👮‍♂️ *Policial:* ${r.gh} ${r.nomePolicial}
+`;
+    texto += `📄 *RG:* ${r.rg}
+`;
+    if(r.local) texto += `📍 *Local de Serviço:* ${r.local}
+`;
+    if(r.cop1 || r.cop2) {
+        texto += `🎥 *Câmera(s):* `;
+        if(r.cop1) texto += `${r.cop1} `;
+        if(r.cop2) texto += `| ${r.cop2}`;
+        texto += `
+`;
+    }
+    texto += `📅 *Data:* ${r.dataS}
+`;
+    texto += `⏰ *Hora:* ${r.horaS}
+`;
+    const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(texto)}`;
+    window.open(url, '_blank');
+  }
+
+  function enviarZapResumoDoDia() {
+    const inputDataObj = document.getElementById('dataResumoZap');
+    let dataEscolhida = inputDataObj.value;
+    const turno = document.getElementById('turnoResumoZap').value;
+    
+    if (!dataEscolhida) {
+        alert("Por favor, selecione uma data no calendário para gerar o resumo.");
+        return;
+    }
+
+    const [ano, mes, dia] = dataEscolhida.split('-');
+    const dataBaseStr = `${dia}/${mes}/${ano}`;
+    
+    const dataBaseObj = new Date(parseInt(ano), parseInt(mes) - 1, parseInt(dia));
+    dataBaseObj.setDate(dataBaseObj.getDate() + 1); 
+    
+    const diaSeguinte = String(dataBaseObj.getDate()).padStart(2, '0');
+    const mesSeguinte = String(dataBaseObj.getMonth() + 1).padStart(2, '0');
+    const anoSeguinte = dataBaseObj.getFullYear();
+    const dataSeguinteStr = `${diaSeguinte}/${mesSeguinte}/${anoSeguinte}`;
+
+    const registrosFiltrados = registros.filter(r => {
+        if (turno === "ALL") {
+            return r.dataS === dataBaseStr;
+        } else if (turno === "DIA") {
+            return r.dataS === dataBaseStr && r.horaS >= "05:00" && r.horaS < "17:00";
+        } else if (turno === "NOITE") {
+            const condicaoHoje = (r.dataS === dataBaseStr && r.horaS >= "17:00");
+            const condicaoAmanha = (r.dataS === dataSeguinteStr && r.horaS < "05:00");
+            return condicaoHoje || condicaoAmanha;
+        }
+    });
+
+    if(registrosFiltrados.length === 0) {
+        alert("Não há registros de cautela salvos para o período selecionado.");
+        return;
+    }
+
+    let periodoTexto = turno === "ALL" ? "DIA COMPLETO" : (turno === "DIA" ? "07:00 às 19:00" : "19:00 às 07:00 (Virada)");
+
+    let texto = `*PMERJ - RUMB | EFETIVO DO TURNO*
+`;
+    texto += `📅 *Data:* ${dataBaseStr}
+`;
+    texto += `🕒 *Turno:* ${periodoTexto}
+
+`;
+
+    registrosFiltrados.forEach((r, index) => {
+        texto += `*${index + 1}. ${r.gh} ${r.nomePolicial}* (RG: ${r.rg})
+`;
+        texto += `📍 Local: ${r.local || 'N/A'}
+`;
+        
+        if(r.cop1 || r.cop2) {
+            texto += `🎥 COP: `;
+            if(r.cop1) texto += `${r.cop1} `;
+            if(r.cop2) texto += `| ${r.cop2}`;
+            texto += `
+`;
+        }
+        texto += `⏰ Entrada: ${r.dataS} às ${r.horaS}
+
+`;
+    });
+
+    texto += `_Resumo gerado pelo sistema automático RUMB._`;
+
+    const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(texto)}`;
+    window.open(url, '_blank');
+  }
+
+  function receberMaterial(index) {
+    const agora = new Date();
+
+    // CÁLCULO ATUALIZADO PARA 24x72 (Ao receber material também)
+    const diffMs = agora.getTime() - dataAncora.getTime();
+    const diffDias = Math.floor(diffMs / (1000 * 60 * 60 * 24)); // Mudança para base em dias
+    const indiceTurno = ((diffDias % sequenciaEscala.length) + sequenciaEscala.length) % sequenciaEscala.length; 
+    const rumbSugerido = sequenciaEscala[indiceTurno].nome;
+
+    const nomeRecebedor = prompt("Informe o nome do RUMB que está recebendo o material:", rumbSugerido);
+    if (nomeRecebedor === null || nomeRecebedor.trim() === "") { alert("Baixa cancelada."); return; }
+
+    registros[index].dataR = agora.toLocaleDateString('pt-BR');
+    registros[index].horaR = agora.toLocaleTimeString('pt-BR').slice(0,5);
+    registros[index].rumbEntrada = nomeRecebedor.toUpperCase();
+    registros[index].status = 'FECHADO';
+    salvarERenderizar();
+  }
+  
+  function setFiltro(tipo) {
+    if (tipo === 'DATA') {
+      const dataEscolhida = document.getElementById('filtroDataTabela').value;
+      if (!dataEscolhida) {
+        alert("Por favor, selecione uma data no calendário para filtrar.");
+        document.getElementById('filtroDataTabela').focus();
+        return;
+      }
+    }
+    
+    filtroAtual = tipo;
+    
+    document.getElementById('btnTodas').classList.remove('active');
+    document.getElementById('btnAbertas').classList.remove('active');
+    document.getElementById('btnFiltrarData').classList.remove('active');
+
+    if(tipo === 'TODOS') {
+        document.getElementById('btnTodas').classList.add('active');
+    } else if(tipo === 'ABERTO') {
+        document.getElementById('btnAbertas').classList.add('active');
+    } else if(tipo === 'DATA') {
+        document.getElementById('btnFiltrarData').classList.add('active');
+    }
+    
+    filtrarTabela();
+  }
+
+  function filtrarTabela() {
+    const termo = document.getElementById('inputBusca').value.toUpperCase();
+    const linhas = document.querySelectorAll('#tabelaCorpo tr');
+    
+    const inputFiltroData = document.getElementById('filtroDataTabela').value;
+    let dataFiltroFormatada = '';
+    if (inputFiltroData) {
+       const [ano, mes, dia] = inputFiltroData.split('-');
+       dataFiltroFormatada = `${dia}/${mes}/${ano}`;
+    }
+
+    linhas.forEach(linha => {
+        const textoLinha = linha.innerText.toUpperCase();
+        const statusLinha = linha.getAttribute('data-status');
+        const dataSaidaLinha = linha.getAttribute('data-datas');
+        const matchTexto = textoLinha.includes(termo);
+        
+        let matchFiltro = true;
+        if (filtroAtual === 'ABERTO' && statusLinha !== 'ABERTO') matchFiltro = false;
+        if (filtroAtual === 'DATA' && dataSaidaLinha !== dataFiltroFormatada) matchFiltro = false;
+        
+        linha.style.display = (matchTexto && matchFiltro) ? '' : 'none';
+    });
+  }
+
+  function salvarERenderizar() {
+    localStorage.setItem('livroCautela_Ras-Compulsorio', JSON.stringify(registros));
+    const tbody = document.getElementById('tabelaCorpo');
+    tbody.innerHTML = '';
+    
+    const abertasCount = registros.filter(r => r.status === 'ABERTO').length;
+    document.getElementById("contadorAbertas").innerText = `🚨 CAUTELAS EM ABERTO: ${abertasCount}`;
+    
+    // NOVA LÓGICA: Geração da data de hoje para comparação
+    const dataAtual = new Date();
+    const dia = String(dataAtual.getDate()).padStart(2, '0');
+    const mes = String(dataAtual.getMonth() + 1).padStart(2, '0');
+    const ano = dataAtual.getFullYear();
+    const dataHojeFormatada = `${dia}/${mes}/${ano}`;
+    
+    // Agora salvamos data-datas no TR para o filtro encontrar mais fácil
+    registros.slice().reverse().forEach((r, iReal) => {
+      const indexOriginal = registros.length - 1 - iReal;
+      
+      // NOVA LÓGICA: Estilo diferenciado para serviços passados
+      let estiloTr = '';
+      if (r.dataS !== dataHojeFormatada) {
+          // Serviço passado: fica bem apagado (transparente e acinzentado)
+          estiloTr = 'opacity: 0.45; background: #e2e8f0; filter: grayscale(80%);';
+      } else if (r.status === 'FECHADO') {
+          // Serviço de hoje e que já foi fechado
+          estiloTr = 'opacity: 0.7; background: #e0ffe0;';
+      }
+
+      tbody.innerHTML += `
+        <tr data-status="${r.status}" data-datas="${r.dataS}" style="${estiloTr}">
+          <td>${r.gh}</td><td>${r.rg}</td><td style="text-align:left">${r.nomePolicial}</td><td>${r.local || '-'}</td>
+          <td>${r.armaInd || '-'}</td><td>${r.qmI || ''}</td><td>${r.qcI || ''}</td>
+          <td>${r.armaCol || '-'}</td><td>${r.qmC || ''}</td><td>${r.qcC || ''}</td>
+          <td>${r.bateria || '-'}</td><td>${r.colete || '-'}</td><td>${r.radio || '-'}</td>
+          <td class="col-cop">${r.cop1 || ''}</td><td class="col-cop">${r.cop2 || ''}</td>
+          <td>${r.dataS}</td><td>${r.horaS}</td><td class="col-obs" title="${r.obs || ''}">${r.obs || '-'}</td><td class="col-rumb">${r.rumbSaida}</td>
+          <td>${r.dataR || ''}</td><td>${r.horaR || ''}</td>
+          <td class="col-rumb" style="display: flex; gap: 4px; justify-content: center; align-items: center; border: none; flex-wrap: wrap;">
+            ${r.status === 'ABERTO' ? `<button class="btn-baixa" onclick="receberMaterial(${indexOriginal})">BAIXAR</button>` : `<span style="flex-grow:1">${r.rumbEntrada}</span>`}
+            <button class="btn-editar" onclick="editarRegistro(${indexOriginal})" title="Editar Informações">✏️</button>
+            <button class="btn-excluir" onclick="excluirRegistro(${indexOriginal})" title="Apagar Registro">🗑️</button>
+            <button class="btn-zap" onclick="enviarZap(${indexOriginal})" title="Enviar recibo p/ WhatsApp">📱</button>
+          </td>
+        </tr>`;
+    });
+    filtrarTabela(); 
+  }
+
+  function fazerBackup() {
+    const dados = localStorage.getItem('livroCautela_Ras-Compulsorio');
+    if (!dados || dados === '[]') { alert("Nada para salvar!"); return; }
+    const blob = new Blob([dados], {type: "application/json"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Livro_Cautela_RAS-COMPULSORIO_rumb_${new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')}.json`;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  }
+
+  function restaurarBackup(input) {
+    const file = input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        const json = JSON.parse(e.target.result);
+        if (Array.isArray(json)) {
+          if(confirm("ATENÇÃO: Isso substituirá a tabela atual pelos dados do arquivo. Continuar?")) {
+            registros = json; salvarERenderizar(); alert("Backup restaurado com sucesso!");
+          }
+        } else { alert("Arquivo inválido."); }
+      } catch (err) { alert("Erro ao ler arquivo: " + err); }
+    };
+    reader.readAsText(file);
+  }
+
+  popularSelects();
+  initAutocomplete();
+  salvarERenderizar();
+  
+  document.getElementById('dataSaida').valueAsDate = new Date();
+  document.getElementById('horaSaida').value = new Date().toLocaleTimeString('pt-BR').slice(0,5);
+  
+  document.getElementById('dataResumoZap').valueAsDate = new Date();
+  document.getElementById('filtroDataTabela').valueAsDate = new Date();
+  
+  atualizarRumbAutomatico();
+
+  document.getElementById('dataSaida').addEventListener('change', atualizarRumbAutomatico);
+  document.getElementById('horaSaida').addEventListener('change', atualizarRumbAutomatico);
+</script>
+</body>
+</html>
